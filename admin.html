@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="ckb" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>پانێڵی بەڕێوەبردن</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@400;600;800&display=swap');
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Noto Kufi Arabic', sans-serif; background-color: #0f1115; color: #e2e8f0; padding: 20px; }
+        .container { max-width: 800px; margin: 0 auto; }
+        h1, h2 { margin-bottom: 16px; color: #ffffff; }
+        .card { background: #161920; border-radius: 12px; padding: 20px; border: 1px solid #222733; margin-bottom: 20px; }
+        .form-group { margin-bottom: 14px; display: flex; flex-direction: column; gap: 6px; }
+        label { font-size: 13px; color: #94a3b8; }
+        select, input { padding: 10px; background: #1f242f; border: 1px solid #2d3446; border-radius: 6px; color: #fff; font-family: inherit; }
+        button { background: #2563eb; color: #fff; border: none; padding: 12px; border-radius: 6px; cursor: pointer; font-weight: 600; font-family: inherit; }
+        button:hover { background: #1d4ed8; }
+        .btn-back { background: #1f242f; color: #fff; text-decoration: none; padding: 8px 16px; border-radius: 6px; font-size: 13px; display: inline-block; margin-bottom: 20px; border: 1px solid #2d3446; }
+        .item-list { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; }
+        .item-row { display: flex; justify-content: space-between; align-items: center; background: #1f242f; padding: 10px; border-radius: 6px; border: 1px solid #2d3446; }
+        .btn-delete { background: #ef4444; padding: 4px 8px; font-size: 11px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="index.html" class="btn-back">⬅️ گەڕانەوە بۆ ماڵپەڕ</a>
+        <h1>پانێڵی بەڕێوەبردنی خول</h1>
+
+        <div class="card">
+            <h2>➕ زیادکردنی یاری نوێ</h2>
+            <div class="form-group">
+                <label>تیپی یەکەم (کوردی)</label>
+                <select id="matchHomeTeam">
+                    <option>فێرگەی وەرزشی شاوێس</option>
+                    <option>ئەکادیمیای دامول</option>
+                    <option>ئەکادیمیای موفتی</option>
+                    <option>ئەکادیمیای بڕوا</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>تیپی دووەم (دەرەوە)</label>
+                <select id="matchAwayTeam">
+                    <option>ئەکادیمیای دامول</option>
+                    <option>فێرگەی وەرزشی شاوێس</option>
+                    <option>ئەکادیمیای موفتی</option>
+                    <option>ئەکادیمیای بڕوا</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>گۆڵی تیپی یەکەم</label>
+                <input type="number" id="matchHomeScore" value="0">
+            </div>
+            <div class="form-group">
+                <label>گۆڵی تیپی دووەم</label>
+                <input type="number" id="matchAwayScore" value="0">
+            </div>
+            <div class="form-group">
+                <label>بارودۆخی یاریەکە</label>
+                <select id="matchStatus">
+                    <option value="finished">کۆتایی هاتووە</option>
+                    <option value="scheduled">نەکراوە</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>ڕێککەوت و کات</label>
+                <input type="text" id="matchDate" placeholder="نموونە: 2026/06/16">
+            </div>
+            <button id="btnSaveMatch">تۆمارکردنی یاری</button>
+            <div class="item-list" id="matchesAdminGrid"></div>
+        </div>
+
+        <div class="card">
+            <h2>➕ زیادکردنی یاریزان / گۆڵەکان</h2>
+            <div class="form-group">
+                <label>ناوی یاریزان</label>
+                <input type="text" id="playerName" placeholder="ناوی سیانی">
+            </div>
+            <div class="form-group">
+                <label>تیپ</label>
+                <select id="playerTeam">
+                    <option>فێرگەی وەرزشی شاوێس</option>
+                    <option>ئەکادیمیای دامول</option>
+                    <option>ئەکادیمیای موفتی</option>
+                    <option>ئەکادیمیای بڕوا</option>
+                </select>
+            </div>
+            <button id="btnSavePlayer">تۆمارکردنی یاریزان</button>
+            <div class="item-list" id="playersAdminGrid"></div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+        import { getDatabase, ref, set, push, onValue, remove } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBhYee5yLdNN-ttq6dux8G0w8_vl-ald-g",
+            authDomain: "league-aec67.firebaseapp.com",
+            databaseURL: "https://league-aec67-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "league-aec67",
+            storageBucket: "league-aec67.firebasestorage.app",
+            messagingSenderId: "825335921135",
+            appId: "1:825335921135:web:2ad16d50a25adc3363de1a",
+            measurementId: "G-ZLKJ3FJVW2"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        // حفظ مباراة
+        document.getElementById('btnSaveMatch').onclick = () => {
+            const mRef = ref(db, 'matchesDatabase');
+            push(mRef, {
+                homeTeam: document.getElementById('matchHomeTeam').value,
+                awayTeam: document.getElementById('matchAwayTeam').value,
+                homeScore: parseInt(document.getElementById('matchHomeScore').value) || 0,
+                awayScore: parseInt(document.getElementById('matchAwayScore').value) || 0,
+                status: document.getElementById('matchStatus').value,
+                date: document.getElementById('matchDate').value
+            }).then(() => alert('یارییەکە بە سەرکەوتوویی پاشەکەوت کرا!'));
+        };
+
+        // حفظ لاعب
+        document.getElementById('btnSavePlayer').onclick = () => {
+            const pRef = ref(db, 'playersDatabase');
+            push(pRef, {
+                name: document.getElementById('playerName').value,
+                team: document.getElementById('playerTeam').value
+            }).then(() => {
+                alert('یاریزانەکە تۆمارکرا!');
+                document.getElementById('playerName').value = '';
+            });
+        };
+
+        // عرض وحذف البيانات في لوحة التحكم
+        onValue(ref(db, '/'), (snapshot) => {
+            const data = snapshot.val() || {};
+            
+            // عرض المباريات للأدمن
+            const mGrid = document.getElementById('matchesAdminGrid');
+            mGrid.innerHTML = '<h3>یارییە تۆمارکراوەکان</h3>';
+            if(data.matchesDatabase) {
+                Object.keys(data.matchesDatabase).forEach(key => {
+                    const m = data.matchesDatabase[key];
+                    mGrid.innerHTML += `
+                        <div class="item-row">
+                            <span>${m.homeTeam} ${m.homeScore} - ${m.awayScore} ${m.awayTeam}</span>
+                            <button class="btn-delete" onclick="deleteItem('matchesDatabase/${key}')">سڕینەوە</button>
+                        </div>
+                    `;
+                });
+            }
+
+            // عرض اللاعبين للأدمن
+            const pGrid = document.getElementById('playersAdminGrid');
+            pGrid.innerHTML = '<h3>لیستی یاریزانان</h3>';
+            if(data.playersDatabase) {
+                Object.keys(data.playersDatabase).forEach(key => {
+                    const p = data.playersDatabase[key];
+                    pGrid.innerHTML += `
+                        <div class="item-row">
+                            <span>${p.name} (${p.team})</span>
+                            <button class="btn-delete" onclick="deleteItem('playersDatabase/${key}')">سڕینەوە</button>
+                        </div>
+                    `;
+                });
+            }
+        });
+
+        window.deleteItem = function(path) {
+            if(confirm('دڵنیای لە سڕینەوەی ئەم بڕگەیە؟')) {
+                remove(ref(db, path));
+            }
+        }
+    </script>
+</body>
+</html>
