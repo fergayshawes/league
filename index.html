@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="ckb" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>خولی فەرمی</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@400;600;800&display=swap');
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            transition: background 0.2s ease;
+        }
+
+        body {
+            font-family: 'Noto Kufi Arabic', sans-serif;
+            background-color: #0f1115; 
+            color: #e2e8f0;
+            padding-bottom: 30px;
+        }
+
+        /* شريط التنقل */
+        nav {
+            background-color: #161920; 
+            border-bottom: 1px solid #222733;
+            padding: 14px 16px;
+        }
+
+        nav .nav-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            align-items: center;
+        }
+
+        nav .brand-wrapper {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+
+        nav .brand {
+            font-size: 16px;
+            font-weight: 800;
+            color: #ffffff;
+        }
+
+        .btn-to-admin {
+            background: #1f242f;
+            color: #ffffff;
+            border: 1px solid #2d3446;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            text-decoration: none;
+            font-family: 'Noto Kufi Arabic', sans-serif;
+        }
+        .btn-to-admin:hover {
+            background: #ffffff;
+            color: #0f1115;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            width: 100%;
+            gap: 6px;
+        }
+
+        nav ul li {
+            flex: 1;
+        }
+
+        nav ul li a {
+            color: #94a3b8;
+            text-decoration: none;
+            padding: 10px 4px;
+            display: block;
+            text-align: center;
+            font-size: 12px;
+            font-weight: 600;
+            border-radius: 8px;
+            background: #1f242f;
+        }
+
+        nav ul li a.active {
+            background: #ffffff;
+            color: #0f1115;
+        }
+
+        .container {
+            padding: 16px;
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        .hero-section {
+            margin-bottom: 20px;
+            padding-right: 10px;
+            border-right: 3px solid #ffffff;
+        }
+
+        .hero-section h1 {
+            font-size: 18px;
+            font-weight: 800;
+            color: #ffffff;
+        }
+
+        .hero-section p {
+            font-size: 11px;
+            color: #707e94;
+            margin-top: 2px;
+        }
+
+        .card {
+            background: #161920;
+            border-radius: 12px;
+            padding: 12px;
+            border: 1px solid #222733;
+        }
+
+        /* جدول الدوري */
+        .table-container { 
+            overflow-x: auto; 
+            width: 100%;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            text-align: right; 
+            white-space: nowrap; 
+        }
+        
+        th, td { 
+            padding: 12px 12px; 
+            font-size: 13px; 
+        }
+        
+        th { 
+            background-color: #1f242f; 
+            color: #94a3b8; 
+            font-weight: 600; 
+        }
+        
+        td { 
+            border-bottom: 1px solid #222733; 
+            color: #e2e8f0; 
+        }
+
+        /* كروت المباريات */
+        .matches-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .match-card {
+            background: #161920;
+            border: 1px solid #222733;
+            border-radius: 12px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .match-header-date {
+            font-size: 12px;
+            font-weight: 600;
+            color: #94a3b8;
+            border-bottom: 1px solid #1f242f;
+            padding-bottom: 8px;
+            margin-bottom: 4px;
+            text-align: center;
+            letter-spacing: 0.5px;
+        }
+
+        .match-main {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            text-align: center;
+        }
+
+        .match-team {
+            flex: 1;
+            font-size: 14px;
+            font-weight: 600;
+            color: #ffffff;
+        }
+
+        .match-center {
+            padding: 0 10px;
+            min-width: 120px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .match-score {
+            font-size: 22px;
+            font-weight: 800;
+            color: #ffffff;
+            background: #1f242f;
+            padding: 4px 14px;
+            border-radius: 8px;
+            border: 1px solid #2d3446;
+            letter-spacing: 2px;
+        }
+
+        .status-finished-label {
+            font-size: 10px;
+            font-weight: 800;
+            color: #ef4444; 
+            background: rgba(239, 68, 68, 0.1);
+            padding: 2px 8px;
+            border-radius: 4px;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            margin-top: 4px;
+        }
+
+        .match-time-display {
+            font-size: 16px;
+            font-weight: 800;
+            color: #ffffff;
+            background: #1f242f;
+            padding: 4px 12px;
+            border-radius: 6px;
+            border: 1px solid #222733;
+            letter-spacing: 0.5px;
+        }
+
+        .match-details {
+            border-top: 1px dashed #222733;
+            padding-top: 12px;
+            display: flex;
+            justify-content: space-between;
+            gap: 16px;
+            font-size: 11px;
+        }
+
+        .team-events {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            color: #94a3b8;
+        }
+
+        .team-events.home { text-align: right; }
+        .team-events.away { text-align: left; }
+
+        .event-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            line-height: 1.4;
+        }
+        
+        .team-events.home .event-item { justify-content: flex-start; }
+        .team-events.away .event-item { justify-content: flex-end; }
+
+        .badge-event {
+            font-size: 9px;
+            font-weight: 800;
+            padding: 1px 5px;
+            border-radius: 3px;
+        }
+        .badge-goal { background: rgba(255, 255, 255, 0.1); color: #ffffff; border: 1px solid rgba(255, 255, 255, 0.2); }
+        .badge-yellow { background: rgba(234, 179, 8, 0.1); color: #eab308; border: 1px solid rgba(234, 179, 8, 0.2); }
+        .badge-red { background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.2); }
+
+        .search-container { margin-bottom: 16px; }
+        .search-input {
+            width: 100%; padding: 12px 16px; background: #161920; border: 1px solid #222733;
+            border-radius: 8px; color: #ffffff; font-family: 'Noto Kufi Arabic', sans-serif; font-size: 13px; outline: none;
+        }
+        .search-input:focus { border-color: #ffffff; }
+
+        .top-scorer-card {
+            background: linear-gradient(135deg, #1f242f 0%, #161920 100%);
+            border: 2px solid #ffffff; border-radius: 12px; padding: 16px; margin-bottom: 20px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .top-scorer-badge { background-color: #ffffff; color: #0f1115; font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 4px; display: inline-block; margin-bottom: 6px; }
+        .top-scorer-info h2 { font-size: 16px; font-weight: 800; color: #ffffff; }
+        .top-scorer-info p { font-size: 11px; color: #94a3b8; margin-top: 2px; }
+        .top-scorer-goals { text-align: center; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); padding: 8px 14px; border-radius: 8px; }
+        .top-scorer-goals .goals-count { font-size: 20px; font-weight: 800; color: #ffffff; display: block; line-height: 1; }
+        .top-scorer-goals .goals-label { font-size: 9px; color: #94a3b8; font-weight: 600; margin-top: 4px; display: block; }
+
+        .players-list { display: flex; flex-direction: column; gap: 10px; }
+        .player-row { background: #161920; border: 1px solid #222733; border-radius: 10px; padding: 14px 12px; display: flex; justify-content: space-between; align-items: center; }
+        .player-identity { display: flex; align-items: center; gap: 12px; }
+        .player-jersey { font-size: 14px; font-weight: 800; color: #ffffff; background-color: #222733; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border-radius: 6px; flex-shrink: 0; border: 1px solid #313849; }
+        .player-meta h3 { margin: 0; color: #ffffff; font-size: 14px; font-weight: 600; }
+        .player-meta p { margin: 2px 0 0 0; font-size: 11px; color: #707e94; }
+        .stat-box { display: flex; flex-direction: column; align-items: center; justify-content: center; background-color: #1f242f; border: 1px solid #2d3446; border-radius: 6px; min-width: 55px; padding: 6px; }
+        .stat-box .box-label { font-size: 10px; color: #94a3b8; font-weight: 600; margin-bottom: 2px; }
+        .stat-box .box-value { font-size: 14px; color: #ffffff; font-weight: 800; }
+        .empty-message { color: #707e94; font-size: 13px; text-align: center; padding: 20px; font-style: italic; }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="nav-container">
+            <div class="brand-wrapper">
+                <div class="brand">خولی فەرمی داتاکان</div>
+                <a href="admin.html" class="btn-to-admin">پانێڵی بەڕێوەبردن ️</a>
+            </div>
+            <ul>
+                <li><a href="#" class="nav-link active" onclick="switchPage('leagues', event, this)">ڕیزبەندی خول</a></li>
+                <li><a href="#" class="nav-link" onclick="switchPage('matches', event, this)">یارییەکان</a></li>
+                <li><a href="#" class="nav-link" onclick="switchPage('players', event, this)">ئاماری یاریزانان</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+
+        <div id="leagues" class="page active">
+            <div class="hero-section">
+                <h1>ڕیزبەندی گشتی تیپەکان</h1>
+                <p>داتای نوێکراوەی یارییەکان و خاڵەکان</p>
+            </div>
+            <div class="card">
+                <div class="table-container">
+                    <table id="leagueTable">
+                        <thead>
+                            <tr>
+                                <th style="width: 60px; text-align: center;">ڕێز</th>
+                                <th style="text-align: right;">تیپ</th>
+                                <th style="text-align: center; width: 45px;">P</th>
+                                <th style="text-align: center; width: 45px;">W</th>
+                                <th style="text-align: center; width: 45px;">D</th>
+                                <th style="text-align: center; width: 45px;">L</th>
+                                <th style="text-align: left; width: 65px;">خاڵ</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="matches" class="page">
+            <div class="hero-section">
+                <h1>خشتەی یارییەکان</h1>
+                <p>خشتەی کات و ئەنجامی یارییەکانی خول</p>
+            </div>
+            <div class="matches-list" id="matchesGrid"></div>
+        </div>
+
+        <div id="players" class="page">
+            <div class="hero-section">
+                <h1>ئاماری یاریزانانی خول</h1>
+                <p>لیستی نوێکراوەی گۆڵکارانی فەرمی خول</p>
+            </div>
+            <div id="topScorerContainer"></div>
+            <div class="search-container">
+                <input type="text" id="playerSearch" class="search-input" onkeyup="filterPlayers()" placeholder="بگەڕێ بۆ ناوی یاریزان یان تیپ...">
+            </div>
+            <div class="players-list" id="playersGrid"></div>
+        </div>
+
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBhYee5yLdNN-ttq6dux8G0w8_vl-ald-g",
+            authDomain: "league-aec67.firebaseapp.com",
+            databaseURL: "https://league-aec67-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "league-aec67",
+            storageBucket: "league-aec67.firebasestorage.app",
+            messagingSenderId: "825335921135",
+            appId: "1:825335921135:web:2ad16d50a25adc3363de1a",
+            measurementId: "G-ZLKJ3FJVW2"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        let leaguesDatabase = [];
+        let playersDatabase = [];
+        let matchesDatabase = [];
+
+        const defaultTeams = [
+            "فێرگەی وەرزشی شاوێس",
+            "ئەکادیمیای دامول",
+            "ئەکادیمیای موفتی",
+            "ئەکادیمیای بڕوا"
+        ];
+
+        function autoRenderLeague() {
+            const tbody = document.querySelector('#leagueTable tbody');
+            if(!tbody) return;
+            tbody.innerHTML = "";
+            
+            leaguesDatabase.forEach((t, i) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td style="font-weight: bold; color: #707e94; text-align: center;">${i + 1}</td>
+                    <td style="font-weight: 600; color: #ffffff; text-align: right;">${t.team}</td>
+                    <td style="text-align: center; color: #e2e8f0; font-weight: 600;">${t.played}</td>
+                    <td style="text-align: center; color: #10b981; font-weight: 600;">${t.wins}</td>
+                    <td style="text-align: center; color: #94a3b8; font-weight: 600;">${t.draws}</td>
+                    <td style="text-align: center; color: #ef4444; font-weight: 600;">${t.losses}</td>
+                    <td style="text-align: left; font-weight: 800; color: #ffffff; font-size: 14px;">${t.points}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function autoRenderMatches() {
+            const grid = document.getElementById('matchesGrid');
+            if(!grid) return;
+            grid.innerHTML = "";
+
+            const allMatches = [...matchesDatabase];
+
+            if(allMatches.length === 0) {
+                grid.innerHTML = `<p class="empty-message">ℹ️ هیچ یارییەک لە ئێستادا زیاد نەکراوە.</p>`;
+                return;
+            }
+
+            allMatches.forEach(m => {
+                const card = document.createElement('div');
+                card.className = "match-card";
+
+                const isFinished = m.status === "finished";
+                let centerSection = "";
+                let detailsSection = "";
+                
+                let finalDate = m.date || 'Upcoming';
+                let finalTime = m.time || '00:00';
+
+                if (finalDate.includes('T')) {
+                    const parts = finalDate.split('T');
+                    finalDate = parts[0];
+                    finalTime = parts[1] ? parts[1].substring(0, 5) : finalTime;
+                }
+
+                finalDate = finalDate.replace(/-/g, '/');
+
+                if (isFinished) {
+                    centerSection = `
+                        <div class="match-score">${m.homeScore || 0} - ${m.awayScore || 0}</div>
+                        <span class="status-finished-label">کۆتایی هاتووە</span>
+                    `;
+                    
+                    const renderEvents = (events) => {
+                        if (!events || events.length === 0) return `<div class="event-item">—</div>`;
+                        return events.map(e => {
+                            let label = "گۆڵ";
+                            let className = "badge-goal";
+                            if (e.type === 'yellow') { label = "زەرد"; className = "badge-yellow"; }
+                            if (e.type === 'red') { label = "سوور"; className = "badge-red"; }
+                            
+                            return `
+                                <div class="event-item">
+                                    <span class="badge-event ${className}">${label}</span> ${e.playerName}
+                                </div>
+                            `;
+                        }).join('');
+                    };
+
+                    detailsSection = `
+                        <div class="match-details">
+                            <div class="team-events home">${renderEvents(m.homeEvents)}</div>
+                            <div class="team-events away">${renderEvents(m.awayEvents)}</div>
+                        </div>
+                    `;
+                } else {
+                    centerSection = `<span class="match-time-display">${finalTime}</span>`;
+                }
+
+                card.innerHTML = `
+                    <div class="match-header-date">${finalDate}</div>
+                    <div class="match-main">
+                        <div class="match-team">${m.homeTeam}</div>
+                        <div class="match-center">${centerSection}</div>
+                        <div class="match-team">${m.awayTeam}</div>
+                    </div>
+                    ${detailsSection}
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function autoRenderPlayersAndStats() {
+            const grid = document.getElementById('playersGrid');
+            const topScorerContainer = document.getElementById('topScorerContainer');
+            if(!grid) return;
+
+            grid.innerHTML = ""; topScorerContainer.innerHTML = "";
+            
+            if (playersDatabase.length === 0) {
+                grid.innerHTML = `<p class="empty-message">ℹ️ هیچ یاریزانێک لە ئێستادا نییە، لە پانێڵی سەرەکی زیادیان بکە.</p>`;
+                return;
+            }
+
+            playersDatabase.sort((a, b) => (Number(b.goals) || 0) - (Number(a.goals) || 0));
+
+            const topScorer = playersDatabase[0];
+            if (topScorer && (Number(topScorer.goals) > 0)) {
+                topScorerContainer.innerHTML = `
+                    <div class="top-scorer-card">
+                        <div class="top-scorer-info">
+                            <span class="top-scorer-badge">گۆڵکاری خول</span>
+                            <h2>${topScorer.name}</h2>
+                            <p>تیپی: ${topScorer.team || 'بێ تیپ'} • ژمارە: #${topScorer.number || '0'}</p>
+                        </div>
+                        <div class="top-scorer-goals">
+                            <span class="goals-count">${topScorer.goals}</span>
+                            <span class="goals-label">گۆڵ</span>
+                        </div>
+                    </div>
+                `;
+            }
+
+            playersDatabase.forEach(p => {
+                const card = document.createElement('div');
+                card.className = "player-row";
+                card.innerHTML = `
+                    <div class="player-identity">
+                        <div class="player-jersey">#${p.number || '0'}</div>
+                        <div class="player-meta">
+                            <h3>${p.name || 'ناوی یاریزان'}</h3>
+                            <p>${p.team || 'بێ تیپ'} ${p.yob ? '• ' + p.yob : ''}</p>
+                        </div>
+                    </div>
+                    <div class="player-data-chips">
+                        <div class="stat-box">
+                            <span class="box-label">گۆڵ</span>
+                            <span class="box-value">${p.goals || 0}</span>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        const dbRef = ref(db, '/');
+        onValue(dbRef, (snapshot) => {
+            const data = snapshot.val();
+            
+            const matchesList = data && data.matchesDatabase ? Object.values(data.matchesDatabase) : [];
+            const playersList = data && data.playersDatabase ? Object.values(data.playersDatabase) : [];
+
+            let computedGoals = {};
+            matchesList.forEach(m => {
+                if(m.status === 'finished') {
+                    if(m.homeEvents) {
+                        Object.values(m.homeEvents).forEach(ev => {
+                            if(ev.type === 'goal' && ev.playerName) {
+                                computedGoals[ev.playerName] = (computedGoals[ev.playerName] || 0) + 1;
+                            }
+                        });
+                    }
+                    if(m.awayEvents) {
+                        Object.values(m.awayEvents).forEach(ev => {
+                            if(ev.type === 'goal' && ev.playerName) {
+                                computedGoals[ev.playerName] = (computedGoals[ev.playerName] || 0) + 1;
+                            }
+                        });
+                    }
+                }
+            });
+
+            playersDatabase = playersList.map(p => {
+                return { ...p, goals: computedGoals[p.name] || 0 };
+            });
+
+            matchesDatabase = matchesList;
+
+            const standings = {};
+            defaultTeams.forEach(teamName => {
+                standings[teamName] = { team: teamName, played: 0, wins: 0, draws: 0, losses: 0, points: 0 };
+            });
+
+            matchesList.forEach(m => {
+                if(m.status !== 'finished') return;
+                
+                if(!standings[m.homeTeam]) standings[m.homeTeam] = { team: m.homeTeam, played: 0, wins: 0, draws: 0, losses: 0, points: 0 };
+                if(!standings[m.awayTeam]) standings[m.awayTeam] = { team: m.awayTeam, played: 0, wins: 0, draws: 0, losses: 0, points: 0 };
+
+                // زیادکردنی ژمارەی یارییەکان بۆ هەردوو تیپ
+                standings[m.homeTeam].played += 1;
+                standings[m.awayTeam].played += 1;
+
+                if(m.homeScore > m.awayScore) {
+                    standings[m.homeTeam].wins += 1; 
+                    standings[m.awayTeam].losses += 1;
+                } else if(m.homeScore < m.awayScore) {
+                    standings[m.awayTeam].wins += 1; 
+                    standings[m.homeTeam].losses += 1;
+                } else {
+                    standings[m.homeTeam].draws += 1; 
+                    standings[m.awayTeam].draws += 1;
+                }
+            });
+
+            leaguesDatabase = Object.values(standings);
+            leaguesDatabase.forEach(t => {
+                t.points = (t.wins * 3) + (t.draws * 1);
+            });
+            
+            leaguesDatabase.sort((a, b) => b.points - a.points);
+
+            autoRenderLeague();
+            autoRenderMatches();
+            autoRenderPlayersAndStats();
+        });
+    </script>
+
+    <script>
+        function filterPlayers() {
+            const filter = document.getElementById('playerSearch').value.trim().toLowerCase();
+            const cards = document.getElementsByClassName('player-row');
+            for (let i = 0; i < cards.length; i++) {
+                const text = cards[i].textContent.toLowerCase();
+                cards[i].style.display = text.includes(filter) ? "flex" : "none";
+            }
+        }
+
+        function switchPage(pageId, event, element) {
+            if(event) event.preventDefault();
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            const target = document.getElementById(pageId);
+            if(target) target.classList.add('active');
+            
+            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+            element.classList.add('active');
+        }
+    </script>
+</body>
+</html>
