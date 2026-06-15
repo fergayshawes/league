@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="ckb" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>خولی فەرمی</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@400;600;800&display=swap');
+
+        * { box-sizing: border-box; margin: 0; padding: 0; transition: background 0.2s ease; }
+        body { font-family: 'Noto Kufi Arabic', sans-serif; background-color: #0f1115; color: #e2e8f0; padding-bottom: 30px; }
+
+        nav { background-color: #161920; border-bottom: 1px solid #222733; padding: 14px 16px; }
+        nav .nav-container { display: flex; flex-direction: column; gap: 12px; align-items: center; }
+        nav .brand-wrapper { display: flex; justify-content: space-between; align-items: center; width: 100%; }
+        nav .brand { font-size: 16px; font-weight: 800; color: #ffffff; }
+
+        .btn-to-admin { background: #1f242f; color: #ffffff; border: 1px solid #2d3446; padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: 600; text-decoration: none; }
+        .btn-to-admin:hover { background: #ffffff; color: #0f1115; }
+
+        nav ul { list-style: none; display: flex; width: 100%; gap: 6px; }
+        nav ul li { flex: 1; }
+        nav ul li a { color: #94a3b8; text-decoration: none; padding: 10px 4px; display: block; text-align: center; font-size: 12px; font-weight: 600; border-radius: 8px; background: #1f242f; }
+        nav ul li a.active { background: #ffffff; color: #0f1115; }
+
+        .container { padding: 16px; }
+        .page { display: none; }
+        .page.active { display: block; }
+
+        .hero-section { margin-bottom: 20px; padding-right: 10px; border-right: 3px solid #ffffff; }
+        .hero-section h1 { font-size: 18px; font-weight: 800; color: #ffffff; }
+        .hero-section p { font-size: 11px; color: #707e94; margin-top: 2px; }
+
+        .card { background: #161920; border-radius: 12px; padding: 12px; border: 1px solid #222733; }
+        .table-container { overflow-x: auto; width: 100%; }
+        table { width: 100%; border-collapse: collapse; text-align: right; white-space: nowrap; }
+        th, td { padding: 12px; font-size: 13px; text-align: center; }
+        th { background-color: #1f242f; color: #94a3b8; font-weight: 600; }
+        td { border-bottom: 1px solid #222733; }
+
+        .cell-white { color: #ffffff; font-weight: 600; }
+        .cell-green { color: #10b981; font-weight: 600; } 
+        .cell-muted { color: rgba(255, 255, 255, 0.45); font-weight: 500; } 
+        .cell-red { color: #ef4444; font-weight: 600; } 
+
+        .team-clickable { cursor: pointer; text-decoration: underline dashed 1px #94a3b8; color: #e2e8f0; }
+        .team-clickable:hover { color: #3b82f6 !important; }
+
+        .matches-list { display: flex; flex-direction: column; gap: 16px; }
+        .match-card { background: #161920; border: 1px solid #222733; border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 16px; }
+        
+        .match-header-date { font-size: 12px; font-weight: 600; color: #94a3b8; border-bottom: 1px solid #1f242f; padding-bottom: 8px; text-align: center; }
+        .match-main { display: flex; justify-content: space-between; align-items: center; text-align: center; }
+        .match-team { flex: 1; font-size: 14px; font-weight: 600; color: #ffffff; }
+        .match-center { padding: 0 10px; min-width: 120px; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 6px; }
+        .match-score { font-size: 22px; font-weight: 800; color: #ffffff; background: #1f242f; padding: 4px 14px; border-radius: 8px; border: 1px solid #2d3446; letter-spacing: 2px; }
+
+        .status-finished-label { font-size: 10px; font-weight: 800; color: #ef4444; background: rgba(239, 68, 68, 0.1); padding: 2px 8px; border-radius: 4px; }
+        .match-motm-box { font-size: 11px; font-weight: 600; color: #3b82f6; background: rgba(59, 130, 246, 0.1); padding: 3px 10px; border-radius: 6px; border: 1px solid rgba(59, 130, 246, 0.2); margin-top: 2px; }
+
+        .search-container { margin-bottom: 16px; }
+        .search-input { width: 100%; padding: 12px 16px; background: #161920; border: 1px solid #222733; border-radius: 8px; color: #ffffff; font-family: 'Noto Kufi Arabic', sans-serif; font-size: 13px; outline: none; }
+
+        .players-list { display: flex; flex-direction: column; gap: 10px; }
+
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(8, 10, 15, 0.96); backdrop-filter: blur(12px); display: none; justify-content: center; align-items: center; z-index: 10000; padding: 16px; }
+        .modal-overlay.active { display: flex; }
+        
+        .beIn-squad-card { background: #12151c; border: 1px solid #252b3a; border-radius: 24px; width: 100%; max-width: 450px; height: 92vh; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.6); }
+        .beIn-header { padding: 16px 20px; background: #1a1e29; border-bottom: 1px solid #252b3a; display: flex; justify-content: space-between; align-items: center; }
+        .beIn-header h2 { font-size: 16px; font-weight: 800; color: #ffffff; text-align: right; }
+        .beIn-formation-badge { background: #2563eb; color: #fff; padding: 6px 14px; border-radius: 30px; font-size: 11px; font-weight: 800; margin-right: 8px; white-space: nowrap; }
+
+        .beIn-body { display: flex; flex-direction: column; flex: 1; overflow-y: auto; background: #0b0d13; }
+        
+        .football-pitch-wrapper { width: 100%; padding: 16px; display: flex; justify-content: center; align-items: center; }
+        
+        .football-pitch-container { 
+            width: 100%; max-width: 360px; background: linear-gradient(to bottom, #14401a 0%, #1c5925 50%, #14401a 100%); 
+            border: 3px solid rgba(255, 255, 255, 0.35); border-radius: 14px; position: relative; 
+            display: flex; flex-direction: column; justify-content: space-between; padding: 25px 10px; 
+            aspect-ratio: 3 / 4; box-shadow: inset 0 0 40px rgba(0,0,0,0.6);
+        }
+        
+        .pitch-center-line { position: absolute; top: 50%; left: 0; width: 100%; height: 2px; background: rgba(255, 255, 255, 0.25); transform: translateY(-50%); }
+        .pitch-center-circle { position: absolute; top: 50%; left: 50%; width: 90px; height: 90px; border: 2px solid rgba(255, 255, 255, 0.25); border-radius: 50%; transform: translate(-50%, -50%); }
+
+        .pitch-row { display: flex; justify-content: center; gap: 24px; align-items: center; width: 100%; z-index: 5; min-height: 60px; }
+        .pitch-player-node { display: flex; flex-direction: column; align-items: center; text-align: center; width: 75px; }
+        
+        .avatar-silver { width: 42px; height: 42px; border-radius: 50%; background: radial-gradient(circle, #f8fafc 0%, #cbd5e1 50%, #64748b 100%); border: 2px solid #ffffff; position: relative; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 8px rgba(0,0,0,0.4); }
+        .pitch-player-name { background: rgba(10, 12, 16, 0.9); border: 1px solid #334155; color: #ffffff; font-size: 10px; font-weight: 600; padding: 2px 6px; border-radius: 6px; margin-top: 5px; white-space: nowrap; max-width: 80px; overflow: hidden; text-overflow: ellipsis; }
+        .pitch-player-number { position: absolute; top: -3px; right: -3px; background: #2563eb; color: #fff; font-size: 8px; font-weight: 800; width: 16px; height: 16px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 1.5px solid #fff; }
+
+        .beIn-subs-sidebar { background: #161920; padding: 16px; border-top: 1px solid #252b3a; }
+        .subs-horizontal-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; margin-top: 10px; }
+        .sub-player-card { display: flex; align-items: center; gap: 8px; background: #0b0d13; padding: 6px 10px; border-radius: 8px; border: 1px solid #222733; }
+    </style>
+</head>
+<body>
+
+    <div class="modal-overlay" id="squadModal">
+        <div class="beIn-squad-card">
+            <div class="beIn-header">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <h2 id="modalTeamName">ناوی تیپ</h2>
+                    <span class="beIn-formation-badge" id="modalFormation">ڕیزبەند</span>
+                </div>
+                <button class="btn-to-admin" style="background:#ef4444; border:none; padding: 6px 14px;" onclick="closeSquadModal()">داخستن</button>
+            </div>
+            
+            <div class="beIn-body">
+                <div class="football-pitch-wrapper">
+                    <div class="football-pitch-container">
+                        <div class="pitch-center-line"></div>
+                        <div class="pitch-center-circle"></div>
+                        
+                        <div class="pitch-row" id="pitchRowAttack"></div>
+                        <div class="pitch-row" id="pitchRowMidfield"></div>
+                        <div class="pitch-row" id="pitchRowDefense"></div>
+                        <div class="pitch-row" id="pitchRowGK"></div>
+                    </div>
+                </div>
+
+                <div class="beIn-subs-sidebar">
+                    <h3 style="font-size:12px; color:#eab308;">یاریزانانی یەدەگ</h3>
+                    <div id="subsListWrapper" class="subs-horizontal-list"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <nav>
+        <div class="nav-container">
+            <div class="brand-wrapper">
+                <div class="brand">خولی فەرمی داتاکان</div>
+                <a href="admin.html" class="btn-to-admin">پانێڵی بەڕێوەبردن</a>
+            </div>
+            <ul>
+                <li><a href="#" class="nav-link active" onclick="switchPage('leagues', event, this)">ڕیزبەندی خول</a></li>
+                <li><a href="#" class="nav-link" onclick="switchPage('matches', event, this)">یارییەکان</a></li>
+                <li><a href="#" class="nav-link" onclick="switchPage('players', event, this)">ئاماری یاریزانان</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div id="leagues" class="page active">
+            <div class="hero-section">
+                <h1>ڕیزبەندی گشتی تیپەکان</h1>
+                <p>داتای نوێکراوەی یارییەکان (کلیک لە ناوەکە بکە بۆ بینینی پێکهاتەی فەرمی)</p>
+            </div>
+            <div class="card">
+                <div class="table-container">
+                    <table id="leagueTable">
+                        <thead>
+                            <tr>
+                                <th style="width: 50px; text-align: center;">ڕێز</th>
+                                <th style="text-align: right;">تیپ</th>
+                                <th>P</th>
+                                <th>W</th>
+                                <th>D</th>
+                                <th>L</th>
+                                <th>خاڵ</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="matches" class="page">
+            <div class="hero-section"><h1>خشتەی یارییەکان</h1></div>
+            <div class="matches-list" id="matchesGrid"></div>
+        </div>
+
+        <div id="players" class="page">
+            <div class="hero-section"><h1>ئاماری یاریزانانی خول</h1></div>
+            <div id="topScorerContainer"></div>
+            <div class="search-container">
+                <input type="text" id="playerSearch" class="search-input" onkeyup="filterPlayers()" placeholder="بگەڕێ بۆ ناوی یاریزان...">
+            </div>
+            <div class="players-list" id="playersGrid"></div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBhYee5yLdNN-ttq6dux8G0w8_vl-ald-g",
+            authDomain: "league-aec67.firebaseapp.com",
+            databaseURL: "https://league-aec67-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "league-aec67",
+            storageBucket: "league-aec67.firebasestorage.app",
+            messagingSenderId: "825335921135",
+            appId: "1:825335921135:web:2ad16d50a25adc3363de1a",
+            measurementId: "G-ZLKJ3FJVW2"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        let leaguesDatabase = []; let playersDatabase = []; let matchesDatabase = []; let squadsDatabase = {};
+        const defaultTeams = ["فێرگەی وەرزشی شاوێس", "ئەکادیمیای دامول", "ئەکادیمیای موفتی", "ئەکادیمیای بڕوا"];
+
+        window.openSquadModal = function(teamName) {
+            document.getElementById('modalTeamName').innerText = teamName;
+            const rowGK = document.getElementById('pitchRowGK');
+            const rowDef = document.getElementById('pitchRowDefense');
+            const rowMid = document.getElementById('pitchRowMidfield');
+            const rowAtt = document.getElementById('pitchRowAttack');
+            const subsWrapper = document.getElementById('subsListWrapper');
+
+            rowGK.innerHTML = ""; rowDef.innerHTML = ""; rowMid.innerHTML = ""; rowAtt.innerHTML = ""; subsWrapper.innerHTML = "";
+
+            const teamData = squadsDatabase[teamName] || { formation: "2-2-1", main: {}, subs: {} };
+            document.getElementById('modalFormation').innerText = `پلان: ${teamData.formation || "2-2-1"}`;
+
+            const mainPlayers = teamData.main ? Object.values(teamData.main) : [];
+            const subPlayers = teamData.subs ? Object.values(teamData.subs) : [];
+
+            mainPlayers.forEach(p => {
+                let html = `
+                    <div class="pitch-player-node">
+                        <div class="avatar-silver"><div class="pitch-player-number">#${p.number || '0'}</div></div>
+                        <div class="pitch-player-name">${p.name}</div>
+                    </div>
+                `;
+                if(p.positionZone === 'gk') rowGK.innerHTML += html;
+                else if(p.positionZone === 'defense') rowDef.innerHTML += html;
+                else if(p.positionZone === 'midfield') rowMid.innerHTML += html;
+                else if(p.positionZone === 'attack') rowAtt.innerHTML += html;
+            });
+
+            if(subPlayers.length === 0) {
+                subsWrapper.innerHTML = `<p style="color:#64748b; font-size:11px;">یەدەگ نییە</p>`;
+            } else {
+                subPlayers.forEach(p => {
+                    subsWrapper.innerHTML += `
+                        <div class="sub-player-card">
+                            <span style="font-size:12px; font-weight:600; color:#fff;">${p.name} (#${p.number || '0'})</span>
+                        </div>
+                    `;
+                });
+            }
+            document.getElementById('squadModal').classList.add('active');
+        };
+
+        window.closeSquadModal = function() { document.getElementById('squadModal').classList.remove('active'); };
+
+        onValue(ref(db, '/'), (snapshot) => {
+            const data = snapshot.val() || {};
+            const matchesList = data.matchesDatabase ? Object.values(data.matchesDatabase) : [];
+            const playersList = data.playersDatabase ? Object.values(data.playersDatabase) : [];
+            squadsDatabase = data.squadsDatabase || {};
+
+            let computedGoals = {};
+            matchesList.forEach(m => {
+                if(m.status === 'finished') {
+                    [m.homeEvents, m.awayEvents].forEach(evs => {
+                        if(evs) Object.values(evs).forEach(e => { if(e.type === 'goal' && e.playerName) computedGoals[e.playerName] = (computedGoals[e.playerName] || 0) + 1; });
+                    });
+                }
+            });
+
+            playersDatabase = playersList.map(p => ({ ...p, goals: computedGoals[p.name] || 0 }));
+            matchesDatabase = matchesList;
+
+            // تحديث المباريات
+            const mGrid = document.getElementById('matchesGrid');
+            if(mGrid) {
+                mGrid.innerHTML = matchesDatabase.length === 0 ? '<p style="color:#64748b; text-align:center;">هیچ یارییەک نەدۆزرایەوە.</p>' : '';
+                matchesDatabase.forEach(m => {
+                    let statusLabel = m.status === 'finished' ? `<span class="status-finished-label">کۆتایی هات</span>` : `<span class="status-finished-label" style="background:rgba(234,179,8,0.1); color:#eab308;">نەکراوە</span>`;
+                    mGrid.innerHTML += `
+                        <div class="match-card">
+                            <div class="match-header-date">${m.date || 'ڕێککەوت دیاری نەکراوە'}</div>
+                            <div class="match-main">
+                                <div class="match-team">${m.homeTeam}</div>
+                                <div class="match-center">
+                                    <div class="match-score">${m.status === 'finished' ? `${m.homeScore} - ${m.awayScore}` : 'VS'}</div>
+                                    ${statusLabel}
+                                </div>
+                                <div class="match-team">${m.awayTeam}</div>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+
+            // تحديث الهدافين واللاعبين
+            playersDatabase.sort((a,b) => b.goals - a.goals);
+            const pGrid = document.getElementById('playersGrid');
+            if(pGrid) {
+                pGrid.innerHTML = '';
+                playersDatabase.forEach(p => {
+                    pGrid.innerHTML += `
+                        <div class="card" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                            <div>
+                                <span style="font-weight:600; color:#fff;">${p.name}</span>
+                                <p style="font-size:11px; color:#64748b;">${p.team}</p>
+                            </div>
+                            <div style="background:#1f242f; padding:4px 10px; border-radius:6px; font-weight:800; color:#10b981;">${p.goals} ⚽</div>
+                        </div>
+                    `;
+                });
+            }
+
+            const standings = {};
+            defaultTeams.forEach(t => { standings[t] = { team: t, played: 0, wins: 0, draws: 0, losses: 0, points: 0 }; });
+            matchesList.forEach(m => {
+                if(m.status !== 'finished') return;
+                if(!standings[m.homeTeam]) standings[m.homeTeam] = { team: m.homeTeam, played: 0, wins: 0, draws: 0, losses: 0, points: 0 };
+                if(!standings[m.awayTeam]) standings[m.awayTeam] = { team: m.awayTeam, played: 0, wins: 0, draws: 0, losses: 0, points: 0 };
+                standings[m.homeTeam].played++; standings[m.awayTeam].played++;
+                if(m.homeScore > m.awayScore) { standings[m.homeTeam].wins++; standings[m.awayTeam].losses++; }
+                else if(m.homeScore < m.awayScore) { standings[m.awayTeam].wins++; standings[m.homeTeam].losses++; }
+                else { standings[m.homeTeam].draws++; standings[m.awayTeam].draws++; }
+            });
+
+            leaguesDatabase = Object.values(standings);
+            leaguesDatabase.forEach(t => { t.points = (t.wins * 3) + (t.draws * 1); });
+            leaguesDatabase.sort((a, b) => b.points - a.points);
+
+            const tbody = document.querySelector('#leagueTable tbody'); if(tbody) tbody.innerHTML = "";
+            leaguesDatabase.forEach((t, i) => {
+                if(tbody) {
+                    tbody.innerHTML += `
+                        <tr>
+                            <td style="color: #94a3b8;">${i+1}</td>
+                            <td style="text-align: right;"><span class="team-clickable" onclick="openSquadModal('${t.team}')">${t.team}</span></td>
+                            <td class="cell-white">${t.played}</td>
+                            <td class="cell-green">${t.wins}</td>
+                            <td class="cell-muted">${t.draws}</td>
+                            <td class="cell-red">${t.losses}</td>
+                            <td class="cell-white">${t.points}</td>
+                        </tr>
+                    `;
+                }
+            });
+        });
+    </script>
+    <script>
+        function switchPage(pageId, event, element) {
+            if(event) event.preventDefault();
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active');
+            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+            element.classList.add('active');
+        }
+    </script>
+</body>
+</html>
