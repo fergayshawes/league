@@ -468,6 +468,25 @@
         </div>
     </div>
 
+    <!-- نافذة معاينة تشكيلة المستخدم -->
+    <div id="adminUserSquadModal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 17, 21, 0.9); display: none; justify-content: center; align-items: center; z-index: 10010; padding: 16px; backdrop-filter: blur(8px);">
+        <div style="background: #161920; border: 1px solid #2d3446; border-radius: 20px; width: 100%; max-width: 420px; padding: 20px; max-height: 90vh; overflow-y: auto; box-shadow: 0 30px 70px rgba(0,0,0,0.8);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid #222733; padding-bottom: 10px;">
+                <h3 style="font-size: 14px; font-weight: 800; color: #ffffff;" id="modalSquadUserName">تشكيلة المستخدم</h3>
+                <button class="btn-danger" style="width: 32px; height: 32px; padding: 0;" onclick="closeAdminSquadModal()">✕</button>
+            </div>
+            
+            <div class="admin-pitch-workspace" style="margin-top: 0; background: #040609; padding: 15px;">
+                <div class="admin-pitch-container" id="adminModalPitchContainer" style="aspect-ratio: 3/4; max-width: 360px;">
+                    <div class="admin-pitch-row" id="modalRowAttack"></div>
+                    <div class="admin-pitch-row" id="modalRowMidfield"></div>
+                    <div class="admin-pitch-row" id="modalRowDefense"></div>
+                    <div class="admin-pitch-row" id="modalRowGK"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div id="loginGate">
         <div class="login-card">
             <h2><i class="fa-solid fa-lock" style="color: #3b82f6;"></i> چوونەژوورەوەی بەڕێوەبەر</h2>
@@ -874,6 +893,29 @@
             </div>
         </div>
 
+        <!-- صندوق حەوتەم: بەڕێوەبردنی بەکارهێنەرانی فانتازی -->
+        <div class="box-panel full-width-panel">
+            <div class="box-title"><i class="fa-solid fa-users-gear"></i> سندوقی حەوتەم: بەڕێوەبردنی بەکارهێنەرانی فانتازی (حسابات المستخدمين)</div>
+            <p style="font-size: 11px; color: #94a3b8; line-height: 1.6;">
+                لێرەدا دەتوانیت زانیاری بەکارهێنەران (ناو، نقاط، ميزانية، صورة)، حظر/إلغاء حظر، حذف الحساب نهائياً، ومعاينة تشكيلة أي مستخدم.
+            </p>
+            <div class="data-table-container">
+                <table id="adminFantasyUsersTable">
+                    <thead>
+                        <tr>
+                            <th><i class="fa-solid fa-user"></i> المستخدم والصورة</th>
+                            <th><i class="fa-solid fa-envelope"></i> البريد الإلكتروني (Gmail)</th>
+                            <th><i class="fa-solid fa-coins"></i> الميزانية (IQD)</th>
+                            <th><i class="fa-solid fa-star"></i> النقاط</th>
+                            <th><i class="fa-solid fa-shield"></i> الحالة</th>
+                            <th style="text-align: left;"><i class="fa-solid fa-gear"></i> الإجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
         <div class="box-panel full-width-panel">
             <div class="box-title"><i class="fa-solid fa-ranking-star"></i> ڕیزبەندی گشتی خول</div>
             <div class="data-table-container">
@@ -922,6 +964,7 @@
         let localSquadsData = {};
         let localNotificationsData = {};
         let localMatchesData = {};
+        let localFantasyUsersData = {};
         let onConfirmCallback = null;
 
         const defaultTeams = ["ئـ", "ب", "ت", "م", "ک", "ل", "د", "ر", "س"];
@@ -1013,6 +1056,129 @@
                 showNotification("باری دوگمەی دەستکاری لە سێرڤەر پاشەکەوت کرا!", "success");
             });
         };
+
+        /* --- الصندوق السابع: إدارة مستخدمي الفانتازي --- */
+        window.activateUserInlineEdit = function(userId) {
+            const tr = document.getElementById(`user-row-${userId}`);
+            const u = localFantasyUsersData[userId];
+            if(!u) return;
+
+            const name = u.customDisplayName || u.displayName || "مستخدم";
+            const photo = u.customPhotoURL || u.photoURL || "";
+            const budget = u.budget !== undefined ? u.budget : 60000;
+            const points = u.points || 0;
+
+            tr.innerHTML = `
+                <td>
+                    <div style="display: flex; flex-direction: column; gap: 4px; width: 100%; min-width: 140px;">
+                        <input type="text" id="edit-user-name-${userId}" class="inline-edit-input" value="${name}" placeholder="اسم المستخدم">
+                        <input type="url" id="edit-user-photo-${userId}" class="inline-edit-input" style="font-size: 10px;" value="${photo}" placeholder="رابط الصورة">
+                    </div>
+                </td>
+                <td style="font-size: 11px; color: #94a3b8;">${u.email || 'بدون إيميل'}</td>
+                <td><input type="number" id="edit-user-budget-${userId}" class="inline-edit-input" style="width: 90px;" value="${budget}"></td>
+                <td><input type="number" id="edit-user-points-${userId}" class="inline-edit-input" style="width: 70px;" value="${points}"></td>
+                <td><span class="badge-icon">${u.isBanned ? 'محظور' : 'نشط'}</span></td>
+                <td class="actions-cell">
+                    <button onclick="saveUserInlineEdit('${userId}')" style="background:#10b981; color:#fff;"><i class="fa-solid fa-floppy-disk"></i></button>
+                    <button class="btn-secondary" onclick="renderFantasyUsersTable()"><i class="fa-solid fa-xmark"></i></button>
+                </td>
+            `;
+            showNotification("دۆخی دەستکاری ئەکاونت چالاککرا.", "info");
+        };
+
+        window.saveUserInlineEdit = function(userId) {
+            const newName = document.getElementById(`edit-user-name-${userId}`).value.trim();
+            const newPhoto = document.getElementById(`edit-user-photo-${userId}`).value.trim();
+            const newBudget = Number(document.getElementById(`edit-user-budget-${userId}`).value) || 0;
+            const newPoints = Number(document.getElementById(`edit-user-points-${userId}`).value) || 0;
+
+            update(ref(db, `fantasyUsers/${userId}`), {
+                customDisplayName: newName,
+                customPhotoURL: newPhoto,
+                budget: newBudget,
+                points: newPoints
+            }).then(() => {
+                showNotification("تم تحديث بيانات المستخدم بنجاح!", "success");
+            });
+        };
+
+        window.toggleBanUser = function(userId, currentBanState) {
+            const nextState = !currentBanState;
+            update(ref(db, `fantasyUsers/${userId}`), {
+                isBanned: nextState
+            }).then(() => {
+                showNotification(nextState ? "تم حظر المستخدم بنجاح!" : "تم فك الحظر عن المستخدم!", nextState ? "error" : "success");
+            });
+        };
+
+        window.deleteFantasyUser = function(userId) {
+            openConfirmModal(
+                "حذف حساب المستخدم",
+                "هل أنت متأكد من حذف هذا الحساب نهائياً؟ ستتم إزالة تشكيلته ونقاطه وكل بياناته ويعود كأنه مستخدم جديد.",
+                () => {
+                    remove(ref(db, `fantasyUsers/${userId}`)).then(() => {
+                        showNotification("تم حذف الحساب بنجاح وتمت مسح كافة بياناته!", "error");
+                    });
+                }
+            );
+        };
+
+        window.previewUserSquad = function(userId) {
+            const u = localFantasyUsersData[userId];
+            if(!u) return;
+
+            const name = u.customDisplayName || u.displayName || "مستخدم";
+            document.getElementById("modalSquadUserName").innerText = `تشكيلة اللاعب: ${name}`;
+
+            const rAtt = document.getElementById('modalRowAttack');
+            const rMid = document.getElementById('modalRowMidfield');
+            const rDef = document.getElementById('modalRowDefense');
+            const rGK = document.getElementById('modalRowGK');
+
+            if(rAtt) rAtt.innerHTML = "";
+            if(rMid) rMid.innerHTML = "";
+            if(rDef) rDef.innerHTML = "";
+            if(rGK) rGK.innerHTML = "";
+
+            const squad = u.squad || { attack: [], midfield: [], defense: [], goalkeeper: [] };
+
+            if(squad.attack) {
+                squad.attack.forEach(p => {
+                    if(p && p.name) rAtt.innerHTML += createModalNodeHtml(p);
+                });
+            }
+            if(squad.midfield) {
+                squad.midfield.forEach(p => {
+                    if(p && p.name) rMid.innerHTML += createModalNodeHtml(p);
+                });
+            }
+            if(squad.defense) {
+                squad.defense.forEach(p => {
+                    if(p && p.name) rDef.innerHTML += createModalNodeHtml(p);
+                });
+            }
+            if(squad.goalkeeper) {
+                squad.goalkeeper.forEach(p => {
+                    if(p && p.name) rGK.innerHTML += createModalNodeHtml(p);
+                });
+            }
+
+            document.getElementById("adminUserSquadModal").style.display = "flex";
+        };
+
+        window.closeAdminSquadModal = function() {
+            document.getElementById("adminUserSquadModal").style.display = "none";
+        };
+
+        function createModalNodeHtml(player) {
+            return `
+                <div class="admin-pitch-node" style="width: 80px;">
+                    <img src="${player.photo || 'https://via.placeholder.com/32'}" style="width: 30px; height: 30px; border-radius: 50%; object-fit: cover; border: 1px solid #fff;">
+                    <span class="admin-node-name" style="font-size: 10px;">${player.name}</span>
+                </div>
+            `;
+        }
 
         /* --- 1. Inline Editing: Players Table --- */
         window.createNewPlayer = function(e) {
@@ -1675,6 +1841,7 @@
             localPlayersArray = data.playersDatabase || {};
             localSquadsData = data.squadsDatabase || {};
             localNotificationsData = data.notificationsDatabase || {};
+            localFantasyUsersData = data.fantasyUsers || {};
             
             renderPlayersTableOnly();
             updateFilteredPlayersList();
@@ -1682,6 +1849,7 @@
             renderFantasyMarketTable();
             renderNotificationsTable();
             renderMatchesTables();
+            renderFantasyUsersTable();
 
             loadTeamSquadManagement();
             calculateLeagueStanding(matchesList);
@@ -1707,6 +1875,45 @@
                 }
             }
         });
+
+        function renderFantasyUsersTable() {
+            const usersTbody = document.querySelector('#adminFantasyUsersTable tbody');
+            if(!usersTbody) return;
+            usersTbody.innerHTML = "";
+
+            Object.keys(localFantasyUsersData).forEach(userId => {
+                const u = localFantasyUsersData[userId];
+                if(!u) return;
+
+                const name = u.customDisplayName || u.displayName || "مستخدم";
+                const photo = u.customPhotoURL || u.photoURL || 'https://via.placeholder.com/32';
+                const budget = u.budget !== undefined ? u.budget : 60000;
+                const points = u.points || 0;
+                const isBanned = Boolean(u.isBanned);
+
+                const tr = document.createElement('tr');
+                tr.id = `user-row-${userId}`;
+                tr.innerHTML = `
+                    <td>
+                        <div class="player-info-cell">
+                            <img src="${photo}" onerror="this.src='https://via.placeholder.com/32'">
+                            <span style="font-weight:600; color:#fff;">${name}</span>
+                        </div>
+                    </td>
+                    <td style="font-size:11px; color:#94a3b8;">${u.email || 'بدون إيميل'}</td>
+                    <td style="color:#eab308; font-weight:bold;">${Number(budget).toLocaleString()} IQD</td>
+                    <td style="color:#10b981; font-weight:bold;">${points}</td>
+                    <td><span class="badge-icon" style="color:${isBanned ? '#ef4444' : '#10b981'}; border-color:${isBanned ? 'rgba(239,68,68,0.3)' : 'rgba(16,185,129,0.3)'}">${isBanned ? 'محظور' : 'نشط'}</span></td>
+                    <td class="actions-cell">
+                        <button onclick="previewUserSquad('${userId}')" style="background:#3b82f6; color:#fff;" title="معاينة التشكيلة"><i class="fa-solid fa-eye"></i></button>
+                        <button onclick="activateUserInlineEdit('${userId}')" style="background:#f59e0b; color:#fff;" title="تعديل"><i class="fa-solid fa-pen-to-square"></i></button>
+                        <button onclick="toggleBanUser('${userId}', ${isBanned})" style="background:${isBanned ? '#10b981' : '#f97316'}; color:#fff;" title="${isBanned ? 'فك الحظر' : 'حظر'}"><i class="fa-solid ${isBanned ? 'fa-unlock' : 'fa-ban'}"></i></button>
+                        <button class="btn-danger" onclick="deleteFantasyUser('${userId}')" title="حذف نهائي"><i class="fa-solid fa-trash"></i></button>
+                    </td>
+                `;
+                usersTbody.appendChild(tr);
+            });
+        }
 
         function renderPlayersTableOnly() {
             const playersTbody = document.querySelector('#adminPlayersTable tbody');
