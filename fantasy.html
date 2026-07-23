@@ -1074,7 +1074,8 @@
                 posDef: "بەرگریکار",
                 posGk: "گۆڵپارێز",
                 notifTabAll: "هەموو ئاگادارییەکان",
-                notifTabMy: "ئاگادارییەکانی فریقی من"
+                notifTabMy: "ئاگادارییەکانی فریقی من",
+                editLockedMsg: "لا يمكن تعديل التشكيلة لوجود مباراة قريبة"
             },
             ar: {
                 loaderText: "تحميل الدوري الرسمي...",
@@ -1121,7 +1122,8 @@
                 posDef: "مدافع",
                 posGk: "حارس",
                 notifTabAll: "جميع الإشعارات",
-                notifTabMy: "إشعارات فريقي"
+                notifTabMy: "إشعارات فريقي",
+                editLockedMsg: "لا يمكن تعديل التشكيلة لوجود مباراة قريبة"
             }
         };
 
@@ -1148,14 +1150,7 @@
             document.getElementById('lblAd3Text').innerText = getLangText('ad3Text');
             document.getElementById('lblAd4Text').innerText = getLangText('ad4Text');
             
-            const editBtn = document.getElementById('lblEditModeBtn');
-            if(editBtn) {
-                if (window.isEditMode) {
-                    editBtn.innerText = getLangText('editModeText');
-                } else {
-                    editBtn.innerText = getLangText('viewModeText');
-                }
-            }
+            updateEditModeUIState();
             
             document.getElementById('lblSetCaptainBtn').innerText = getLangText('setCaptainBtn');
             document.getElementById('btnFantasySubmitSquad').innerText = getLangText('submitSquadBtn');
@@ -1198,6 +1193,7 @@
         let userAdsData = {};
         let userClaimedNotifications = {}; 
         window.isEditMode = false; 
+        let isSystemEditAllowed = true; 
         window.currentFormation = "2-2-1";
         let currentMarketPageIndex = 0;
         let isDataLoadedFromFirebase = false;
@@ -1209,6 +1205,16 @@
             const loader = document.getElementById("page-loader");
             if(loader) loader.classList.add("fade-out");
             applyGlobalTranslations();
+        });
+
+        const systemSettingsRef = ref(db, 'systemSettings/fantasyEditMode');
+        onValue(systemSettingsRef, (snapshot) => {
+            const val = snapshot.val();
+            isSystemEditAllowed = val !== null ? val : true;
+            if(!isSystemEditAllowed) {
+                window.isEditMode = false;
+            }
+            updateEditModeUIState();
         });
 
         function updateEditModeUIState() {
@@ -1647,9 +1653,19 @@
         };
 
         window.toggleEditMode = function() {
+            const lang = document.documentElement.getAttribute("lang") || 'ckb';
+            if (!isSystemEditAllowed && !window.isEditMode) {
+                window.showToast(
+                    lang === 'ar' ? "تعديل التشكيلة مقفول" : "دەستکاری پێکهاتە داخراوە",
+                    getLangText('editLockedMsg'),
+                    "error"
+                );
+                return;
+            }
+
             window.isEditMode = !window.isEditMode;
             updateEditModeUIState();
-            const lang = document.documentElement.getAttribute("lang") || 'ckb';
+            
             if (window.isEditMode) {
                 window.showToast(lang === 'ar' ? "وضع التعديل" : "دۆخی دەستکاری", lang === 'ar' ? "تم تفعيل وضع التعديل، يمكنك الآن تعديل تشكيلتك." : "دۆخی دەستکاری کارا بوو، دەتوانیت پێکهاتەکەت بگۆڕیت.", "success");
             } else {
