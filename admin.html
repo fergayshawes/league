@@ -897,7 +897,7 @@
         <div class="box-panel full-width-panel">
             <div class="box-title"><i class="fa-solid fa-users-gear"></i> سندوقی حەوتەم: بەڕێوەبردنی بەکارهێنەرانی فانتازی (حسابات المستخدمين)</div>
             <p style="font-size: 11px; color: #94a3b8; line-height: 1.6;">
-                لێرەدا دەتوانیت زانیاری بەکارهێنەران (ناو، نقاط، ميزانية، صورة)، حظر/إلغاء حظر، حذف الحساب نهائياً، ومعاينة تشكيلة أي مستخدم.
+                لێرەدا دەتوانیت زانیاری بەکارهێنەران (ناو، نقاط، ميزانية، صورة)، حظر/إلغاء حظر، حذف الحساب نهائياً، ومعاينة تشكيلة أي مستخدم. (المرتبون تنازلياً حسب النقاط)
             </p>
             <div class="data-table-container">
                 <table id="adminFantasyUsersTable">
@@ -1108,7 +1108,7 @@
             update(ref(db, `fantasyUsers/${userId}`), {
                 isBanned: nextState
             }).then(() => {
-                showNotification(nextState ? "تم حظر المستخدم بنجاح!" : "تم فك الحظر عن المستخدم!", nextState ? "error" : "success");
+                showNotification(nextState ? "تم حظر المستخدم بنجاح! لن يتمكن من دخول الفانتازي بعد الآن." : "تم فك الحظر عن المستخدم!", nextState ? "error" : "success");
             });
         };
 
@@ -1881,8 +1881,14 @@
             if(!usersTbody) return;
             usersTbody.innerHTML = "";
 
-            Object.keys(localFantasyUsersData).forEach(userId => {
-                const u = localFantasyUsersData[userId];
+            // ترتيب المستخدمين تنازلياً حسب النقاط (الأعلى نقاطاً في الأعلى)
+            const sortedUsersEntries = Object.entries(localFantasyUsersData).sort((a, b) => {
+                const pointsA = a[1].points || 0;
+                const pointsB = b[1].points || 0;
+                return pointsB - pointsA;
+            });
+
+            sortedUsersEntries.forEach(([userId, u]) => {
                 if(!u) return;
 
                 const name = u.customDisplayName || u.displayName || "مستخدم";
@@ -1890,8 +1896,6 @@
                 const budget = u.budget !== undefined ? u.budget : 60000;
                 const points = u.points || 0;
                 const isBanned = Boolean(u.isBanned);
-                
-                // تم التعديل هنا لضمان جلب البريد الإلكتروني بشكل صحيح
                 const userEmail = u.email || (u.providerData && u.providerData[0] && u.providerData[0].email) || 'بدون إيميل';
 
                 const tr = document.createElement('tr');
