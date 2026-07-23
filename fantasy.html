@@ -1046,8 +1046,8 @@
                 ad2Text: "ریکلامی دووەم",
                 ad3Text: "ریکلامی سێیەم",
                 ad4Text: "ریکلامی چوارەم",
-                viewModeText: "وضع العرض",
-                editModeText: "تعديل التشكيلة",
+                viewModeText: "دۆخی نیشاندان",
+                editModeText: "دۆخی دەستکاری",
                 setCaptainBtn: "دیاریکردنی کابتن",
                 submitSquadBtn: "پشتڕاستکردنەوە و بەشداریکردن",
                 extraPlayersTitle: "یاریزانە یەدەگ و زیادەکان (کۆگا):",
@@ -1075,7 +1075,8 @@
                 posGk: "گۆڵپارێز",
                 notifTabAll: "هەموو ئاگادارییەکان",
                 notifTabMy: "ئاگادارییەکانی فریقی من",
-                editLockedMsg: "لا يمكن تعديل التشكيلة لوجود مباراة قريبة"
+                matchLockedErrorTitle: "ناتوانرێت دەستکاری بکرێت",
+                matchLockedErrorDesc: "لا يمكن تعديل التشكيلة لـ وجود مباراة قريبة!"
             },
             ar: {
                 loaderText: "تحميل الدوري الرسمي...",
@@ -1123,7 +1124,8 @@
                 posGk: "حارس",
                 notifTabAll: "جميع الإشعارات",
                 notifTabMy: "إشعارات فريقي",
-                editLockedMsg: "لا يمكن تعديل التشكيلة لوجود مباراة قريبة"
+                matchLockedErrorTitle: "لا يمكن التعديل",
+                matchLockedErrorDesc: "لا يمكن تعديل التشكيلة لـ وجود مباراة قريبة!"
             }
         };
 
@@ -1150,7 +1152,14 @@
             document.getElementById('lblAd3Text').innerText = getLangText('ad3Text');
             document.getElementById('lblAd4Text').innerText = getLangText('ad4Text');
             
-            updateEditModeUIState();
+            const editBtn = document.getElementById('lblEditModeBtn');
+            if(editBtn) {
+                if (window.isEditMode) {
+                    editBtn.innerText = getLangText('editModeText');
+                } else {
+                    editBtn.innerText = getLangText('viewModeText');
+                }
+            }
             
             document.getElementById('lblSetCaptainBtn').innerText = getLangText('setCaptainBtn');
             document.getElementById('btnFantasySubmitSquad').innerText = getLangText('submitSquadBtn');
@@ -1193,7 +1202,6 @@
         let userAdsData = {};
         let userClaimedNotifications = {}; 
         window.isEditMode = false; 
-        let isSystemEditAllowed = true; 
         window.currentFormation = "2-2-1";
         let currentMarketPageIndex = 0;
         let isDataLoadedFromFirebase = false;
@@ -1205,16 +1213,6 @@
             const loader = document.getElementById("page-loader");
             if(loader) loader.classList.add("fade-out");
             applyGlobalTranslations();
-        });
-
-        const systemSettingsRef = ref(db, 'systemSettings/fantasyEditMode');
-        onValue(systemSettingsRef, (snapshot) => {
-            const val = snapshot.val();
-            isSystemEditAllowed = val !== null ? val : true;
-            if(!isSystemEditAllowed) {
-                window.isEditMode = false;
-            }
-            updateEditModeUIState();
         });
 
         function updateEditModeUIState() {
@@ -1652,14 +1650,15 @@
             }, 3000);
         };
 
+        // متغير محاكاة حالة وجود مباراة قريبة (قم بتغييره إلى true لاختبار قفل زر التعديل)
+        let isMatchSoon = false; 
+
         window.toggleEditMode = function() {
             const lang = document.documentElement.getAttribute("lang") || 'ckb';
-            if (!isSystemEditAllowed && !window.isEditMode) {
-                window.showToast(
-                    lang === 'ar' ? "تعديل التشكيلة مقفول" : "دەستکاری پێکهاتە داخراوە",
-                    getLangText('editLockedMsg'),
-                    "error"
-                );
+            
+            // التحقق من حالة وجود مباراة قريبة عند الرغبة بالانتقال من وضع العرض إلى وضع التعديل
+            if (!window.isEditMode && isMatchSoon) {
+                window.showToast(getLangText('matchLockedErrorTitle'), getLangText('matchLockedErrorDesc'), "error");
                 return;
             }
 
