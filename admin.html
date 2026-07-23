@@ -1890,6 +1890,9 @@
                 const budget = u.budget !== undefined ? u.budget : 60000;
                 const points = u.points || 0;
                 const isBanned = Boolean(u.isBanned);
+                
+                // تم التعديل هنا لضمان جلب البريد الإلكتروني بشكل صحيح
+                const userEmail = u.email || (u.providerData && u.providerData[0] && u.providerData[0].email) || 'بدون إيميل';
 
                 const tr = document.createElement('tr');
                 tr.id = `user-row-${userId}`;
@@ -1900,7 +1903,7 @@
                             <span style="font-weight:600; color:#fff;">${name}</span>
                         </div>
                     </td>
-                    <td style="font-size:11px; color:#94a3b8;">${u.email || 'بدون إيميل'}</td>
+                    <td style="font-size:11px; color:#94a3b8;">${userEmail}</td>
                     <td style="color:#eab308; font-weight:bold;">${Number(budget).toLocaleString()} IQD</td>
                     <td style="color:#10b981; font-weight:bold;">${points}</td>
                     <td><span class="badge-icon" style="color:${isBanned ? '#ef4444' : '#10b981'}; border-color:${isBanned ? 'rgba(239,68,68,0.3)' : 'rgba(16,185,129,0.3)'}">${isBanned ? 'محظور' : 'نشط'}</span></td>
