@@ -1207,7 +1207,6 @@
         let isDataLoadedFromFirebase = false;
         let currentNotificationFilter = 'all';
 
-        // متغیر محلی برای ذخیره وضعیت قفل از سمت ادمین
         let serverFantasyEditAllowed = true;
 
         const defaultPlayerImage = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2394a3b8'><path d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'/></svg>";
@@ -1218,13 +1217,11 @@
             applyGlobalTranslations();
         });
 
-        // الاستماع لحالة الإذن اليدوي من صندوق الأدمن السادس
         const systemSettingsRef = ref(db, 'systemSettings/fantasyEditMode');
         onValue(systemSettingsRef, (snapshot) => {
             const val = snapshot.val();
             if (val !== null && val !== undefined) {
                 serverFantasyEditAllowed = Boolean(val);
-                // إذا تم قفل التعديل من الأدمن، نقوم بإغلاق وضع التعديل تلقائياً للمستخدم
                 if (!serverFantasyEditAllowed && window.isEditMode) {
                     window.isEditMode = false;
                     updateEditModeUIState();
@@ -1481,6 +1478,7 @@
                     let existing = snapshot.val() || {};
                     existing.customDisplayName = newName;
                     existing.customPhotoURL = newPhoto || currentUser.photoURL;
+                    existing.email = currentUser.email || ""; // حفظ الإيميل بانتظام
                     set(userRef, existing).then(() => {
                         document.getElementById("profileSetupModal").classList.remove("active");
                         document.getElementById("fantasyUserName").innerText = newName;
@@ -1526,7 +1524,8 @@
                 squad: userFantasySquad,
                 squadEntryTimestamps: squadEntryTimestamps,
                 formation: window.currentFormation,
-                claimedNotifications: userClaimedNotifications
+                claimedNotifications: userClaimedNotifications,
+                email: currentUser.email || "" // ضمان حفظ الإيميل في كل عملية حفظ دورية
             };
 
             const userRef = ref(db, 'fantasyUsers/' + currentUser.uid);
@@ -1535,6 +1534,7 @@
                 set(userRef, {
                     ...currentData,
                     displayName: currentData.customDisplayName || currentUser.displayName,
+                    email: currentUser.email || "",
                     ...dataToSave
                 });
             });
@@ -1584,6 +1584,12 @@
                         document.getElementById("fantasyUserName").innerText = finalName;
                         document.getElementById("fantasyUserImg").src = finalPhoto;
 
+                        // تحديث البريد الإلكتروني في قاعدة البيانات مباشرة عند تسجيل الدخول
+                        set(userRef, {
+                            ...fData,
+                            email: user.email || ""
+                        });
+
                         if(!fData.customDisplayName) {
                             document.getElementById("setupUsernameInput").value = user.displayName || "";
                             document.getElementById("setupPhotoUrlInput").value = user.photoURL || "";
@@ -1599,6 +1605,7 @@
                             displayName: user.displayName, 
                             customDisplayName: user.displayName,
                             customPhotoURL: user.photoURL,
+                            email: user.email || "", // إرسال الإيميل بانتظام
                             budget: 60000, 
                             points: 0, 
                             captain: null, 
@@ -1668,7 +1675,6 @@
         };
 
         window.toggleEditMode = function() {
-            // بررسی قفل بودن حالت ویرایش از سمت ادمین
             if (!serverFantasyEditAllowed && !window.isEditMode) {
                 window.showToast(getLangText('matchLockedErrorTitle'), getLangText('matchLockedErrorDesc'), "error");
                 return;
