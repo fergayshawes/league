@@ -923,9 +923,9 @@
                     </div>
                 </div>
 
-                <!-- جدول الترتيب العام لفانتازي المستخدمين بدون إيموجي ومع أيقونات FontAwesome -->
+                <!-- جدول الترتيب العام لفانتازي المستخدمين -->
                 <div class="fantasy-leaderboard-container">
-                    <h3 style="font-size: 13px; font-weight: 800; margin-bottom: 8px;" id="lblLeaderboardTitle"><i class="fa-solid fa-ranking-star" style="color: #eab308; margin-left: 5px;"></i> ڕیزبەندی گشتی بەکارهێنەرانی فانتازی</h3>
+                    <h3 style="font-size: 13px; font-weight: 800; margin-bottom: 8px;" id="lblLeaderboardTitle"><i class="fa-solid fa-ranking-star" style="color: #eab308; margin-left: 5px;"></i> <span id="lblLeaderboardText">ڕیزبەندی گشتی بەکارهێنەرانی فانتازی</span></h3>
                     <div style="overflow-x: auto;">
                         <table class="leaderboard-table">
                             <thead>
@@ -1065,6 +1065,7 @@
                 fantasyBudget: "بودجەی بەردەست",
                 fantasyPoints: "کۆی گشتی خاڵەکان",
                 leaderboardTitle: "ڕیزبەندی گشتی بەکارهێنەرانی فانتازی",
+                userYourTeamTag: "(تیمەکەت)",
                 leaderColUser: "بەکارهێنەر",
                 leaderColPoints: "خاڵەکان (PTS)",
                 viewModeText: "دۆخی نیشاندان",
@@ -1115,6 +1116,7 @@
                 fantasyBudget: "الميزانية المتاحة",
                 fantasyPoints: "إجمالي النقاط",
                 leaderboardTitle: "الترتيب العام لمستخدمي الفانتازي",
+                userYourTeamTag: "(فريقك)",
                 leaderColUser: "المستخدم",
                 leaderColPoints: "النقاط (PTS)",
                 viewModeText: "وضع العرض",
@@ -1171,6 +1173,7 @@
             document.getElementById('lblEditProfileBtn').innerText = getLangText('editProfileBtn');
             document.getElementById('lblFantasyBudget').innerText = getLangText('fantasyBudget');
             document.getElementById('lblFantasyPoints').innerText = getLangText('fantasyPoints');
+            document.getElementById('lblLeaderboardText').innerText = getLangText('leaderboardTitle');
             document.getElementById('lblLeaderColUser').innerText = getLangText('leaderColUser');
             document.getElementById('lblLeaderColPoints').innerText = getLangText('leaderColPoints');
             
@@ -1277,7 +1280,6 @@
                     tr.style.background = "rgba(16, 185, 129, 0.08)";
                 }
 
-                // استبدال الإيموجي بأيقونات FontAwesome احترافية للمراكز الأولى
                 let rankDisplay = `${index + 1}`;
                 if(index === 0) {
                     rankDisplay = `<i class="fa-solid fa-trophy" style="color: #eab308; font-size: 14px;" title="المركز الأول"></i> 1`;
@@ -1292,7 +1294,7 @@
                     <td>
                         <div class="leaderboard-user-cell">
                             <img src="${photo}" class="leaderboard-user-avatar" onerror="this.src='https://via.placeholder.com/32'">
-                            <span style="font-weight: 700; color: var(--text-main);">${name} ${isCurrent ? '<span style="font-size:10px; color:#10b981;">(تیمەکەت)</span>' : ''}</span>
+                            <span style="font-weight: 700; color: var(--text-main);">${name} ${isCurrent ? `<span style="font-size:10px; color:#10b981;">${getLangText('userYourTeamTag')}</span>` : ''}</span>
                         </div>
                     </td>
                     <td style="text-align: center; font-weight: 800; color: #10b981; font-size: 13px;">${pts}</td>
