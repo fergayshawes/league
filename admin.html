@@ -451,6 +451,44 @@
         
         .badge-icon { background: #1f242f; padding: 4px 8px; border-radius: 6px; font-size: 11px; color: #94a3b8; border: 1px solid #2d3446; }
         .section-subtitle { font-size: 12px; font-weight: 600; color: #94a3b8; margin-top: 10px; margin-bottom: 5px; }
+
+        /* تنسيق مخصص لصندوق إدخال الأحداث ليصبح مرتباً وعمودياً */
+        .event-builder-box {
+            background: #1f242f;
+            border: 1px solid #2d3446;
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 6px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .event-controls-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        .event-item-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #161920;
+            border: 1px solid #2d3446;
+            padding: 5px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            margin: 3px;
+        }
+        .event-item-tag button {
+            background: none;
+            border: none;
+            color: #ef4444;
+            cursor: pointer;
+            padding: 0;
+            width: auto;
+            height: auto;
+            font-size: 12px;
+        }
     </style>
 </head>
 <body>
@@ -464,6 +502,25 @@
             <div class="confirm-actions">
                 <button class="btn-danger" id="confirmYesBtn"><i class="fa-solid fa-trash"></i> بەڵێ</button>
                 <button class="btn-secondary" onclick="closeConfirmModal()"><i class="fa-solid fa-xmark"></i> پاشگەزبوونەوە</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- نافذة معاينة تشكيلة المستخدم -->
+    <div id="adminUserSquadModal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 17, 21, 0.9); display: none; justify-content: center; align-items: center; z-index: 10010; padding: 16px; backdrop-filter: blur(8px);">
+        <div style="background: #161920; border: 1px solid #2d3446; border-radius: 20px; width: 100%; max-width: 420px; padding: 20px; max-height: 90vh; overflow-y: auto; box-shadow: 0 30px 70px rgba(0,0,0,0.8);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid #222733; padding-bottom: 10px;">
+                <h3 style="font-size: 14px; font-weight: 800; color: #ffffff;" id="modalSquadUserName">تشكيلة المستخدم</h3>
+                <button class="btn-danger" style="width: 32px; height: 32px; padding: 0;" onclick="closeAdminSquadModal()">✕</button>
+            </div>
+            
+            <div class="admin-pitch-workspace" style="margin-top: 0; background: #040609; padding: 15px;">
+                <div class="admin-pitch-container" id="adminModalPitchContainer" style="aspect-ratio: 3/4; max-width: 360px;">
+                    <div class="admin-pitch-row" id="modalRowAttack"></div>
+                    <div class="admin-pitch-row" id="modalRowMidfield"></div>
+                    <div class="admin-pitch-row" id="modalRowDefense"></div>
+                    <div class="admin-pitch-row" id="modalRowGK"></div>
+                </div>
             </div>
         </div>
     </div>
@@ -558,7 +615,7 @@
                 <div class="form-row" style="margin-bottom: 12px;">
                     <div class="form-group">
                         <label><i class="fa-solid fa-house-chimney"></i> فەریقی یەکەم</label>
-                        <select id="mHomeTeam">
+                        <select id="mHomeTeam" onchange="updateMatchEventPlayerDropdowns()">
                             <option value="ئـ">ئـ</option>
                             <option value="ب">ب</option>
                             <option value="ت">ت</option>
@@ -572,7 +629,7 @@
                     </div>
                     <div class="form-group">
                         <label><i class="fa-solid fa-plane"></i> فەریقی دووەم</label>
-                        <select id="mAwayTeam">
+                        <select id="mAwayTeam" onchange="updateMatchEventPlayerDropdowns()">
                             <option value="ئـ">ئـ</option>
                             <option value="ب">ب</option>
                             <option value="ت">ت</option>
@@ -597,11 +654,11 @@
                     <div class="form-row" style="margin-bottom: 12px;">
                         <div class="form-group">
                             <label><i class="fa-solid fa-list-ol"></i> گۆڵ (Home)</label>
-                            <input type="number" id="mHomeScore" value="0">
+                            <input type="number" id="mHomeScore" value="0" readonly style="background:#12151c; font-weight:bold;">
                         </div>
                         <div class="form-group">
                             <label><i class="fa-solid fa-list-ol"></i> گۆڵ (Away)</label>
-                            <input type="number" id="mAwayScore" value="0">
+                            <input type="number" id="mAwayScore" value="0" readonly style="background:#12151c; font-weight:bold;">
                         </div>
                     </div>
                     <div class="form-row" style="margin-bottom: 12px;">
@@ -611,23 +668,59 @@
                         </div>
                         <div class="form-group">
                             <label><i class="fa-solid fa-star"></i> باشترین یاریزان (MOTM)</label>
-                            <input type="text" id="mMotm" placeholder="ناوی یاریزان">
+                            <select id="mMotm">
+                                <option value="">دیاری نەکراوە</option>
+                            </select>
                         </div>
                     </div>
                     
-                    <div class="form-row" style="margin-bottom: 14px;">
-                        <div class="form-group">
-                            <label><i class="fa-solid fa-notes-medical"></i> ڕووداوەکان (فەریقی ١)</label>
-                            <textarea id="mHomeEventsRaw" rows="3" placeholder="ناو - گۆڵ&#10;ناو - کارتی زەرد"></textarea>
+                    <!-- قسم أحداث المباريات بتصميم مرتب وعمودي تماماً -->
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label><i class="fa-solid fa-notes-medical"></i> ڕووداوەکان (فەریقی ١)</label>
+                        <div class="event-builder-box">
+                            <div class="form-group">
+                                <label style="font-size: 10px; color: #707e94;">هەڵبژاردنی یاریزان</label>
+                                <select id="homeEventPlayerSelect"></select>
+                            </div>
+                            <div class="event-controls-row">
+                                <div class="form-group" style="flex: 1;">
+                                    <label style="font-size: 10px; color: #707e94;">جۆری ڕووداو</label>
+                                    <select id="homeEventTypeSelect">
+                                        <option value="goal">⚽ گۆڵ</option>
+                                        <option value="yellow">🟨 کارتی زەرد</option>
+                                        <option value="red">🟥 کارتی سوور</option>
+                                    </select>
+                                </div>
+                                <button type="button" onclick="addMatchEvent('home')" style="background:#10b981; color:#fff; height: 42px; margin-top: 16px; padding: 0 16px;"><i class="fa-solid fa-plus"></i> زیادکردن</button>
+                            </div>
+                            <div id="homeEventsListContainer" style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px;"></div>
                         </div>
-                        <div class="form-group">
-                            <label><i class="fa-solid fa-notes-medical"></i> ڕووداوەکان (فەریقی ٢)</label>
-                            <textarea id="mAwayEventsRaw" rows="3" placeholder="ناو - گۆڵ&#10;ناو - کارتی زەرد"></textarea>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label><i class="fa-solid fa-notes-medical"></i> ڕووداوەکان (فەریقی ٢)</label>
+                        <div class="event-builder-box">
+                            <div class="form-group">
+                                <label style="font-size: 10px; color: #707e94;">هەڵبژاردنی یاریزان</label>
+                                <select id="awayEventPlayerSelect"></select>
+                            </div>
+                            <div class="event-controls-row">
+                                <div class="form-group" style="flex: 1;">
+                                    <label style="font-size: 10px; color: #707e94;">جۆری ڕووداو</label>
+                                    <select id="awayEventTypeSelect">
+                                        <option value="goal">⚽ گۆڵ</option>
+                                        <option value="yellow">🟨 کارتی زەرد</option>
+                                        <option value="red">🟥 کارتی سوور</option>
+                                    </select>
+                                </div>
+                                <button type="button" onclick="addMatchEvent('away')" style="background:#10b981; color:#fff; height: 42px; margin-top: 16px; padding: 0 16px;"><i class="fa-solid fa-plus"></i> زیادکردن</button>
+                            </div>
+                            <div id="awayEventsListContainer" style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px;"></div>
                         </div>
                     </div>
                 </div>
 
-                <button type="submit" style="width: 100%; background: #3b82f6; color:#fff;"><i class="fa-solid fa-circle-plus"></i> تۆمارکردنی یاری</button>
+                <button type="submit" style="width: 100%; background: #3b82f6; color:#fff; margin-top: 10px;"><i class="fa-solid fa-circle-plus"></i> تۆمارکردنی یاری</button>
             </form>
 
             <div class="section-subtitle"><i class="fa-solid fa-clock"></i> یارییە داهاتووەکان (تەواونەکراو)</div>
@@ -874,6 +967,29 @@
             </div>
         </div>
 
+        <!-- صندوق حەوتەم: بەڕێوەبردنی بەکارهێنەرانی فانتازی -->
+        <div class="box-panel full-width-panel">
+            <div class="box-title"><i class="fa-solid fa-users-gear"></i> سندوقی حەوتەم: بەڕێوەبردنی بەکارهێنەرانی فانتازی (حسابات المستخدمين)</div>
+            <p style="font-size: 11px; color: #94a3b8; line-height: 1.6;">
+                لێرەدا دەتوانیت زانیاری بەکارهێنەران (ناو، نقاط، ميزانية، صورة)، حظر/إلغاء حظر، حذف الحساب نهائياً، ومعاينة تشكيلة أي مستخدم. (المرتبون تنازلياً حسب النقاط)
+            </p>
+            <div class="data-table-container">
+                <table id="adminFantasyUsersTable">
+                    <thead>
+                        <tr>
+                            <th><i class="fa-solid fa-user"></i> المستخدم والصورة</th>
+                            <th><i class="fa-solid fa-envelope"></i> البريد الإلكتروني (Gmail)</th>
+                            <th><i class="fa-solid fa-coins"></i> الميزانية (IQD)</th>
+                            <th><i class="fa-solid fa-star"></i> النقاط</th>
+                            <th><i class="fa-solid fa-shield"></i> الحالة</th>
+                            <th style="text-align: left;"><i class="fa-solid fa-gear"></i> الإجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
         <div class="box-panel full-width-panel">
             <div class="box-title"><i class="fa-solid fa-ranking-star"></i> ڕیزبەندی گشتی خول</div>
             <div class="data-table-container">
@@ -922,7 +1038,11 @@
         let localSquadsData = {};
         let localNotificationsData = {};
         let localMatchesData = {};
+        let localFantasyUsersData = {};
         let onConfirmCallback = null;
+
+        let currentHomeEvents = [];
+        let currentAwayEvents = [];
 
         const defaultTeams = ["ئـ", "ب", "ت", "م", "ک", "ل", "د", "ر", "س"];
 
@@ -1004,9 +1124,130 @@
             document.getElementById('typeFinished').classList.toggle('active', mode === 'finished');
             document.getElementById('wrapperUpcoming').style.display = mode === 'upcoming' ? 'block' : 'none';
             document.getElementById('wrapperFinished').style.display = mode === 'finished' ? 'block' : 'none';
+            if(mode === 'finished') {
+                updateMatchEventPlayerDropdowns();
+            }
         }
 
-        /* --- الصندوق السادس: التفعيل والتعطيل اليدوي فقط --- */
+        window.updateMatchEventPlayerDropdowns = function() {
+            const homeTeam = document.getElementById('mHomeTeam').value;
+            const awayTeam = document.getElementById('mAwayTeam').value;
+
+            const homeSel = document.getElementById('homeEventPlayerSelect');
+            const awaySel = document.getElementById('awayEventPlayerSelect');
+            const motmSel = document.getElementById('mMotm');
+
+            if(homeSel) homeSel.innerHTML = "";
+            if(awaySel) awaySel.innerHTML = "";
+            if(motmSel) motmSel.innerHTML = '<option value="">دیاری نەکراوە</option>';
+
+            const allPlayers = Object.values(localPlayersArray);
+
+            const homePlayers = allPlayers.filter(p => p.team === homeTeam);
+            const awayPlayers = allPlayers.filter(p => p.team === awayTeam);
+
+            if(homePlayers.length === 0) {
+                homeSel.innerHTML = '<option value="">هیچ یاریزانێک لەم فەریقە نییە</option>';
+            } else {
+                homePlayers.forEach(p => {
+                    homeSel.innerHTML += `<option value="${p.name}">${p.name} (#${p.number})</option>`;
+                });
+            }
+
+            if(awayPlayers.length === 0) {
+                awaySel.innerHTML = '<option value="">هیچ یاریزانێک لەم فەریقە نییە</option>';
+            } else {
+                awayPlayers.forEach(p => {
+                    awaySel.innerHTML += `<option value="${p.name}">${p.name} (#${p.number})</option>`;
+                });
+            }
+
+            [...homePlayers, ...awayPlayers].forEach(p => {
+                if(motmSel) motmSel.innerHTML += `<option value="${p.name}">${p.name} (${p.team})</option>`;
+            });
+        };
+
+        window.addMatchEvent = function(teamSide) {
+            let pSelect, typeSelect, targetArray;
+            if(teamSide === 'home') {
+                pSelect = document.getElementById('homeEventPlayerSelect');
+                typeSelect = document.getElementById('homeEventTypeSelect');
+                targetArray = currentHomeEvents;
+            } else {
+                pSelect = document.getElementById('awayEventPlayerSelect');
+                typeSelect = document.getElementById('awayEventTypeSelect');
+                targetArray = currentAwayEvents;
+            }
+
+            const pName = pSelect.value;
+            const eType = typeSelect.value;
+
+            if(!pName) {
+                showNotification("تکایە یاریزانێک دیاری بکە!", "error");
+                return;
+            }
+
+            targetArray.push({ type: eType, playerName: pName });
+            renderMatchEventsUI();
+            updateFinishedScoresCount();
+        };
+
+        window.removeMatchEvent = function(teamSide, index) {
+            if(teamSide === 'home') {
+                currentHomeEvents.splice(index, 1);
+            } else {
+                currentAwayEvents.splice(index, 1);
+            }
+            renderMatchEventsUI();
+            updateFinishedScoresCount();
+        };
+
+        function renderMatchEventsUI() {
+            const homeContainer = document.getElementById('homeEventsListContainer');
+            const awayContainer = document.getElementById('awayEventsListContainer');
+
+            if(homeContainer) {
+                homeContainer.innerHTML = "";
+                currentHomeEvents.forEach((ev, idx) => {
+                    let icon = '⚽';
+                    if(ev.type === 'yellow') icon = '🟨';
+                    if(ev.type === 'red') icon = '🟥';
+                    homeContainer.innerHTML += `
+                        <div class="event-item-tag">
+                            <span>${icon} ${ev.playerName}</span>
+                            <button type="button" onclick="removeMatchEvent('home', ${idx})">✕</button>
+                        </div>
+                    `;
+                });
+            }
+
+            if(awayContainer) {
+                awayContainer.innerHTML = "";
+                currentAwayEvents.forEach((ev, idx) => {
+                    let icon = '⚽';
+                    if(ev.type === 'yellow') icon = '🟨';
+                    if(ev.type === 'red') icon = '🟥';
+                    awayContainer.innerHTML += `
+                        <div class="event-item-tag">
+                            <span>${icon} ${ev.playerName}</span>
+                            <button type="button" onclick="removeMatchEvent('away', ${idx})">✕</button>
+                        </div>
+                    `;
+                });
+            }
+        }
+
+        function updateFinishedScoresCount() {
+            let homeGoals = currentHomeEvents.filter(e => e.type === 'goal').length;
+            let awayGoals = currentAwayEvents.filter(e => e.type === 'goal').length;
+
+            const hScoreInput = document.getElementById('mHomeScore');
+            const aScoreInput = document.getElementById('mAwayScore');
+
+            if(hScoreInput) hScoreInput.value = homeGoals;
+            if(aScoreInput) aScoreInput.value = awayGoals;
+        }
+
         window.updateFantasyEditStateManual = function(val) {
             const configVal = (val === 'true');
             set(ref(db, 'systemSettings/fantasyEditMode'), configVal).then(() => {
@@ -1014,7 +1255,128 @@
             });
         };
 
-        /* --- 1. Inline Editing: Players Table --- */
+        window.activateUserInlineEdit = function(userId) {
+            const tr = document.getElementById(`user-row-${userId}`);
+            const u = localFantasyUsersData[userId];
+            if(!u) return;
+
+            const name = u.customDisplayName || u.displayName || "مستخدم";
+            const photo = u.customPhotoURL || u.photoURL || "";
+            const budget = u.budget !== undefined ? u.budget : 60000;
+            const points = u.points || 0;
+
+            tr.innerHTML = `
+                <td>
+                    <div style="display: flex; flex-direction: column; gap: 4px; width: 100%; min-width: 140px;">
+                        <input type="text" id="edit-user-name-${userId}" class="inline-edit-input" value="${name}" placeholder="اسم المستخدم">
+                        <input type="url" id="edit-user-photo-${userId}" class="inline-edit-input" style="font-size: 10px;" value="${photo}" placeholder="رابط الصورة">
+                    </div>
+                </td>
+                <td style="font-size: 11px; color: #94a3b8;">${u.email || 'بدون إيميل'}</td>
+                <td><input type="number" id="edit-user-budget-${userId}" class="inline-edit-input" style="width: 90px;" value="${budget}"></td>
+                <td><input type="number" id="edit-user-points-${userId}" class="inline-edit-input" style="width: 70px;" value="${points}"></td>
+                <td><span class="badge-icon">${u.isBanned ? 'محظور' : 'نشط'}</span></td>
+                <td class="actions-cell">
+                    <button onclick="saveUserInlineEdit('${userId}')" style="background:#10b981; color:#fff;" title="حفظ"><i class="fa-solid fa-floppy-disk"></i></button>
+                    <button class="btn-secondary" onclick="renderFantasyUsersTable()" title="إلغاء"><i class="fa-solid fa-xmark"></i></button>
+                </td>
+            `;
+            showNotification("دۆخی دەستکاری ئەکاونت چالاککرا.", "info");
+        };
+
+        window.saveUserInlineEdit = function(userId) {
+            const newName = document.getElementById(`edit-user-name-${userId}`).value.trim();
+            const newPhoto = document.getElementById(`edit-user-photo-${userId}`).value.trim();
+            const newBudget = Number(document.getElementById(`edit-user-budget-${userId}`).value) || 0;
+            const newPoints = Number(document.getElementById(`edit-user-points-${userId}`).value) || 0;
+
+            update(ref(db, `fantasyUsers/${userId}`), {
+                customDisplayName: newName,
+                customPhotoURL: newPhoto,
+                budget: newBudget,
+                points: newPoints
+            }).then(() => {
+                showNotification("تم تحديث النقاط والميزانية والبيانات بنجاح!", "success");
+            });
+        };
+
+        window.toggleBanUser = function(userId, currentBanState) {
+            const nextState = !currentBanState;
+            update(ref(db, `fantasyUsers/${userId}`), {
+                isBanned: nextState
+            }).then(() => {
+                showNotification(nextState ? "تم حظر المستخدم بنجاح! لن يتمكن من دخول الفانتازي بعد الآن." : "تم فك الحظر عن المستخدم!", nextState ? "error" : "success");
+            });
+        };
+
+        window.deleteFantasyUser = function(userId) {
+            openConfirmModal(
+                "حذف حساب المستخدم",
+                "هل أنت متأكد من حذف هذا الحساب نهائياً؟ ستتم إزالة تشكيلته ونقاطه وكل بياناته ويعود كأنه مستخدم جديد.",
+                () => {
+                    remove(ref(db, `fantasyUsers/${userId}`)).then(() => {
+                        showNotification("تم حذف الحساب بنجاح وتمت مسح كافة بياناته!", "error");
+                    });
+                }
+            );
+        };
+
+        window.previewUserSquad = function(userId) {
+            const u = localFantasyUsersData[userId];
+            if(!u) return;
+
+            const name = u.customDisplayName || u.displayName || "مستخدم";
+            document.getElementById("modalSquadUserName").innerText = `تشكيلة اللاعب: ${name}`;
+
+            const rAtt = document.getElementById('modalRowAttack');
+            const rMid = document.getElementById('modalRowMidfield');
+            const rDef = document.getElementById('modalRowDefense');
+            const rGK = document.getElementById('modalRowGK');
+
+            if(rAtt) rAtt.innerHTML = "";
+            if(rMid) rMid.innerHTML = "";
+            if(rDef) rDef.innerHTML = "";
+            if(rGK) rGK.innerHTML = "";
+
+            const squad = u.squad || { attack: [], midfield: [], defense: [], goalkeeper: [] };
+
+            if(squad.attack) {
+                squad.attack.forEach(p => {
+                    if(p && p.name) rAtt.innerHTML += createModalNodeHtml(p);
+                });
+            }
+            if(squad.midfield) {
+                squad.midfield.forEach(p => {
+                    if(p && p.name) rMid.innerHTML += createModalNodeHtml(p);
+                });
+            }
+            if(squad.defense) {
+                squad.defense.forEach(p => {
+                    if(p && p.name) rDef.innerHTML += createModalNodeHtml(p);
+                });
+            }
+            if(squad.goalkeeper) {
+                squad.goalkeeper.forEach(p => {
+                    if(p && p.name) rGK.innerHTML += createModalNodeHtml(p);
+                });
+            }
+
+            document.getElementById("adminUserSquadModal").style.display = "flex";
+        };
+
+        window.closeAdminSquadModal = function() {
+            document.getElementById("adminUserSquadModal").style.display = "none";
+        };
+
+        function createModalNodeHtml(player) {
+            return `
+                <div class="admin-pitch-node" style="width: 80px;">
+                    <img src="${player.photo || 'https://via.placeholder.com/32'}" style="width: 30px; height: 30px; border-radius: 50%; object-fit: cover; border: 1px solid #fff;">
+                    <span class="admin-node-name" style="font-size: 10px;">${player.name}</span>
+                </div>
+            `;
+        }
+
         window.createNewPlayer = function(e) {
             e.preventDefault();
             if(!validateFields(['pName', 'pTeam', 'pNumber'])) return;
@@ -1102,7 +1464,6 @@
             });
         }
 
-        /* --- 2. Inline Editing: Matches Tables (Upcoming & Finished) --- */
         window.activateUpcomingInlineEdit = function(matchId) {
             const tr = document.getElementById(`upcoming-row-${matchId}`);
             const m = localMatchesData[matchId];
@@ -1202,7 +1563,6 @@
             renderMatchesTables();
         }
 
-        /* --- 3. Inline Editing: Fantasy Market Table --- */
         window.activateFantasyInlineEdit = function(playerId) {
             const tr = document.getElementById(`market-row-${playerId}`);
             const p = localPlayersArray[playerId];
@@ -1244,7 +1604,6 @@
             });
         };
 
-        /* --- 4. Inline Editing: Notifications Table --- */
         window.activateNotifInlineEdit = function(notifId) {
             const tr = document.getElementById(`notif-row-${notifId}`);
             const n = localNotificationsData[notifId];
@@ -1292,7 +1651,6 @@
             renderNotificationsTable();
         }
 
-        /* --- Helper & Utility Functions --- */
         window.updateFilteredPlayersList = function() {
             const selectedTeam = document.getElementById('marketTeamSelect').value;
             const marketPlayerSelect = document.getElementById('marketPlayerSelect');
@@ -1442,24 +1800,6 @@
             });
         };
 
-        function parseEvents(rawText) {
-            if(!rawText || !rawText.trim()) return [];
-            const lines = rawText.split('\n');
-            const events = [];
-            lines.forEach(line => {
-                if(line.includes('-')) {
-                    const parts = line.split('-');
-                    const pName = parts[0].trim();
-                    const typeRaw = parts[1].trim();
-                    let type = 'goal';
-                    if(typeRaw.includes('زەرد')) type = 'yellow';
-                    if(typeRaw.includes('سوور') || typeRaw.includes('سور')) type = 'red';
-                    events.push({ type: type, playerName: pName });
-                }
-            });
-            return events;
-        }
-
         window.createNewMatch = function(e) {
             e.preventDefault();
             
@@ -1498,15 +1838,18 @@
             } else {
                 matchPayload.date = document.getElementById('mDateOnly').value;
                 matchPayload.time = ""; 
-                matchPayload.motm = document.getElementById('mMotm').value.trim() || "دیاری نەکراوە";
+                matchPayload.motm = document.getElementById('mMotm').value || "دیاری نەکراوە";
                 matchPayload.homeScore = Number(document.getElementById('mHomeScore').value) || 0;
                 matchPayload.awayScore = Number(document.getElementById('mAwayScore').value) || 0;
-                matchPayload.homeEvents = parseEvents(document.getElementById('mHomeEventsRaw').value);
-                matchPayload.awayEvents = parseEvents(document.getElementById('mAwayEventsRaw').value);
+                matchPayload.homeEvents = [...currentHomeEvents];
+                matchPayload.awayEvents = [...currentAwayEvents];
             }
 
             set(newMatchPush, matchPayload).then(() => {
                 document.getElementById('matchForm').reset();
+                currentHomeEvents = [];
+                currentAwayEvents = [];
+                renderMatchEventsUI();
                 toggleMatchForm('upcoming');
                 showNotification(`یاری نێوان [ ${homeT} × ${awayT} ] بە سەرکەوتوویی خستە ناو خشتەکەوە!`, "success");
             });
@@ -1645,7 +1988,6 @@
             `;
         }
 
-        /* --- Real-Time Database Sync --- */
         const dbRef = ref(db, '/');
         onValue(dbRef, (snapshot) => {
             const data = snapshot.val() || {};
@@ -1675,6 +2017,7 @@
             localPlayersArray = data.playersDatabase || {};
             localSquadsData = data.squadsDatabase || {};
             localNotificationsData = data.notificationsDatabase || {};
+            localFantasyUsersData = data.fantasyUsers || {};
             
             renderPlayersTableOnly();
             updateFilteredPlayersList();
@@ -1682,11 +2025,12 @@
             renderFantasyMarketTable();
             renderNotificationsTable();
             renderMatchesTables();
+            renderFantasyUsersTable();
+            updateMatchEventPlayerDropdowns();
 
             loadTeamSquadManagement();
             calculateLeagueStanding(matchesList);
 
-            // مزامنة حالة السندوق السادس
             const settingVal = data.systemSettings && data.systemSettings.fantasyEditMode !== undefined ? data.systemSettings.fantasyEditMode : true;
             const selectEl = document.getElementById('fantasyEditStateSelect');
             const badgeEl = document.getElementById('fantasyRealStatusBadge');
@@ -1707,6 +2051,51 @@
                 }
             }
         });
+
+        function renderFantasyUsersTable() {
+            const usersTbody = document.querySelector('#adminFantasyUsersTable tbody');
+            if(!usersTbody) return;
+            usersTbody.innerHTML = "";
+
+            const sortedUsersEntries = Object.entries(localFantasyUsersData).sort((a, b) => {
+                const pointsA = a[1].points || 0;
+                const pointsB = b[1].points || 0;
+                return pointsB - pointsA;
+            });
+
+            sortedUsersEntries.forEach(([userId, u]) => {
+                if(!u) return;
+
+                const name = u.customDisplayName || u.displayName || "مستخدم";
+                const photo = u.customPhotoURL || u.photoURL || 'https://via.placeholder.com/32';
+                const budget = u.budget !== undefined ? u.budget : 60000;
+                const points = u.points || 0;
+                const isBanned = Boolean(u.isBanned);
+                const userEmail = u.email || (u.providerData && u.providerData[0] && u.providerData[0].email) || 'بدون إيميل';
+
+                const tr = document.createElement('tr');
+                tr.id = `user-row-${userId}`;
+                tr.innerHTML = `
+                    <td>
+                        <div class="player-info-cell">
+                            <img src="${photo}" onerror="this.src='https://via.placeholder.com/32'">
+                            <span style="font-weight:600; color:#fff;">${name}</span>
+                        </div>
+                    </td>
+                    <td style="font-size:11px; color:#94a3b8;">${userEmail}</td>
+                    <td style="color:#eab308; font-weight:bold;">${Number(budget).toLocaleString()} IQD</td>
+                    <td style="color:#10b981; font-weight:bold;">${points}</td>
+                    <td><span class="badge-icon" style="color:${isBanned ? '#ef4444' : '#10b981'}; border-color:${isBanned ? 'rgba(239,68,68,0.3)' : 'rgba(16,185,129,0.3)'}">${isBanned ? 'محظور' : 'نشط'}</span></td>
+                    <td class="actions-cell">
+                        <button onclick="previewUserSquad('${userId}')" style="background:#3b82f6; color:#fff;" title="معاينة التشكيلة"><i class="fa-solid fa-eye"></i></button>
+                        <button onclick="activateUserInlineEdit('${userId}')" style="background:#f59e0b; color:#fff;" title="تعديل"><i class="fa-solid fa-pen-to-square"></i></button>
+                        <button onclick="toggleBanUser('${userId}', ${isBanned})" style="background:${isBanned ? '#10b981' : '#f97316'}; color:#fff;" title="${isBanned ? 'فك الحظر' : 'حظر'}"><i class="fa-solid ${isBanned ? 'fa-unlock' : 'fa-ban'}"></i></button>
+                        <button class="btn-danger" onclick="deleteFantasyUser('${userId}')" title="حذف نهائي"><i class="fa-solid fa-trash"></i></button>
+                    </td>
+                `;
+                usersTbody.appendChild(tr);
+            });
+        }
 
         function renderPlayersTableOnly() {
             const playersTbody = document.querySelector('#adminPlayersTable tbody');
