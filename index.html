@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cyber League</title>
+    <title>Cyber League - الأساسي</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@400;600;800&display=swap');
@@ -270,13 +270,6 @@
             position: relative; overflow: hidden; box-shadow: var(--shadow-md);
         }
 
-        .player-card {
-            background: var(--bg-card); border-radius: 16px; padding: 16px 20px; border: 1px solid var(--border-color);
-            position: relative; overflow: hidden; display: flex; flex-direction: row; 
-            justify-content: space-between; align-items: center; cursor: pointer; box-shadow: var(--shadow-sm);
-        }
-        .player-card:hover { transform: translateY(-2px); border-color: var(--text-main); box-shadow: var(--shadow-md); }
-
         .table-container { overflow-x: auto; width: 100%; border-radius: 10px; }
         table { width: 100%; border-collapse: collapse; text-align: right; white-space: nowrap; }
         th, td { padding: 15px 14px; font-size: 13px; }
@@ -311,7 +304,6 @@
 
         .event-icons-group { display: inline-flex; align-items: center; gap: 4px; }
 
-        /* تعديل شكل الكروت الصفراء والحمراء لتكون مستطيلة */
         .card-icon-rect {
             display: inline-block;
             width: 7px;
@@ -321,34 +313,6 @@
         }
         .card-yellow { background-color: #eab308; }
         .card-red { background-color: #ef4444; }
-
-        .search-container { margin-bottom: 16px; }
-        .search-input { width: 100%; padding: 14px 18px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; color: var(--text-main); font-family: 'Noto Kufi Arabic', sans-serif; font-size: 13px; outline: none; box-shadow: var(--shadow-sm); }
-        .search-input:focus { border-color: var(--text-main); background: var(--bg-sub); box-shadow: var(--shadow-md); }
-
-        .top-scorer-card { background: linear-gradient(135deg, #172030 0%, #080c12 100%); border: 2px solid var(--text-main); border-radius: 16px; padding: 20px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; position: relative; box-shadow: var(--shadow-lg); }
-        [data-theme="light"] .top-scorer-card { background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%); }
-        .top-scorer-badge { background-color: var(--text-main); color: var(--bg-body); font-size: 10px; font-weight: 800; padding: 3px 10px; border-radius: 5px; display: inline-block; margin-bottom: 6px; }
-        .top-scorer-info h2 { font-size: 19px; font-weight: 800; color: var(--text-main); }
-        .top-scorer-info p { font-size: 12px; color: var(--text-muted); margin-top: 3px; }
-        .top-scorer-goals { text-align: center; background: rgba(255, 255, 255, 0.08); border: 2px solid var(--border-color); padding: 10px 18px; border-radius: 10px; }
-        .top-scorer-goals .goals-count { font-size: 25px; font-weight: 800; color: var(--text-main); display: block; line-height: 1; }
-
-        .players-list { display: flex; flex-direction: column; gap: 12px; }
-        .player-identity { display: flex; align-items: center; gap: 16px; }
-        
-        .player-jersey { width: 48px; height: 48px; border-radius: 50%; border: 2px solid var(--border-color); overflow: hidden; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-        .player-jersey img { width: 100%; height: 100%; object-fit: cover; }
-        .player-meta { display: flex; flex-direction: column; gap: 6px; }
-        .player-meta h3 { margin: 0; color: var(--text-main); font-size: 15px; font-weight: 800; }
-        
-        .player-badges-container { display: flex; align-items: center; gap: 8px; }
-        .info-badge { font-size: 10.5px; font-weight: 800; padding: 4px 10px; border-radius: 6px; background: var(--bg-sub); border: 1px solid var(--border-color); color: var(--text-muted); display: inline-flex; align-items: center; justify-content: center; }
-        .info-badge.number-badge { color: var(--player-number-color); border-color: rgba(0, 136, 255, 0.3); }
-        
-        .stat-box { display: flex; flex-direction: column; align-items: center; justify-content: center; background-color: var(--bg-sub); border: 1px solid var(--border-color); border-radius: 10px; min-width: 65px; padding: 8px 10px; }
-        .stat-box .box-label { font-size: 10px; color: var(--text-muted); font-weight: 600; margin-bottom: 2px; }
-        .stat-box .box-value { font-size: 17px; color: var(--player-number-color); font-weight: 800; }
 
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(3, 4, 7, 0.95); display: none; justify-content: center; align-items: center; z-index: 10000; padding: 16px; backdrop-filter: blur(8px); }
         .modal-overlay.active { display: flex; }
@@ -536,9 +500,9 @@
                 </div>
             </div>
             <ul>
-                <li><a href="#" id="nav-leagues" class="nav-link active" onclick="switchPage('leagues', event, this)"><i class="fa-solid fa-trophy"></i></a></li>
-                <li><a href="#" id="nav-matches" class="nav-link" onclick="switchPage('matches', event, this)"><i class="fa-solid fa-calendar-days"></i></a></li>
-                <li><a href="#" id="nav-players" class="nav-link" onclick="switchPage('players', event, this)"><i class="fa-solid fa-users"></i></a></li>
+                <li><a href="index.html" id="nav-leagues" class="nav-link active"><i class="fa-solid fa-trophy"></i></a></li>
+                <li><a href="index.html" id="nav-matches" class="nav-link"><i class="fa-solid fa-calendar-days"></i></a></li>
+                <li><a href="players.html" id="nav-players" class="nav-link"><i class="fa-solid fa-users"></i></a></li>
                 <li><a href="fantasy.html" id="nav-fantasy" class="nav-link"><i class="fa-solid fa-gamepad"></i></a></li>
             </ul>
         </div>
@@ -570,24 +534,12 @@
             </div>
         </div>
 
-        <div id="matches" class="page">
-            <div class="hero-section">
+        <div id="matches" class="page active">
+            <div class="hero-section" style="margin-top: 30px;">
                 <h1 id="lblMatchesTitle">خشتەی یارییەکان</h1>
                 <p id="lblMatchesDesc">خشتەی کات و ئەنجامی یارییەکانی خول</p>
             </div>
             <div class="matches-list" id="matchesGrid"></div>
-        </div>
-
-        <div id="players" class="page">
-            <div class="hero-section">
-                <h1 id="lblPlayersTitle">ئاماری یاریزانانی تیپەکان</h1>
-                <p id="lblPlayersDesc">لیستی نوێکراوەی گۆڵکارانی فەرمی خول</p>
-            </div>
-            <div id="topScorerContainer"></div>
-            <div class="search-container">
-                <input type="text" id="playerSearch" class="search-input" onkeyup="filterPlayers()" placeholder="بگەڕێ بۆ ناوی یاریزان یان تیپ...">
-            </div>
-            <div class="players-list" id="playersGrid"></div>
         </div>
     </div>
 
@@ -618,8 +570,6 @@
 
         const domLeagueTableBody = document.querySelector('#leagueTable tbody');
         const domMatchesGrid = document.getElementById('matchesGrid');
-        const domPlayersGrid = document.getElementById('playersGrid');
-        const domTopScorerContainer = document.getElementById('topScorerContainer');
 
         window.showPlayerLuxuryCard = function(playerName, playerNumber, teamName) {
             const playerData = playersDatabase.find(p => p.name.trim() === playerName.trim());
@@ -818,66 +768,6 @@
             domMatchesGrid.appendChild(gridFragments);
         }
 
-        function autoRenderPlayersAndStats() {
-            if(!domPlayersGrid || !domTopScorerContainer) return; 
-            domPlayersGrid.innerHTML = ""; domTopScorerContainer.innerHTML = "";
-            const isAr = document.documentElement.getAttribute("lang") === "ar";
-
-            if (playersDatabase.length === 0) {
-                domPlayersGrid.innerHTML = `<p class="empty-message">ℹ️ ${isAr ? 'لا يوجد لاعبين حالياً في النظام.' : 'هیچ یاریزانێک لە ئێستادا لە سیستەمەکەدا نییە.'}</p>`;
-                return;
-            }
-
-            playersDatabase.sort((a, b) => (b.goals || 0) - (a.goals || 0));
-            const topScorer = playersDatabase[0];
-            if (topScorer && (topScorer.goals > 0)) {
-                domTopScorerContainer.innerHTML = `
-                    <div class="top-scorer-card">
-                        <div class="top-scorer-info">
-                            <span class="top-scorer-badge">${isAr ? 'هداف الدوري' : 'گۆڵکاری خول'}</span>
-                            <h2>${topScorer.name}</h2>
-                            <p>${isAr ? 'الفريق' : 'تیپی'}: ${topScorer.team || (isAr ? 'بدون فريق' : 'بێ تیپ')} • ${isAr ? 'الرقم' : 'ژمارە'}: #${topScorer.number || '0'}</p>
-                        </div>
-                        <div class="top-scorer-goals">
-                            <span class="goals-count">${topScorer.goals}</span>
-                            <span class="goals-label">${isAr ? 'أهداف' : 'گۆڵ'}</span>
-                        </div>
-                    </div>
-                `;
-            }
-
-            let listFragments = document.createDocumentFragment();
-            playersDatabase.forEach((p) => {
-                const card = document.createElement('div');
-                card.className = "player-card";
-                card.onclick = () => showPlayerLuxuryCard(p.name, p.number, p.team || (isAr ? 'بدون فريق' : 'بێ تیپ'));
-                
-                const imgSource = p.photo ? p.photo : defaultPlayerImage;
-                card.innerHTML = `
-                    <div class="player-identity">
-                        <div class="player-jersey">
-                            <img src="${imgSource}" alt="${p.name || 'Player'}">
-                        </div>
-                        <div class="player-meta">
-                            <h3>${p.name || (isAr ? 'اسم اللاعب' : 'ناوی یاریزان')}</h3>
-                            <div class="player-badges-container">
-                                <span class="info-badge team-badge">${isAr ? 'الفريق' : 'تیپ'}: ${p.team || (isAr ? 'بدون فريق' : 'بێ تیپ')}</span>
-                                <span class="info-badge number-badge">${isAr ? 'الرقم' : 'ژمارە'}: #${p.number || '0'}</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="player-data-chips">
-                        <div class="stat-box">
-                            <span class="box-label">${isAr ? 'أهداف' : 'گۆڵ'}</span>
-                            <span class="box-value">${p.goals || 0}</span>
-                        </div>
-                    </div>
-                `;
-                listFragments.appendChild(card);
-            });
-            domPlayersGrid.appendChild(listFragments);
-        }
-
         const dbRef = ref(db, '/');
         onValue(dbRef, (snapshot) => {
             const data = snapshot.val();
@@ -923,12 +813,8 @@
             leaguesDatabase.forEach(t => { t.points = (t.wins * 3) + (t.draws * 1); });
             leaguesDatabase.sort((a, b) => b.points - a.points);
 
-            window.autoRefreshTranslations = function() {
-                autoRenderLeague(); 
-                autoRenderMatches(); 
-                autoRenderPlayersAndStats();
-            };
-            window.autoRefreshTranslations();
+            autoRenderLeague(); 
+            autoRenderMatches(); 
 
             setTimeout(() => {
                 const loader = document.getElementById("page-loader");
@@ -947,9 +833,6 @@
                 thRank: "ڕێز", thTeam: "تیپ", thPoints: "خاڵ",
                 matchesTitle: "خشتەی یارییەکان",
                 matchesDesc: "خشتەی کات و ئەنجامی یارییەکانی خول",
-                playersTitle: "ئاماری یاریزانانی تیپەکان",
-                playersDesc: "لیستی نوێکراوەی گۆڵکارانی فەرمی خول",
-                searchPlaceholder: "بگەڕێ بۆ ناوی یاریزان یان تیپ...",
                 playerGoalsCard: "گۆڵەکانی یاریزان",
                 subsTitle: "یاریزانانی یەدەگ",
                 updateTitle: "ئاگاداری دەربارەی نوێکردنەوە",
@@ -966,9 +849,6 @@
                 thRank: "الترتيب", thTeam: "الفريق", thPoints: "النقاط",
                 matchesTitle: "جدول المباريات",
                 matchesDesc: "جدول الأوقات ونتائج مباريات الدوري الكروي",
-                playersTitle: "إحصائيات لاعبي الدوري",
-                playersDesc: "القائمة المحدثة لهدافي الدوري الرسمي",
-                searchPlaceholder: "ابحث عن اسم اللاعب أو الفريق...",
                 playerGoalsCard: "أهداف اللاعب الحالية",
                 subsTitle: "اللاعبين البدلاء",
                 updateTitle: "تنويه بخصوص التحديث",
@@ -987,11 +867,6 @@
             document.documentElement.setAttribute("data-theme", currentTheme);
             updateThemeIcon(currentTheme);
 
-            // استرجاع القسم الأخير الذي كان فيه المستخدم عند الدخول للموقع مرة أخرى
-            const savedPage = localStorage.getItem("currentActivePage") || "leagues";
-            const targetNav = document.getElementById("nav-" + savedPage);
-            switchPage(savedPage, null, targetNav);
-
             const hasSeenNotice = localStorage.getItem("cyberLeagueUpdateNotice");
             if (!hasSeenNotice) {
                 document.getElementById("updateNoticeModal").classList.add("active");
@@ -1002,7 +877,6 @@
             const currentLang = document.documentElement.getAttribute("lang") === "ar" ? "ckb" : "ar";
             applyLanguage(currentLang);
             localStorage.setItem("appLang", currentLang);
-            if (window.autoRefreshTranslations) window.autoRefreshTranslations();
         }
 
         function applyLanguage(lang) {
@@ -1018,12 +892,8 @@
             document.getElementById("thTeam").innerText = trans.thTeam;
             document.getElementById("thPoints").innerText = trans.thPoints;
             
-            document.getElementById("lblPlayersTitle").innerText = trans.playersTitle;
-            document.getElementById("lblPlayersDesc").innerText = trans.playersDesc;
-
             document.getElementById("lblMatchesTitle").innerText = trans.matchesTitle;
             document.getElementById("lblMatchesDesc").innerText = trans.matchesDesc;
-            document.getElementById("playerSearch").setAttribute("placeholder", trans.searchPlaceholder);
             document.getElementById("lblPlayerGoalsCard").innerText = trans.playerGoalsCard;
             document.getElementById("lblSubsTitle").innerText = trans.subsTitle;
             document.getElementById("lblUpdateTitle").innerText = trans.updateTitle;
@@ -1049,28 +919,6 @@
         function closeUpdateModal() {
             document.getElementById("updateNoticeModal").classList.remove("active");
             localStorage.setItem("cyberLeagueUpdateNotice", "true");
-        }
-
-        function filterPlayers() {
-            const filter = document.getElementById('playerSearch').value.trim().toLowerCase();
-            const cards = document.getElementsByClassName('player-card');
-            for (let i = 0; i < cards.length; i++) {
-                const text = cards[i].innerText.toLowerCase();
-                cards[i].style.display = text.includes(filter) ? "flex" : "none";
-            }
-        }
-
-        function switchPage(pageId, event, element) {
-            if(event) event.preventDefault();
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            const target = document.getElementById(pageId);
-            if(target) target.classList.add('active');
-            
-            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-            if(element) element.classList.add('active');
-
-            // حفظ القسم الحالي في الذاكرة المحلية (localStorage)
-            localStorage.setItem("currentActivePage", pageId);
         }
     </script>
 </body>
