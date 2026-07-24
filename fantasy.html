@@ -724,13 +724,13 @@
 
     <div id="toastContainer"></div>
 
-    <!-- نافذة الحظر -->
+    <!-- نافذة الحظر (تتغير للغة العربية أو الكوردية تلقائياً حسب زر اللغة) -->
     <div class="modal-overlay" id="bannedModal" style="z-index: 999999;">
         <div class="beIn-squad-card" style="height: auto; max-width: 380px; padding: 25px; text-align: center;">
             <div style="font-size: 50px; color: #ef4444; margin-bottom: 15px;"><i class="fa-solid fa-ban"></i></div>
             <h2 style="color: #ef4444; margin-bottom: 10px;" id="bannedModalTitle">حسابك محظور</h2>
             <p style="font-size: 13px; color: var(--text-muted); line-height: 1.6; margin-bottom: 20px;" id="bannedModalDesc">عذراً، تم حظر حسابك من قبل إدارة الموقع. لا يمكنك الدخول إلى قسم الفانتازي.</p>
-            <button class="btn-action-submit-squad" style="background: #ef4444; margin-top: 0;" onclick="logoutDueToBan()">تسجيل الخروج بحساب آخر</button>
+            <button class="btn-action-submit-squad" id="bannedLogoutBtn" style="background: #ef4444; margin-top: 0;" onclick="logoutDueToBan()">تسجيل الخروج بحساب آخر</button>
         </div>
     </div>
 
@@ -1088,7 +1088,8 @@
                 matchLockedErrorTitle: "ناتوانرێت دەستکاری بکرێت",
                 matchLockedErrorDesc: " ناتوانرێت دەستکاری بکرێت چونکە بەم زووانە یارییەک دێتە پێشەوە.",
                 bannedTitle: "هەژمارەکەت قەدەغەکراوە",
-                bannedDesc: "ببورە، هەژمارەکەت لەلایەن بەڕێوەبەرەوە قەدەغەکراوە و ناتوانیت دەست بە فانتازی بکەیت."
+                bannedDesc: "ببورە، هەژمارەکەت لەلایەن بەڕێوەبەرەوە قەدەغەکراوە و ناتوانیت دەست بە فانتازی بکەیت.",
+                bannedLogoutBtn: "چوونە دەرەوە بە هەژمارێکی تر"
             },
             ar: {
                 loaderText: "تحميل الدوري الرسمي...",
@@ -1139,7 +1140,8 @@
                 matchLockedErrorTitle: "تنبيه التعديل",
                 matchLockedErrorDesc: "لا يمكن التعديل لوجود مباراة قريبة",
                 bannedTitle: "حسابك محظور",
-                bannedDesc: "عذراً، تم حظر حسابك من قبل إدارة الموقع. لا يمكنك الدخول إلى قسم الفانتازي."
+                bannedDesc: "عذراً، تم حظر حسابك من قبل إدارة الموقع. لا يمكنك الدخول إلى قسم الفانتازي.",
+                bannedLogoutBtn: "تسجيل الخروج بحساب آخر"
             }
         };
 
@@ -1203,6 +1205,7 @@
             document.getElementById('lblNotifTabMy').innerText = getLangText('notifTabMy');
             document.getElementById('bannedModalTitle').innerText = getLangText('bannedTitle');
             document.getElementById('bannedModalDesc').innerText = getLangText('bannedDesc');
+            document.getElementById('bannedLogoutBtn').innerText = getLangText('bannedLogoutBtn');
         };
 
         let playersDatabase = [];
@@ -1222,7 +1225,6 @@
         let currentMarketPageIndex = 0;
         let isDataLoadedFromFirebase = false;
         let currentNotificationFilter = 'all';
-        let userListenerUnsubscribe = null;
 
         let serverFantasyEditAllowed = true;
 
@@ -1290,71 +1292,6 @@
             }
         }
 
-        function isSquadFull() {
-            let totalPlayersCount = 0;
-            if (userFantasySquad) {
-                Object.keys(userFantasySquad).forEach(zone => {
-                    userFantasySquad[zone].forEach(p => {
-                        if (p && p.name) totalPlayersCount++;
-                    });
-                });
-            }
-            return totalPlayersCount === 6;
-        }
-
-        function processNewNotificationsForUser() {
-            if (!currentUser || !isDataLoadedFromFirebase) return;
-            let updated = false;
-
-            notificationsDatabase.forEach(n => {
-                if (!n || !n.id || !n.playerName) return;
-
-                if (userClaimedNotifications[n.id] === undefined) {
-                    let playerNameTrimmed = n.playerName.trim();
-                    let entryTime = squadEntryTimestamps[playerNameTrimmed];
-                    let notifTime = n.timestamp || 0;
-
-                    let activePlayerNames = [];
-                    Object.keys(userFantasySquad).forEach(z => {
-                        userFantasySquad[z].forEach(p => {
-                            if (p && p.name) activePlayerNames.push(p.name.trim());
-                        });
-                    });
-
-                    let isPlayerInSquadNow = activePlayerNames.includes(playerNameTrimmed);
-
-                    if (isSquadFull() && isPlayerInSquadNow && entryTime !== undefined && entryTime <= notifTime) {
-                        userClaimedNotifications[n.id] = { claimed: true, wasCaptain: (userCaptain && userCaptain === playerNameTrimmed) };
-                        updated = true;
-                    } else {
-                        userClaimedNotifications[n.id] = { claimed: false, wasCaptain: false };
-                        updated = true;
-                    }
-                }
-            });
-
-            let calculatedTotalPoints = 0;
-            Object.keys(userClaimedNotifications).forEach(notifId => {
-                let claimInfo = userClaimedNotifications[notifId];
-                if (claimInfo && claimInfo.claimed) {
-                    let matchingNotif = notificationsDatabase.find(item => item.id === notifId);
-                    if (matchingNotif) {
-                        let pts = getNotificationPointValue(matchingNotif.type);
-                        if (claimInfo.wasCaptain) {
-                            pts *= 2;
-                        }
-                        calculatedTotalPoints += pts;
-                    }
-                }
-            });
-
-            if (userPoints !== calculatedTotalPoints || updated) {
-                userPoints = calculatedTotalPoints;
-                saveUserDataRealtime();
-                updateFantasyPitchUI();
-            }
-        }
-
         const notifRef = ref(db, 'notificationsDatabase');
         onValue(notifRef, (snapshot) => {
             const data = snapshot.val();
@@ -1366,7 +1303,6 @@
                 notificationsDatabase.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
             }
             renderNotifications();
-            processNewNotificationsForUser();
         });
 
         const playersRef = ref(db, 'playersDatabase');
@@ -1555,7 +1491,6 @@
             const userRef = ref(db, 'fantasyUsers/' + currentUser.uid);
             get(userRef).then((snapshot) => {
                 let currentData = snapshot.val() || {};
-                // إذا لم يتم حذف الحساب أثناء التعديل
                 if (currentData) {
                     set(userRef, {
                         ...currentData,
@@ -1581,12 +1516,10 @@
                 currentUser = user;
                 authWall.style.display = "none";
                 
-                // الاستماع الحي الفوري لتغييرات الحساب (الحظر أو الحذف من قبل الأدمن)
                 const userRef = ref(db, 'fantasyUsers/' + user.uid);
                 onValue(userRef, (snapshot) => {
                     const fData = snapshot.val();
                     
-                    // إذا قام الأدمن بحذف الحساب تماماً من قاعدة البيانات
                     if (!fData) {
                         isDataLoadedFromFirebase = false;
                         fantasyPageContent.style.display = "none";
@@ -1595,7 +1528,6 @@
                         return;
                     }
 
-                    // إذا قام الأدمن بحظر المستخدم (`isBanned = true`)
                     if (fData.isBanned === true) {
                         document.getElementById("bannedModal").classList.add("active");
                         fantasyPageContent.style.display = "none";
@@ -1605,8 +1537,10 @@
                         fantasyPageContent.style.display = "block";
                     }
 
+                    // التحديث الفوري للميزانية والنقاط الواردة من الأدمن
                     userBudget = fData.budget !== undefined ? fData.budget : 60000;
-                    userPoints = fData.points || 0;
+                    userPoints = fData.points !== undefined ? fData.points : 0;
+                    
                     userCaptain = fData.captain || null;
                     userAdsData = fData.adsData || {};
                     userReservePlayers = fData.reservePlayers || [];
@@ -1636,9 +1570,8 @@
                     renderMarketGlobal();
                     renderSellPlayersList();
                     updateAdsUI();
-                    processNewNotificationsForUser();
                 }, {
-                    onlyOnce: false // استماع مستمر وحي
+                    onlyOnce: false
                 });
 
             } else {
@@ -2013,7 +1946,6 @@
             renderSellPlayersList();
             renderNotifications();
             closeFantasySelector();
-            processNewNotificationsForUser();
 
             window.showToast(lang === 'ar' ? "تم التحديث" : "نوێکرایەوە", lang === 'ar' ? "تم وضع اللاعب في التشكيلة بنجاح!" : "یاریزانەکە دابنرا لە پێکهاتەدا!", "success");
         };
