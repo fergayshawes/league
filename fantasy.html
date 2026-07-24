@@ -1014,7 +1014,7 @@
             </div>
 
             <div class="fantasy-bottom-nav">
-                <button class="fantasy-nav-item active" id="btnSubTabProfile" onclick="switchFantasySubPage('fantasy-sub-profile', this)">
+                <button class="fantasy-nav-item" id="btnSubTabProfile" onclick="switchFantasySubPage('fantasy-sub-profile', this)">
                     <i class="fa-solid fa-user-gear"></i>
                 </button>
                 <button class="fantasy-nav-item" id="btnSubTabSquad" onclick="switchFantasySubPage('fantasy-sub-squad', this)">
@@ -2351,17 +2351,17 @@
             // استعادة القسم الرئيسي الفرعي لفانتازي
             const savedSubPage = localStorage.getItem("activeFantasySubPage");
             const savedNavBtnId = localStorage.getItem("activeFantasyNavBtn");
-            if (savedSubPage && document.getElementById(savedSubPage)) {
-                const pages = document.querySelectorAll('.fantasy-subpage');
-                pages.forEach(p => p.classList.remove('active'));
-                document.getElementById(savedSubPage).classList.add('active');
+            
+            const targetSubPage = (savedSubPage && document.getElementById(savedSubPage)) ? savedSubPage : 'fantasy-sub-profile';
+            const targetNavBtnId = (savedNavBtnId && document.getElementById(savedNavBtnId)) ? savedNavBtnId : 'btnSubTabProfile';
 
-                const navBtns = document.querySelectorAll('.fantasy-nav-item');
-                navBtns.forEach(b => b.classList.remove('active'));
-                if (savedNavBtnId && document.getElementById(savedNavBtnId)) {
-                    document.getElementById(savedNavBtnId).classList.add('active');
-                }
-            }
+            const pages = document.querySelectorAll('.fantasy-subpage');
+            pages.forEach(p => p.classList.remove('active'));
+            document.getElementById(targetSubPage).classList.add('active');
+
+            const navBtns = document.querySelectorAll('.fantasy-nav-item');
+            navBtns.forEach(b => b.classList.remove('active'));
+            document.getElementById(targetNavBtnId).classList.add('active');
 
             // استعادة تبويب سوق الانتقالات (بيع أو شراء)
             const savedMarketTab = localStorage.getItem("activeMarketTab");
