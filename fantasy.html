@@ -1242,6 +1242,9 @@
             const loader = document.getElementById("page-loader");
             if(loader) loader.classList.add("fade-out");
             applyGlobalTranslations();
+            
+            // استعادة القسم الأخير عند التحميل أو الريفريش
+            restoreLastActiveState();
         });
 
         // الاستماع لقائمة جميع مستخدمي الفانتازي لعرضهم في جدول الترتيب العام
@@ -1648,7 +1651,7 @@
                 return;
             }
             if (!window.isEditMode) {
-                window.showToast(lang === 'ar' ? "وضع العرض فعال" : "دۆخی نیشاندان کارایە", lang === 'ar' ? "يرجى الضغط على زر وضع العرض لتفعيله وتعديل التشكيلة." : "تکایە سەرەتا دۆخی دەستکاری کارا بکە.", "error");
+                window.showToast(lang === 'ar' ? "وضع العرض فعال" : "دۆخی نیشاندان کارایە", lang === 'ar' ? "يرجى الضغط على وضع التعديل أولاً." : "تکایە سەرەتا دۆخی دەستکاری کارا بکە.", "error");
                 document.getElementById("formationSelector").value = window.currentFormation;
                 return;
             }
@@ -1824,7 +1827,7 @@
                 return;
             }
             if (!window.isEditMode) {
-                window.showToast(lang === 'ar' ? "وضع العرض فعال" : "دۆخی نیشاندان کارایە", lang === 'ar' ? "يرجى الضغط على زر وضع العرض لتفعيله وإزالة اللاعبين." : "تکایە دۆخی دەستکاری کارا بکە بۆ لابردنی یاریزان.", "error");
+                window.showToast(lang === 'ar' ? "وضع العرض فعال" : "دۆخی نیشاندان کارایە", lang === 'ar' ? "يرجى تفعيل وضع التعديل لإزالة اللاعبين." : "تکایە دۆخی دەستکاری کارا بکە بۆ لابردنی یاریزان.", "error");
                 return;
             }
 
@@ -1898,7 +1901,7 @@
                 if(player && player.name) {
                     openPlayerDetailCardModal(player.name, player.team || '', player.goals || 0, player.photo || '', player.number || 0, player.price || 40000, player.positionZone || '');
                 } else {
-                    window.showToast(lang === 'ar' ? "وضع العرض فعال" : "دۆخی نیشاندان کارایە", lang === 'ar' ? "وضع العرض مفعل. اضغط على زر وضع العرض للتعديل وإضافة اللاعبين." : "دۆخی نیشاندان کارایە. تکایە دۆخی دەستکاری کارا بکە.", "error");
+                    window.showToast(lang === 'ar' ? "وضع العرض فعال" : "دۆخی نیشاندان کارایە", lang === 'ar' ? "وضع العرض مفعل. اضغط على وضع التعديل لإضافة اللاعبين." : "دۆخی نیشاندان کارایە. تکایە دۆخی دەستکاری کارا بکە.", "error");
                 }
             }
         };
@@ -2317,6 +2320,15 @@
 
             document.getElementById(subPageId).classList.add('active');
             btnElement.classList.add('active');
+            
+            // حفظ القسم النشط الحالي في localStorage
+            localStorage.setItem("activeFantasySubPage", subPageId);
+            
+            // ربط الزر المرادف له في شريط التنقل السفلي
+            if(subPageId === 'fantasy-sub-profile') localStorage.setItem("activeFantasyNavBtn", 'btnSubTabProfile');
+            else if(subPageId === 'fantasy-sub-squad') localStorage.setItem("activeFantasyNavBtn", 'btnSubTabSquad');
+            else if(subPageId === 'fantasy-sub-market') localStorage.setItem("activeFantasyNavBtn", 'btnSubTabMarket');
+            else if(subPageId === 'fantasy-sub-news') localStorage.setItem("activeFantasyNavBtn", 'btnSubTabNews');
         };
 
         window.switchNotificationFilter = function(filterType) {
@@ -2331,8 +2343,38 @@
                 btnMy.classList.add("active");
                 btnAll.classList.remove("active");
             }
+            localStorage.setItem("activeNotifFilter", filterType);
             renderNotifications();
         };
+
+        function restoreLastActiveState() {
+            // استعادة القسم الرئيسي الفرعي لفانتازي
+            const savedSubPage = localStorage.getItem("activeFantasySubPage");
+            const savedNavBtnId = localStorage.getItem("activeFantasyNavBtn");
+            if (savedSubPage && document.getElementById(savedSubPage)) {
+                const pages = document.querySelectorAll('.fantasy-subpage');
+                pages.forEach(p => p.classList.remove('active'));
+                document.getElementById(savedSubPage).classList.add('active');
+
+                const navBtns = document.querySelectorAll('.fantasy-nav-item');
+                navBtns.forEach(b => b.classList.remove('active'));
+                if (savedNavBtnId && document.getElementById(savedNavBtnId)) {
+                    document.getElementById(savedNavBtnId).classList.add('active');
+                }
+            }
+
+            // استعادة تبويب سوق الانتقالات (بيع أو شراء)
+            const savedMarketTab = localStorage.getItem("activeMarketTab");
+            if (savedMarketTab !== null) {
+                switchMarketTab(Number(savedMarketTab));
+            }
+
+            // استعادة فلتر الإشعارات (الكل أو الخاصة بي)
+            const savedNotifFilter = localStorage.getItem("activeNotifFilter");
+            if (savedNotifFilter) {
+                switchNotificationFilter(savedNotifFilter);
+            }
+        }
 
         function formatTimeAgo(timestamp) {
             const lang = document.documentElement.getAttribute("lang");
