@@ -233,21 +233,6 @@
             background: var(--text-main); color: var(--bg-body);
         }
 
-        nav ul { list-style: none; display: flex; width: 100%; gap: 8px; }
-        nav ul li { flex: 1; }
-        nav ul li a {
-            color: var(--text-muted); text-decoration: none; padding: 12px 4px; display: flex;
-            align-items: center; justify-content: center; background: var(--bg-sub);
-            border-radius: 8px; border: 1px solid var(--border-color);
-            transition: all 0.15s ease; outline: none; box-shadow: var(--shadow-sm);
-        }
-        nav ul li a i { font-size: 18px; }
-        nav ul li a:hover { color: var(--text-main); background: var(--bg-card); }
-        nav ul li a.active {
-            background: var(--text-main); color: var(--bg-body);
-            font-weight: 800; border-color: var(--text-main);
-        }
-
         .container { padding: 16px; margin-top: 5px; }
 
         .hero-section { 
@@ -414,7 +399,7 @@
         }
         .news-points-badge.minus { color: #ef4444; }
 
-        .fantasy-auth-box { text-align: center; padding: 25px; border: 1px solid var(--border-color); border-radius: 16px; background: var(--bg-card); margin-top: 20px; box-shadow: var(--shadow-sm); }
+        .fantasy-auth-box { text-align: center; padding: 25px; border: 1px solid var(--border-color); border-radius: 16px; background: var(--bg-card); box-shadow: var(--shadow-sm); }
         .fantasy-user-profile { display: flex; align-items: center; justify-content: space-between; background: var(--bg-card); padding: 15px; border-radius: 14px; border: 1px solid var(--border-color); margin-bottom: 20px; }
         .fantasy-user-avatar { width: 55px; height: 55px; border-radius: 50%; border: 2px solid var(--text-main); object-fit: cover; }
         .fantasy-stats-dashboard { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
@@ -840,18 +825,12 @@
                     <a href="index.html" class="btn-header-icon" id="lblBackHome" title="گەڕانەوە بۆ سەرەکی"><i class="fa-solid fa-house"></i></a>
                 </div>
             </div>
-            <ul>
-                <li style="flex:1;"><a href="index.html" class="nav-link"><i class="fa-solid fa-trophy"></i></a></li>
-                <li style="flex:1;"><a href="index.html" class="nav-link"><i class="fa-solid fa-calendar-days"></i></a></li>
-                <li style="flex:1;"><a href="index.html" class="nav-link"><i class="fa-solid fa-users"></i></a></li>
-                <li style="flex:1;"><a href="fantasy.html" class="nav-link active"><i class="fa-solid fa-gamepad"></i></a></li>
-            </ul>
         </div>
     </nav>
 
     <div class="container">
-        <div id="fantasyAuthWall" style="display: none; text-align: center; padding: 40px 20px;">
-            <div class="fantasy-auth-box">
+        <div id="fantasyAuthWall" style="display: none; text-align: center; padding: 20px; min-height: calc(100vh - 120px); display: flex; align-items: center; justify-content: center;">
+            <div class="fantasy-auth-box" style="width: 100%; max-width: 400px; margin: auto;">
                 <i class="fa-solid fa-lock" style="font-size: 40px; color: #eab308; margin-bottom: 15px;"></i>
                 <h3 id="lblFantasyLoginReq" style="margin-bottom: 15px; font-size: 15px;">بۆ بەکارهێنانی بەشی فانتازی، دەبێت سەرەتا لەڕێگەی گۆگڵەوە بچیتە ژوورەوە</h3>
                 <button class="btn-google-login" onclick="loginWithGoogle()">
@@ -1604,7 +1583,7 @@
             } else {
                 currentUser = null;
                 isDataLoadedFromFirebase = false;
-                authWall.style.display = "block";
+                authWall.style.display = "flex";
                 fantasyPageContent.style.display = "none";
             }
         });
