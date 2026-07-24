@@ -311,6 +311,17 @@
 
         .event-icons-group { display: inline-flex; align-items: center; gap: 4px; }
 
+        /* تعديل شكل الكروت الصفراء والحمراء لتكون مستطيلة */
+        .card-icon-rect {
+            display: inline-block;
+            width: 7px;
+            height: 11px;
+            border-radius: 1px;
+            vertical-align: middle;
+        }
+        .card-yellow { background-color: #eab308; }
+        .card-red { background-color: #ef4444; }
+
         .search-container { margin-bottom: 16px; }
         .search-input { width: 100%; padding: 14px 18px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; color: var(--text-main); font-family: 'Noto Kufi Arabic', sans-serif; font-size: 13px; outline: none; box-shadow: var(--shadow-sm); }
         .search-input:focus { border-color: var(--text-main); background: var(--bg-sub); box-shadow: var(--shadow-md); }
@@ -726,7 +737,6 @@
                 return;
             }
 
-            // ترتيب المباريات من الأحدث إلى الأقدم بناءً على التاريخ والوقت
             const sortedMatches = [...matchesDatabase].sort((a, b) => {
                 const dateA = new Date((a.date || '2026-01-01') + ' ' + (a.time || '00:00'));
                 const dateB = new Date((b.date || '2026-01-01') + ' ' + (b.time || '00:00'));
@@ -756,7 +766,6 @@
                         ${motmHtml}
                     `;
                     
-                    // دمج الأحداث لكل لاعب بحيث تظهر الأيقونات بجانب اسمه (بدون تكرار لأسماء اللاعبين) وإذا اختلف نوع الحدث أو انقسم يتم عرضه بأسطر نظيفة
                     const groupAndRenderEvents = (events) => {
                         if (!events || events.length === 0) return `<div class="event-item">—</div>`;
                         
@@ -771,8 +780,8 @@
                         return Object.entries(playerEventsMap).map(([playerName, types]) => {
                             let iconsHtml = types.map(t => {
                                 if(t === 'goal') return '<i class="fa-solid fa-futbol" style="color: #ffffff;" title="هدف"></i>';
-                                if(t === 'yellow') return '<i class="fa-solid fa-square" style="color: #eab308;" title="أصفر"></i>';
-                                if(t === 'red') return '<i class="fa-solid fa-square" style="color: #ef4444;" title="أحمر"></i>';
+                                if(t === 'yellow') return '<span class="card-icon-rect card-yellow" title="أصفر"></span>';
+                                if(t === 'red') return '<span class="card-icon-rect card-red" title="أحمر"></span>';
                                 return '';
                             }).join(' ');
 
@@ -978,6 +987,11 @@
             document.documentElement.setAttribute("data-theme", currentTheme);
             updateThemeIcon(currentTheme);
 
+            // استرجاع القسم الأخير الذي كان فيه المستخدم عند الدخول للموقع مرة أخرى
+            const savedPage = localStorage.getItem("currentActivePage") || "leagues";
+            const targetNav = document.getElementById("nav-" + savedPage);
+            switchPage(savedPage, null, targetNav);
+
             const hasSeenNotice = localStorage.getItem("cyberLeagueUpdateNotice");
             if (!hasSeenNotice) {
                 document.getElementById("updateNoticeModal").classList.add("active");
@@ -1054,6 +1068,9 @@
             
             document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
             if(element) element.classList.add('active');
+
+            // حفظ القسم الحالي في الذاكرة المحلية (localStorage)
+            localStorage.setItem("currentActivePage", pageId);
         }
     </script>
 </body>
