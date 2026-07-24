@@ -1080,8 +1080,8 @@
                 <td><input type="number" id="edit-user-points-${userId}" class="inline-edit-input" style="width: 70px;" value="${points}"></td>
                 <td><span class="badge-icon">${u.isBanned ? 'محظور' : 'نشط'}</span></td>
                 <td class="actions-cell">
-                    <button onclick="saveUserInlineEdit('${userId}')" style="background:#10b981; color:#fff;"><i class="fa-solid fa-floppy-disk"></i></button>
-                    <button class="btn-secondary" onclick="renderFantasyUsersTable()"><i class="fa-solid fa-xmark"></i></button>
+                    <button onclick="saveUserInlineEdit('${userId}')" style="background:#10b981; color:#fff;" title="حفظ"><i class="fa-solid fa-floppy-disk"></i></button>
+                    <button class="btn-secondary" onclick="renderFantasyUsersTable()" title="إلغاء"><i class="fa-solid fa-xmark"></i></button>
                 </td>
             `;
             showNotification("دۆخی دەستکاری ئەکاونت چالاککرا.", "info");
@@ -1099,7 +1099,7 @@
                 budget: newBudget,
                 points: newPoints
             }).then(() => {
-                showNotification("تم تحديث بيانات المستخدم بنجاح!", "success");
+                showNotification("تم تحديث النقاط والميزانية والبيانات بنجاح!", "success");
             });
         };
 
