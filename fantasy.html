@@ -724,6 +724,16 @@
 
     <div id="toastContainer"></div>
 
+    <!-- نافذة الحظر -->
+    <div class="modal-overlay" id="bannedModal" style="z-index: 999999;">
+        <div class="beIn-squad-card" style="height: auto; max-width: 380px; padding: 25px; text-align: center;">
+            <div style="font-size: 50px; color: #ef4444; margin-bottom: 15px;"><i class="fa-solid fa-ban"></i></div>
+            <h2 style="color: #ef4444; margin-bottom: 10px;" id="bannedModalTitle">حسابك محظور</h2>
+            <p style="font-size: 13px; color: var(--text-muted); line-height: 1.6; margin-bottom: 20px;" id="bannedModalDesc">عذراً، تم حظر حسابك من قبل إدارة الموقع. لا يمكنك الدخول إلى قسم الفانتازي.</p>
+            <button class="btn-action-submit-squad" style="background: #ef4444; margin-top: 0;" onclick="logoutDueToBan()">تسجيل الخروج بحساب آخر</button>
+        </div>
+    </div>
+
     <div class="notification-info-modal" id="notificationInfoModal">
         <div class="notification-info-card">
             <button class="btn-close-luxury-corner" onclick="closeNotificationInfoModal()">✕</button>
@@ -1009,8 +1019,8 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-        import { getDatabase, ref, onValue, set, get } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
-        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+        import { getDatabase, ref, onValue, set, get, remove } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBhYee5yLdNN-ttq6dux8G0w8_vl-ald-g",
@@ -1076,7 +1086,9 @@
                 notifTabAll: "هەموو ئاگادارییەکان",
                 notifTabMy: "ئاگادارییەکانی فریقی من",
                 matchLockedErrorTitle: "ناتوانرێت دەستکاری بکرێت",
-                matchLockedErrorDesc: " ناتوانرێت دەستکاری بکرێت چونکە بەم زووانە یارییەک دێتە پێشەوە."
+                matchLockedErrorDesc: " ناتوانرێت دەستکاری بکرێت چونکە بەم زووانە یارییەک دێتە پێشەوە.",
+                bannedTitle: "هەژمارەکەت قەدەغەکراوە",
+                bannedDesc: "ببورە، هەژمارەکەت لەلایەن بەڕێوەبەرەوە قەدەغەکراوە و ناتوانیت دەست بە فانتازی بکەیت."
             },
             ar: {
                 loaderText: "تحميل الدوري الرسمي...",
@@ -1125,7 +1137,9 @@
                 notifTabAll: "جميع الإشعارات",
                 notifTabMy: "إشعارات فريقي",
                 matchLockedErrorTitle: "تنبيه التعديل",
-                matchLockedErrorDesc: "لا يمكن التعديل لوجود مباراة قريبة"
+                matchLockedErrorDesc: "لا يمكن التعديل لوجود مباراة قريبة",
+                bannedTitle: "حسابك محظور",
+                bannedDesc: "عذراً، تم حظر حسابك من قبل إدارة الموقع. لا يمكنك الدخول إلى قسم الفانتازي."
             }
         };
 
@@ -1187,6 +1201,8 @@
             document.getElementById('lblNotifCloseBtn').innerText = getLangText('notifCloseBtn');
             document.getElementById('lblNotifTabAll').innerText = getLangText('notifTabAll');
             document.getElementById('lblNotifTabMy').innerText = getLangText('notifTabMy');
+            document.getElementById('bannedModalTitle').innerText = getLangText('bannedTitle');
+            document.getElementById('bannedModalDesc').innerText = getLangText('bannedDesc');
         };
 
         let playersDatabase = [];
@@ -1206,6 +1222,7 @@
         let currentMarketPageIndex = 0;
         let isDataLoadedFromFirebase = false;
         let currentNotificationFilter = 'all';
+        let userListenerUnsubscribe = null;
 
         let serverFantasyEditAllowed = true;
 
@@ -1451,6 +1468,13 @@
             });
         };
 
+        window.logoutDueToBan = function() {
+            signOut(auth).then(() => {
+                document.getElementById("bannedModal").classList.remove("active");
+                window.location.reload();
+            });
+        };
+
         window.openProfileEditModal = function() {
             if(!currentUser) return;
             const userRef = ref(db, 'fantasyUsers/' + currentUser.uid);
@@ -1478,7 +1502,7 @@
                     let existing = snapshot.val() || {};
                     existing.customDisplayName = newName;
                     existing.customPhotoURL = newPhoto || currentUser.photoURL;
-                    existing.email = currentUser.email || ""; // حفظ الإيميل بانتظام
+                    existing.email = currentUser.email || "";
                     set(userRef, existing).then(() => {
                         document.getElementById("profileSetupModal").classList.remove("active");
                         document.getElementById("fantasyUserName").innerText = newName;
@@ -1525,18 +1549,21 @@
                 squadEntryTimestamps: squadEntryTimestamps,
                 formation: window.currentFormation,
                 claimedNotifications: userClaimedNotifications,
-                email: currentUser.email || "" // ضمان حفظ الإيميل في كل عملية حفظ دورية
+                email: currentUser.email || ""
             };
 
             const userRef = ref(db, 'fantasyUsers/' + currentUser.uid);
             get(userRef).then((snapshot) => {
                 let currentData = snapshot.val() || {};
-                set(userRef, {
-                    ...currentData,
-                    displayName: currentData.customDisplayName || currentUser.displayName,
-                    email: currentUser.email || "",
-                    ...dataToSave
-                });
+                // إذا لم يتم حذف الحساب أثناء التعديل
+                if (currentData) {
+                    set(userRef, {
+                        ...currentData,
+                        displayName: currentData.customDisplayName || currentUser.displayName,
+                        email: currentUser.email || "",
+                        ...dataToSave
+                    });
+                }
             });
         }
 
@@ -1553,74 +1580,56 @@
             if (user) {
                 currentUser = user;
                 authWall.style.display = "none";
-                fantasyPageContent.style.display = "block";
-
+                
+                // الاستماع الحي الفوري لتغييرات الحساب (الحظر أو الحذف من قبل الأدمن)
                 const userRef = ref(db, 'fantasyUsers/' + user.uid);
-                get(userRef).then((snapshot) => {
+                onValue(userRef, (snapshot) => {
                     const fData = snapshot.val();
-                    if(fData) {
-                        userBudget = fData.budget !== undefined ? fData.budget : 60000;
-                        userPoints = fData.points || 0;
-                        userCaptain = fData.captain || null;
-                        userAdsData = fData.adsData || {};
-                        userReservePlayers = fData.reservePlayers || [];
-                        squadEntryTimestamps = fData.squadEntryTimestamps || {};
-                        userClaimedNotifications = fData.claimedNotifications || {};
-                        if(fData.formation) {
-                            window.currentFormation = fData.formation;
-                            document.getElementById("formationSelector").value = window.currentFormation;
-                        }
-                        if(fData.squad) {
-                            userFantasySquad = {
-                                attack: fData.squad.attack || [null],
-                                midfield: fData.squad.midfield || [null, null],
-                                defense: fData.squad.defense || [null, null],
-                                goalkeeper: fData.squad.goalkeeper || [null]
-                            };
-                        }
-
-                        const finalName = fData.customDisplayName || user.displayName;
-                        const finalPhoto = fData.customPhotoURL || user.photoURL;
-                        document.getElementById("fantasyUserName").innerText = finalName;
-                        document.getElementById("fantasyUserImg").src = finalPhoto;
-
-                        // تحديث البريد الإلكتروني في قاعدة البيانات مباشرة عند تسجيل الدخول
-                        set(userRef, {
-                            ...fData,
-                            email: user.email || ""
-                        });
-
-                        if(!fData.customDisplayName) {
-                            document.getElementById("setupUsernameInput").value = user.displayName || "";
-                            document.getElementById("setupPhotoUrlInput").value = user.photoURL || "";
-                            document.getElementById("profileSetupModal").classList.add("active");
-                        }
-                    } else {
-                        userBudget = 60000;
-                        userAdsData = {};
-                        userReservePlayers = [];
-                        squadEntryTimestamps = {};
-                        userClaimedNotifications = {};
-                        set(userRef, { 
-                            displayName: user.displayName, 
-                            customDisplayName: user.displayName,
-                            customPhotoURL: user.photoURL,
-                            email: user.email || "", // إرسال الإيميل بانتظام
-                            budget: 60000, 
-                            points: 0, 
-                            captain: null, 
-                            adsData: {}, 
-                            reservePlayers: [], 
-                            squadEntryTimestamps: {},
-                            squad: userFantasySquad, 
-                            formation: "2-2-1",
-                            claimedNotifications: {}
-                        });
-                        document.getElementById("setupUsernameInput").value = user.displayName || "";
-                        document.getElementById("setupPhotoUrlInput").value = user.photoURL || "";
-                        document.getElementById("profileSetupModal").classList.add("active");
-                    }
                     
+                    // إذا قام الأدمن بحذف الحساب تماماً من قاعدة البيانات
+                    if (!fData) {
+                        isDataLoadedFromFirebase = false;
+                        fantasyPageContent.style.display = "none";
+                        authWall.style.display = "block";
+                        window.showToast("تم الحذف", "تم حذف حسابك من قبل الإدارة أو إعادة تعيينه.", "error");
+                        return;
+                    }
+
+                    // إذا قام الأدمن بحظر المستخدم (`isBanned = true`)
+                    if (fData.isBanned === true) {
+                        document.getElementById("bannedModal").classList.add("active");
+                        fantasyPageContent.style.display = "none";
+                        return;
+                    } else {
+                        document.getElementById("bannedModal").classList.remove("active");
+                        fantasyPageContent.style.display = "block";
+                    }
+
+                    userBudget = fData.budget !== undefined ? fData.budget : 60000;
+                    userPoints = fData.points || 0;
+                    userCaptain = fData.captain || null;
+                    userAdsData = fData.adsData || {};
+                    userReservePlayers = fData.reservePlayers || [];
+                    squadEntryTimestamps = fData.squadEntryTimestamps || {};
+                    userClaimedNotifications = fData.claimedNotifications || {};
+                    if(fData.formation) {
+                        window.currentFormation = fData.formation;
+                        document.getElementById("formationSelector").value = window.currentFormation;
+                    }
+                    if(fData.squad) {
+                        userFantasySquad = {
+                            attack: fData.squad.attack || [null],
+                            midfield: fData.squad.midfield || [null, null],
+                            defense: fData.squad.defense || [null, null],
+                            goalkeeper: fData.squad.goalkeeper || [null]
+                        };
+                    }
+
+                    const finalName = fData.customDisplayName || user.displayName;
+                    const finalPhoto = fData.customPhotoURL || user.photoURL;
+                    document.getElementById("fantasyUserName").innerText = finalName;
+                    document.getElementById("fantasyUserImg").src = finalPhoto;
+
                     isDataLoadedFromFirebase = true;
                     updateFormationStructure();
                     updateFantasyPitchUI();
@@ -1628,7 +1637,10 @@
                     renderSellPlayersList();
                     updateAdsUI();
                     processNewNotificationsForUser();
+                }, {
+                    onlyOnce: false // استماع مستمر وحي
                 });
+
             } else {
                 currentUser = null;
                 isDataLoadedFromFirebase = false;
