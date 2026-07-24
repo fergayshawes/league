@@ -500,8 +500,8 @@
                 </div>
             </div>
             <ul>
-                <li><a href="index.html" id="nav-leagues" class="nav-link active"><i class="fa-solid fa-trophy"></i></a></li>
-                <li><a href="index.html" id="nav-matches" class="nav-link"><i class="fa-solid fa-calendar-days"></i></a></li>
+                <li><a href="#" id="nav-leagues" class="nav-link active" onclick="switchPage('leagues', event, this)"><i class="fa-solid fa-trophy"></i></a></li>
+                <li><a href="#" id="nav-matches" class="nav-link" onclick="switchPage('matches', event, this)"><i class="fa-solid fa-calendar-days"></i></a></li>
                 <li><a href="players.html" id="nav-players" class="nav-link"><i class="fa-solid fa-users"></i></a></li>
                 <li><a href="fantasy.html" id="nav-fantasy" class="nav-link"><i class="fa-solid fa-gamepad"></i></a></li>
             </ul>
@@ -534,8 +534,8 @@
             </div>
         </div>
 
-        <div id="matches" class="page active">
-            <div class="hero-section" style="margin-top: 30px;">
+        <div id="matches" class="page">
+            <div class="hero-section">
                 <h1 id="lblMatchesTitle">خشتەی یارییەکان</h1>
                 <p id="lblMatchesDesc">خشتەی کات و ئەنجامی یارییەکانی خول</p>
             </div>
@@ -813,8 +813,11 @@
             leaguesDatabase.forEach(t => { t.points = (t.wins * 3) + (t.draws * 1); });
             leaguesDatabase.sort((a, b) => b.points - a.points);
 
-            autoRenderLeague(); 
-            autoRenderMatches(); 
+            window.autoRefreshTranslations = function() {
+                autoRenderLeague(); 
+                autoRenderMatches(); 
+            };
+            window.autoRefreshTranslations();
 
             setTimeout(() => {
                 const loader = document.getElementById("page-loader");
@@ -867,6 +870,10 @@
             document.documentElement.setAttribute("data-theme", currentTheme);
             updateThemeIcon(currentTheme);
 
+            const savedPage = localStorage.getItem("currentActivePage") || "leagues";
+            const targetNav = document.getElementById("nav-" + savedPage);
+            switchPage(savedPage, null, targetNav);
+
             const hasSeenNotice = localStorage.getItem("cyberLeagueUpdateNotice");
             if (!hasSeenNotice) {
                 document.getElementById("updateNoticeModal").classList.add("active");
@@ -877,6 +884,7 @@
             const currentLang = document.documentElement.getAttribute("lang") === "ar" ? "ckb" : "ar";
             applyLanguage(currentLang);
             localStorage.setItem("appLang", currentLang);
+            if (window.autoRefreshTranslations) window.autoRefreshTranslations();
         }
 
         function applyLanguage(lang) {
@@ -919,6 +927,18 @@
         function closeUpdateModal() {
             document.getElementById("updateNoticeModal").classList.remove("active");
             localStorage.setItem("cyberLeagueUpdateNotice", "true");
+        }
+
+        function switchPage(pageId, event, element) {
+            if(event) event.preventDefault();
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            const target = document.getElementById(pageId);
+            if(target) target.classList.add('active');
+            
+            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+            if(element) element.classList.add('active');
+
+            localStorage.setItem("currentActivePage", pageId);
         }
     </script>
 </body>
