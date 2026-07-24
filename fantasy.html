@@ -711,6 +711,49 @@
             color: var(--bg-body);
             box-shadow: var(--shadow-sm);
         }
+
+        /* تنسيق جدول الترتيب العام لفانتازي المستخدمين */
+        .fantasy-leaderboard-container {
+            margin-top: 20px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 16px;
+            box-shadow: var(--shadow-md);
+        }
+        .leaderboard-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: right;
+            margin-top: 10px;
+        }
+        .leaderboard-table th, .leaderboard-table td {
+            padding: 10px 12px;
+            font-size: 12px;
+        }
+        .leaderboard-table th {
+            background: var(--bg-sub);
+            color: var(--text-muted);
+            font-weight: 700;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .leaderboard-table td {
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-main);
+            vertical-align: middle;
+        }
+        .leaderboard-user-cell {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .leaderboard-user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 1px solid var(--border-color);
+        }
     </style>
 </head>
 <body>
@@ -724,7 +767,7 @@
 
     <div id="toastContainer"></div>
 
-    <!-- نافذة الحظر (تتغير للغة العربية أو الكوردية تلقائياً حسب زر اللغة) -->
+    <!-- نافذة الحظر -->
     <div class="modal-overlay" id="bannedModal" style="z-index: 999999;">
         <div class="beIn-squad-card" style="height: auto; max-width: 380px; padding: 25px; text-align: center;">
             <div style="font-size: 50px; color: #ef4444; margin-bottom: 15px;"><i class="fa-solid fa-ban"></i></div>
@@ -905,6 +948,25 @@
                     </div>
                 </div>
 
+                <!-- جدول الترتيب العام لفانتازي المستخدمين -->
+                <div class="fantasy-leaderboard-container">
+                    <h3 style="font-size: 13px; font-weight: 800; margin-bottom: 8px;" id="lblLeaderboardTitle">🏆 ڕیزبەندی گشتی بەکارهێنەرانی فانتازی</h3>
+                    <div style="overflow-x: auto;">
+                        <table class="leaderboard-table">
+                            <thead>
+                                <tr>
+                                    <th style="text-align: center; width: 45px;">#</th>
+                                    <th id="lblLeaderColUser">المستخدم</th>
+                                    <th style="text-align: center; color: #10b981;" id="lblLeaderColPoints">النقاط (PTS)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="fantasyLeaderboardTbody">
+                                <!-- سيتم تعبئتها ديناميكياً -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
                 <h3 style="font-size: 13px; margin: 15px 0 5px 0; font-weight: 800;" id="lblWatchAdsTitle">ریکلامەکان ببینە بۆ بەدەستهێنانی بودجە (2,000 IQD بۆ هەر ریکلامێک):</h3>
                 <div class="ads-grid">
                     <div class="ad-slot-box" id="adBox-1" onclick="watchAdReward(1)">
@@ -1051,6 +1113,9 @@
                 editProfileBtn: "دەستکاری هەژمار",
                 fantasyBudget: "بودجەی بەردەست",
                 fantasyPoints: "کۆی گشتی خاڵەکان",
+                leaderboardTitle: "🏆 ڕیزبەندی گشتی بەکارهێنەرانی فانتازی",
+                leaderColUser: "بەکارهێنەر",
+                leaderColPoints: "خاڵەکان (PTS)",
                 watchAdsTitle: "ریکلامەکان ببینە بۆ بەدەستهێنانی بودجە (2,000 IQD بۆ هەر ریکلامێک):",
                 ad1Text: "ریکلامی یەکەم",
                 ad2Text: "ریکلامی دووەم",
@@ -1103,6 +1168,9 @@
                 editProfileBtn: "تعديل الحساب",
                 fantasyBudget: "الميزانية المتاحة",
                 fantasyPoints: "إجمالي النقاط",
+                leaderboardTitle: "🏆 الترتيب العام لمستخدمي الفانتازي",
+                leaderColUser: "المستخدم",
+                leaderColPoints: "النقاط (PTS)",
                 watchAdsTitle: "شاهد الإعلانات لكسب الميزانية (2,000 IQD لكل إعلان):",
                 ad1Text: "الإعلان الأول",
                 ad2Text: "الإعلان الثاني",
@@ -1162,6 +1230,9 @@
             document.getElementById('lblEditProfileBtn').innerText = getLangText('editProfileBtn');
             document.getElementById('lblFantasyBudget').innerText = getLangText('fantasyBudget');
             document.getElementById('lblFantasyPoints').innerText = getLangText('fantasyPoints');
+            document.getElementById('lblLeaderboardTitle').innerText = getLangText('leaderboardTitle');
+            document.getElementById('lblLeaderColUser').innerText = getLangText('leaderColUser');
+            document.getElementById('lblLeaderColPoints').innerText = getLangText('leaderColPoints');
             document.getElementById('lblWatchAdsTitle').innerText = getLangText('watchAdsTitle');
             document.getElementById('lblAd1Text').innerText = getLangText('ad1Text');
             document.getElementById('lblAd2Text').innerText = getLangText('ad2Text');
@@ -1210,6 +1281,7 @@
 
         let playersDatabase = [];
         let notificationsDatabase = [];
+        let globalFantasyUsers = {};
         
         let currentUser = null;
         let userFantasySquad = { attack: [null], midfield: [null, null], defense: [null, null], goalkeeper: [null] };
@@ -1235,6 +1307,61 @@
             if(loader) loader.classList.add("fade-out");
             applyGlobalTranslations();
         });
+
+        // الاستماع لقائمة جميع مستخدمي الفانتازي لعرضهم في جدول الترتيب العام
+        const allUsersRef = ref(db, 'fantasyUsers');
+        onValue(allUsersRef, (snapshot) => {
+            const data = snapshot.val();
+            globalFantasyUsers = data || {};
+            renderFantasyLeaderboard();
+        });
+
+        function renderFantasyLeaderboard() {
+            const tbody = document.getElementById("fantasyLeaderboardTbody");
+            if(!tbody) return;
+            tbody.innerHTML = "";
+
+            // ترتيب المستخدمين تنازلياً حسب النقاط
+            const sortedUsers = Object.entries(globalFantasyUsers).sort((a, b) => {
+                const ptsA = a[1].points || 0;
+                const ptsB = b[1].points || 0;
+                return ptsB - ptsA;
+            });
+
+            if(sortedUsers.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="3" style="text-align: center; color: var(--text-muted); padding: 15px;">هیچ بەکارهێنەرێک نییە</td></tr>`;
+                return;
+            }
+
+            sortedUsers.forEach(([uid, u], index) => {
+                const name = u.customDisplayName || u.displayName || "مستخدم";
+                const photo = u.customPhotoURL || u.photoURL || 'https://via.placeholder.com/32';
+                const pts = u.points || 0;
+                const isCurrent = currentUser && currentUser.uid === uid;
+
+                const tr = document.createElement('tr');
+                if (isCurrent) {
+                    tr.style.background = "rgba(16, 185, 129, 0.08)";
+                }
+
+                let rankBadge = `${index + 1}`;
+                if(index === 0) rankBadge = "🥇 1";
+                else if(index === 1) rankBadge = "🥈 2";
+                else if(index === 2) rankBadge = "🥉 3";
+
+                tr.innerHTML = `
+                    <td style="text-align: center; font-weight: bold; color: var(--text-muted);">${rankBadge}</td>
+                    <td>
+                        <div class="leaderboard-user-cell">
+                            <img src="${photo}" class="leaderboard-user-avatar" onerror="this.src='https://via.placeholder.com/32'">
+                            <span style="font-weight: 700; color: var(--text-main);">${name} ${isCurrent ? '<span style="font-size:10px; color:#10b981;">(تیمەکەت)</span>' : ''}</span>
+                        </div>
+                    </td>
+                    <td style="text-align: center; font-weight: 800; color: #10b981; font-size: 13px;">${pts}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
 
         const systemSettingsRef = ref(db, 'systemSettings/fantasyEditMode');
         onValue(systemSettingsRef, (snapshot) => {
@@ -1537,7 +1664,6 @@
                         fantasyPageContent.style.display = "block";
                     }
 
-                    // التحديث الفوري للميزانية والنقاط الواردة من الأدمن
                     userBudget = fData.budget !== undefined ? fData.budget : 60000;
                     userPoints = fData.points !== undefined ? fData.points : 0;
                     
@@ -1570,6 +1696,7 @@
                     renderMarketGlobal();
                     renderSellPlayersList();
                     updateAdsUI();
+                    renderFantasyLeaderboard();
                 }, {
                     onlyOnce: false
                 });
@@ -1579,6 +1706,7 @@
                 isDataLoadedFromFirebase = false;
                 authWall.style.display = "block";
                 fantasyPageContent.style.display = "none";
+                renderFantasyLeaderboard();
             }
         });
 
@@ -2508,6 +2636,7 @@
             renderMarketGlobal();
             renderSellPlayersList();
             updateAdsUI();
+            renderFantasyLeaderboard();
         };
 
         const savedTheme = localStorage.getItem('theme') || 'dark';
