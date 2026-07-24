@@ -452,12 +452,21 @@
         .badge-icon { background: #1f242f; padding: 4px 8px; border-radius: 6px; font-size: 11px; color: #94a3b8; border: 1px solid #2d3446; }
         .section-subtitle { font-size: 12px; font-weight: 600; color: #94a3b8; margin-top: 10px; margin-bottom: 5px; }
 
+        /* تنسيق مخصص لصندوق إدخال الأحداث ليصبح مرتباً وعمودياً */
         .event-builder-box {
             background: #1f242f;
             border: 1px solid #2d3446;
             border-radius: 8px;
-            padding: 10px;
-            margin-top: 8px;
+            padding: 12px;
+            margin-top: 6px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .event-controls-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
         }
         .event-item-tag {
             display: inline-flex;
@@ -465,7 +474,7 @@
             gap: 6px;
             background: #161920;
             border: 1px solid #2d3446;
-            padding: 4px 8px;
+            padding: 5px 10px;
             border-radius: 6px;
             font-size: 11px;
             margin: 3px;
@@ -478,7 +487,7 @@
             padding: 0;
             width: auto;
             height: auto;
-            font-size: 11px;
+            font-size: 12px;
         }
     </style>
 </head>
@@ -665,39 +674,48 @@
                         </div>
                     </div>
                     
-                    <div class="form-row" style="margin-bottom: 14px;">
-                        <!-- فەریقی ١ - أحداث -->
-                        <div class="form-group">
-                            <label><i class="fa-solid fa-notes-medical"></i> ڕووداوەکان (فەریقی ١)</label>
-                            <div class="event-builder-box">
-                                <div style="display: flex; gap: 6px; margin-bottom: 6px;">
-                                    <select id="homeEventPlayerSelect" style="flex: 2;"></select>
-                                    <select id="homeEventTypeSelect" style="flex: 1.2;">
-                                        <option value="goal">⚽ گۆڵ</option>
-                                        <option value="yellow">🟨 زەرد</option>
-                                        <option value="red">🟥 سوور</option>
-                                    </select>
-                                    <button type="button" onclick="addMatchEvent('home')" style="background:#10b981; color:#fff; width: 40px;"><i class="fa-solid fa-plus"></i></button>
-                                </div>
-                                <div id="homeEventsListContainer" style="display: flex; flex-wrap: wrap; gap: 4px;"></div>
+                    <!-- قسم أحداث المباريات بتصميم مرتب وعمودي تماماً -->
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label><i class="fa-solid fa-notes-medical"></i> ڕووداوەکان (فەریقی ١)</label>
+                        <div class="event-builder-box">
+                            <div class="form-group">
+                                <label style="font-size: 10px; color: #707e94;">هەڵبژاردنی یاریزان</label>
+                                <select id="homeEventPlayerSelect"></select>
                             </div>
+                            <div class="event-controls-row">
+                                <div class="form-group" style="flex: 1;">
+                                    <label style="font-size: 10px; color: #707e94;">جۆری ڕووداو</label>
+                                    <select id="homeEventTypeSelect">
+                                        <option value="goal">⚽ گۆڵ</option>
+                                        <option value="yellow">🟨 کارتی زەرد</option>
+                                        <option value="red">🟥 کارتی سوور</option>
+                                    </select>
+                                </div>
+                                <button type="button" onclick="addMatchEvent('home')" style="background:#10b981; color:#fff; height: 42px; margin-top: 16px; padding: 0 16px;"><i class="fa-solid fa-plus"></i> زیادکردن</button>
+                            </div>
+                            <div id="homeEventsListContainer" style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px;"></div>
                         </div>
+                    </div>
 
-                        <!-- فەریقی ٢ - أحداث -->
-                        <div class="form-group">
-                            <label><i class="fa-solid fa-notes-medical"></i> ڕووداوەکان (فەریقی ٢)</label>
-                            <div class="event-builder-box">
-                                <div style="display: flex; gap: 6px; margin-bottom: 6px;">
-                                    <select id="awayEventPlayerSelect" style="flex: 2;"></select>
-                                    <select id="awayEventTypeSelect" style="flex: 1.2;">
-                                        <option value="goal">⚽ گۆڵ</option>
-                                        <option value="yellow">🟨 زەرد</option>
-                                        <option value="red">🟥 سوور</option>
-                                    </select>
-                                    <button type="button" onclick="addMatchEvent('away')" style="background:#10b981; color:#fff; width: 40px;"><i class="fa-solid fa-plus"></i></button>
-                                </div>
-                                <div id="awayEventsListContainer" style="display: flex; flex-wrap: wrap; gap: 4px;"></div>
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label><i class="fa-solid fa-notes-medical"></i> ڕووداوەکان (فەریقی ٢)</label>
+                        <div class="event-builder-box">
+                            <div class="form-group">
+                                <label style="font-size: 10px; color: #707e94;">هەڵبژاردنی یاریزان</label>
+                                <select id="awayEventPlayerSelect"></select>
                             </div>
+                            <div class="event-controls-row">
+                                <div class="form-group" style="flex: 1;">
+                                    <label style="font-size: 10px; color: #707e94;">جۆری ڕووداو</label>
+                                    <select id="awayEventTypeSelect">
+                                        <option value="goal">⚽ گۆڵ</option>
+                                        <option value="yellow">🟨 کارتی زەرد</option>
+                                        <option value="red">🟥 کارتی سوور</option>
+                                    </select>
+                                </div>
+                                <button type="button" onclick="addMatchEvent('away')" style="background:#10b981; color:#fff; height: 42px; margin-top: 16px; padding: 0 16px;"><i class="fa-solid fa-plus"></i> زیادکردن</button>
+                            </div>
+                            <div id="awayEventsListContainer" style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px;"></div>
                         </div>
                     </div>
                 </div>
@@ -1023,7 +1041,6 @@
         let localFantasyUsersData = {};
         let onConfirmCallback = null;
 
-        // مصفوفة مؤقتة للأحداث الخاصة بالمباراة قيد الإنشاء
         let currentHomeEvents = [];
         let currentAwayEvents = [];
 
@@ -1112,7 +1129,6 @@
             }
         }
 
-        /* --- نظام إدخال أحداث المباريات عبر القوائم الذكية --- */
         window.updateMatchEventPlayerDropdowns = function() {
             const homeTeam = document.getElementById('mHomeTeam').value;
             const awayTeam = document.getElementById('mAwayTeam').value;
@@ -1146,23 +1162,20 @@
                 });
             }
 
-            // تحديث قائمة MOTM لتشمل لاعبي الفريقين
             [...homePlayers, ...awayPlayers].forEach(p => {
                 if(motmSel) motmSel.innerHTML += `<option value="${p.name}">${p.name} (${p.team})</option>`;
             });
         };
 
         window.addMatchEvent = function(teamSide) {
-            let pSelect, typeSelect, container, targetArray;
+            let pSelect, typeSelect, targetArray;
             if(teamSide === 'home') {
                 pSelect = document.getElementById('homeEventPlayerSelect');
                 typeSelect = document.getElementById('homeEventTypeSelect');
-                container = document.getElementById('homeEventsListContainer');
                 targetArray = currentHomeEvents;
             } else {
                 pSelect = document.getElementById('awayEventPlayerSelect');
                 typeSelect = document.getElementById('awayEventTypeSelect');
-                container = document.getElementById('awayEventsListContainer');
                 targetArray = currentAwayEvents;
             }
 
@@ -1235,7 +1248,6 @@
             if(aScoreInput) aScoreInput.value = awayGoals;
         }
 
-        /* --- الصندوق السادس: التفعيل والتعطيل اليدوي فقط --- */
         window.updateFantasyEditStateManual = function(val) {
             const configVal = (val === 'true');
             set(ref(db, 'systemSettings/fantasyEditMode'), configVal).then(() => {
@@ -1243,7 +1255,6 @@
             });
         };
 
-        /* --- الصندوق السابع: إدارة مستخدمي الفانتازي --- */
         window.activateUserInlineEdit = function(userId) {
             const tr = document.getElementById(`user-row-${userId}`);
             const u = localFantasyUsersData[userId];
@@ -1366,7 +1377,6 @@
             `;
         }
 
-        /* --- 1. Inline Editing: Players Table --- */
         window.createNewPlayer = function(e) {
             e.preventDefault();
             if(!validateFields(['pName', 'pTeam', 'pNumber'])) return;
@@ -1454,7 +1464,6 @@
             });
         }
 
-        /* --- 2. Inline Editing: Matches Tables (Upcoming & Finished) --- */
         window.activateUpcomingInlineEdit = function(matchId) {
             const tr = document.getElementById(`upcoming-row-${matchId}`);
             const m = localMatchesData[matchId];
@@ -1554,7 +1563,6 @@
             renderMatchesTables();
         }
 
-        /* --- 3. Inline Editing: Fantasy Market Table --- */
         window.activateFantasyInlineEdit = function(playerId) {
             const tr = document.getElementById(`market-row-${playerId}`);
             const p = localPlayersArray[playerId];
@@ -1596,7 +1604,6 @@
             });
         };
 
-        /* --- 4. Inline Editing: Notifications Table --- */
         window.activateNotifInlineEdit = function(notifId) {
             const tr = document.getElementById(`notif-row-${notifId}`);
             const n = localNotificationsData[notifId];
@@ -1644,7 +1651,6 @@
             renderNotificationsTable();
         }
 
-        /* --- Helper & Utility Functions --- */
         window.updateFilteredPlayersList = function() {
             const selectedTeam = document.getElementById('marketTeamSelect').value;
             const marketPlayerSelect = document.getElementById('marketPlayerSelect');
@@ -1982,7 +1988,6 @@
             `;
         }
 
-        /* --- Real-Time Database Sync --- */
         const dbRef = ref(db, '/');
         onValue(dbRef, (snapshot) => {
             const data = snapshot.val() || {};
@@ -2026,7 +2031,6 @@
             loadTeamSquadManagement();
             calculateLeagueStanding(matchesList);
 
-            // مزامنة حالة السندوق السادس
             const settingVal = data.systemSettings && data.systemSettings.fantasyEditMode !== undefined ? data.systemSettings.fantasyEditMode : true;
             const selectEl = document.getElementById('fantasyEditStateSelect');
             const badgeEl = document.getElementById('fantasyRealStatusBadge');
