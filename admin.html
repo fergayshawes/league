@@ -451,6 +451,35 @@
         
         .badge-icon { background: #1f242f; padding: 4px 8px; border-radius: 6px; font-size: 11px; color: #94a3b8; border: 1px solid #2d3446; }
         .section-subtitle { font-size: 12px; font-weight: 600; color: #94a3b8; margin-top: 10px; margin-bottom: 5px; }
+
+        .event-builder-box {
+            background: #1f242f;
+            border: 1px solid #2d3446;
+            border-radius: 8px;
+            padding: 10px;
+            margin-top: 8px;
+        }
+        .event-item-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #161920;
+            border: 1px solid #2d3446;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            margin: 3px;
+        }
+        .event-item-tag button {
+            background: none;
+            border: none;
+            color: #ef4444;
+            cursor: pointer;
+            padding: 0;
+            width: auto;
+            height: auto;
+            font-size: 11px;
+        }
     </style>
 </head>
 <body>
@@ -577,7 +606,7 @@
                 <div class="form-row" style="margin-bottom: 12px;">
                     <div class="form-group">
                         <label><i class="fa-solid fa-house-chimney"></i> فەریقی یەکەم</label>
-                        <select id="mHomeTeam">
+                        <select id="mHomeTeam" onchange="updateMatchEventPlayerDropdowns()">
                             <option value="ئـ">ئـ</option>
                             <option value="ب">ب</option>
                             <option value="ت">ت</option>
@@ -591,7 +620,7 @@
                     </div>
                     <div class="form-group">
                         <label><i class="fa-solid fa-plane"></i> فەریقی دووەم</label>
-                        <select id="mAwayTeam">
+                        <select id="mAwayTeam" onchange="updateMatchEventPlayerDropdowns()">
                             <option value="ئـ">ئـ</option>
                             <option value="ب">ب</option>
                             <option value="ت">ت</option>
@@ -616,11 +645,11 @@
                     <div class="form-row" style="margin-bottom: 12px;">
                         <div class="form-group">
                             <label><i class="fa-solid fa-list-ol"></i> گۆڵ (Home)</label>
-                            <input type="number" id="mHomeScore" value="0">
+                            <input type="number" id="mHomeScore" value="0" readonly style="background:#12151c; font-weight:bold;">
                         </div>
                         <div class="form-group">
                             <label><i class="fa-solid fa-list-ol"></i> گۆڵ (Away)</label>
-                            <input type="number" id="mAwayScore" value="0">
+                            <input type="number" id="mAwayScore" value="0" readonly style="background:#12151c; font-weight:bold;">
                         </div>
                     </div>
                     <div class="form-row" style="margin-bottom: 12px;">
@@ -630,23 +659,50 @@
                         </div>
                         <div class="form-group">
                             <label><i class="fa-solid fa-star"></i> باشترین یاریزان (MOTM)</label>
-                            <input type="text" id="mMotm" placeholder="ناوی یاریزان">
+                            <select id="mMotm">
+                                <option value="">دیاری نەکراوە</option>
+                            </select>
                         </div>
                     </div>
                     
                     <div class="form-row" style="margin-bottom: 14px;">
+                        <!-- فەریقی ١ - أحداث -->
                         <div class="form-group">
                             <label><i class="fa-solid fa-notes-medical"></i> ڕووداوەکان (فەریقی ١)</label>
-                            <textarea id="mHomeEventsRaw" rows="3" placeholder="ناو - گۆڵ&#10;ناو - کارتی زەرد"></textarea>
+                            <div class="event-builder-box">
+                                <div style="display: flex; gap: 6px; margin-bottom: 6px;">
+                                    <select id="homeEventPlayerSelect" style="flex: 2;"></select>
+                                    <select id="homeEventTypeSelect" style="flex: 1.2;">
+                                        <option value="goal">⚽ گۆڵ</option>
+                                        <option value="yellow">🟨 زەرد</option>
+                                        <option value="red">🟥 سوور</option>
+                                    </select>
+                                    <button type="button" onclick="addMatchEvent('home')" style="background:#10b981; color:#fff; width: 40px;"><i class="fa-solid fa-plus"></i></button>
+                                </div>
+                                <div id="homeEventsListContainer" style="display: flex; flex-wrap: wrap; gap: 4px;"></div>
+                            </div>
                         </div>
+
+                        <!-- فەریقی ٢ - أحداث -->
                         <div class="form-group">
                             <label><i class="fa-solid fa-notes-medical"></i> ڕووداوەکان (فەریقی ٢)</label>
-                            <textarea id="mAwayEventsRaw" rows="3" placeholder="ناو - گۆڵ&#10;ناو - کارتی زەرد"></textarea>
+                            <div class="event-builder-box">
+                                <div style="display: flex; gap: 6px; margin-bottom: 6px;">
+                                    <select id="awayEventPlayerSelect" style="flex: 2;"></select>
+                                    <select id="awayEventTypeSelect" style="flex: 1.2;">
+                                        <option value="goal">⚽ گۆڵ</option>
+                                        <option value="yellow">🟨 زەرد</option>
+                                        <option value="red">🟥 سوور</option>
+                                    </select>
+                                    <button type="button" onclick="addMatchEvent('away')" style="background:#10b981; color:#fff; width: 40px;"><i class="fa-solid fa-plus"></i></button>
+                                </div>
+                                <div id="awayEventsListContainer" style="display: flex; flex-wrap: wrap; gap: 4px;"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <button type="submit" style="width: 100%; background: #3b82f6; color:#fff;"><i class="fa-solid fa-circle-plus"></i> تۆمارکردنی یاری</button>
+                <button type="submit" style="width: 100%; background: #3b82f6; color:#fff; margin-top: 10px;"><i class="fa-solid fa-circle-plus"></i> تۆمارکردنی یاری</button>
             </form>
 
             <div class="section-subtitle"><i class="fa-solid fa-clock"></i> یارییە داهاتووەکان (تەواونەکراو)</div>
@@ -967,6 +1023,10 @@
         let localFantasyUsersData = {};
         let onConfirmCallback = null;
 
+        // مصفوفة مؤقتة للأحداث الخاصة بالمباراة قيد الإنشاء
+        let currentHomeEvents = [];
+        let currentAwayEvents = [];
+
         const defaultTeams = ["ئـ", "ب", "ت", "م", "ک", "ل", "د", "ر", "س"];
 
         window.showNotification = function(message, type = 'success') {
@@ -1047,6 +1107,132 @@
             document.getElementById('typeFinished').classList.toggle('active', mode === 'finished');
             document.getElementById('wrapperUpcoming').style.display = mode === 'upcoming' ? 'block' : 'none';
             document.getElementById('wrapperFinished').style.display = mode === 'finished' ? 'block' : 'none';
+            if(mode === 'finished') {
+                updateMatchEventPlayerDropdowns();
+            }
+        }
+
+        /* --- نظام إدخال أحداث المباريات عبر القوائم الذكية --- */
+        window.updateMatchEventPlayerDropdowns = function() {
+            const homeTeam = document.getElementById('mHomeTeam').value;
+            const awayTeam = document.getElementById('mAwayTeam').value;
+
+            const homeSel = document.getElementById('homeEventPlayerSelect');
+            const awaySel = document.getElementById('awayEventPlayerSelect');
+            const motmSel = document.getElementById('mMotm');
+
+            if(homeSel) homeSel.innerHTML = "";
+            if(awaySel) awaySel.innerHTML = "";
+            if(motmSel) motmSel.innerHTML = '<option value="">دیاری نەکراوە</option>';
+
+            const allPlayers = Object.values(localPlayersArray);
+
+            const homePlayers = allPlayers.filter(p => p.team === homeTeam);
+            const awayPlayers = allPlayers.filter(p => p.team === awayTeam);
+
+            if(homePlayers.length === 0) {
+                homeSel.innerHTML = '<option value="">هیچ یاریزانێک لەم فەریقە نییە</option>';
+            } else {
+                homePlayers.forEach(p => {
+                    homeSel.innerHTML += `<option value="${p.name}">${p.name} (#${p.number})</option>`;
+                });
+            }
+
+            if(awayPlayers.length === 0) {
+                awaySel.innerHTML = '<option value="">هیچ یاریزانێک لەم فەریقە نییە</option>';
+            } else {
+                awayPlayers.forEach(p => {
+                    awaySel.innerHTML += `<option value="${p.name}">${p.name} (#${p.number})</option>`;
+                });
+            }
+
+            // تحديث قائمة MOTM لتشمل لاعبي الفريقين
+            [...homePlayers, ...awayPlayers].forEach(p => {
+                if(motmSel) motmSel.innerHTML += `<option value="${p.name}">${p.name} (${p.team})</option>`;
+            });
+        };
+
+        window.addMatchEvent = function(teamSide) {
+            let pSelect, typeSelect, container, targetArray;
+            if(teamSide === 'home') {
+                pSelect = document.getElementById('homeEventPlayerSelect');
+                typeSelect = document.getElementById('homeEventTypeSelect');
+                container = document.getElementById('homeEventsListContainer');
+                targetArray = currentHomeEvents;
+            } else {
+                pSelect = document.getElementById('awayEventPlayerSelect');
+                typeSelect = document.getElementById('awayEventTypeSelect');
+                container = document.getElementById('awayEventsListContainer');
+                targetArray = currentAwayEvents;
+            }
+
+            const pName = pSelect.value;
+            const eType = typeSelect.value;
+
+            if(!pName) {
+                showNotification("تکایە یاریزانێک دیاری بکە!", "error");
+                return;
+            }
+
+            targetArray.push({ type: eType, playerName: pName });
+            renderMatchEventsUI();
+            updateFinishedScoresCount();
+        };
+
+        window.removeMatchEvent = function(teamSide, index) {
+            if(teamSide === 'home') {
+                currentHomeEvents.splice(index, 1);
+            } else {
+                currentAwayEvents.splice(index, 1);
+            }
+            renderMatchEventsUI();
+            updateFinishedScoresCount();
+        };
+
+        function renderMatchEventsUI() {
+            const homeContainer = document.getElementById('homeEventsListContainer');
+            const awayContainer = document.getElementById('awayEventsListContainer');
+
+            if(homeContainer) {
+                homeContainer.innerHTML = "";
+                currentHomeEvents.forEach((ev, idx) => {
+                    let icon = '⚽';
+                    if(ev.type === 'yellow') icon = '🟨';
+                    if(ev.type === 'red') icon = '🟥';
+                    homeContainer.innerHTML += `
+                        <div class="event-item-tag">
+                            <span>${icon} ${ev.playerName}</span>
+                            <button type="button" onclick="removeMatchEvent('home', ${idx})">✕</button>
+                        </div>
+                    `;
+                });
+            }
+
+            if(awayContainer) {
+                awayContainer.innerHTML = "";
+                currentAwayEvents.forEach((ev, idx) => {
+                    let icon = '⚽';
+                    if(ev.type === 'yellow') icon = '🟨';
+                    if(ev.type === 'red') icon = '🟥';
+                    awayContainer.innerHTML += `
+                        <div class="event-item-tag">
+                            <span>${icon} ${ev.playerName}</span>
+                            <button type="button" onclick="removeMatchEvent('away', ${idx})">✕</button>
+                        </div>
+                    `;
+                });
+            }
+        }
+
+        function updateFinishedScoresCount() {
+            let homeGoals = currentHomeEvents.filter(e => e.type === 'goal').length;
+            let awayGoals = currentAwayEvents.filter(e => e.type === 'goal').length;
+
+            const hScoreInput = document.getElementById('mHomeScore');
+            const aScoreInput = document.getElementById('mAwayScore');
+
+            if(hScoreInput) hScoreInput.value = homeGoals;
+            if(aScoreInput) aScoreInput.value = awayGoals;
         }
 
         /* --- الصندوق السادس: التفعيل والتعطيل اليدوي فقط --- */
@@ -1608,24 +1794,6 @@
             });
         };
 
-        function parseEvents(rawText) {
-            if(!rawText || !rawText.trim()) return [];
-            const lines = rawText.split('\n');
-            const events = [];
-            lines.forEach(line => {
-                if(line.includes('-')) {
-                    const parts = line.split('-');
-                    const pName = parts[0].trim();
-                    const typeRaw = parts[1].trim();
-                    let type = 'goal';
-                    if(typeRaw.includes('زەرد')) type = 'yellow';
-                    if(typeRaw.includes('سوور') || typeRaw.includes('سور')) type = 'red';
-                    events.push({ type: type, playerName: pName });
-                }
-            });
-            return events;
-        }
-
         window.createNewMatch = function(e) {
             e.preventDefault();
             
@@ -1664,15 +1832,18 @@
             } else {
                 matchPayload.date = document.getElementById('mDateOnly').value;
                 matchPayload.time = ""; 
-                matchPayload.motm = document.getElementById('mMotm').value.trim() || "دیاری نەکراوە";
+                matchPayload.motm = document.getElementById('mMotm').value || "دیاری نەکراوە";
                 matchPayload.homeScore = Number(document.getElementById('mHomeScore').value) || 0;
                 matchPayload.awayScore = Number(document.getElementById('mAwayScore').value) || 0;
-                matchPayload.homeEvents = parseEvents(document.getElementById('mHomeEventsRaw').value);
-                matchPayload.awayEvents = parseEvents(document.getElementById('mAwayEventsRaw').value);
+                matchPayload.homeEvents = [...currentHomeEvents];
+                matchPayload.awayEvents = [...currentAwayEvents];
             }
 
             set(newMatchPush, matchPayload).then(() => {
                 document.getElementById('matchForm').reset();
+                currentHomeEvents = [];
+                currentAwayEvents = [];
+                renderMatchEventsUI();
                 toggleMatchForm('upcoming');
                 showNotification(`یاری نێوان [ ${homeT} × ${awayT} ] بە سەرکەوتوویی خستە ناو خشتەکەوە!`, "success");
             });
@@ -1850,6 +2021,7 @@
             renderNotificationsTable();
             renderMatchesTables();
             renderFantasyUsersTable();
+            updateMatchEventPlayerDropdowns();
 
             loadTeamSquadManagement();
             calculateLeagueStanding(matchesList);
@@ -1881,7 +2053,6 @@
             if(!usersTbody) return;
             usersTbody.innerHTML = "";
 
-            // ترتيب المستخدمين تنازلياً حسب النقاط (الأعلى نقاطاً في الأعلى)
             const sortedUsersEntries = Object.entries(localFantasyUsersData).sort((a, b) => {
                 const pointsA = a[1].points || 0;
                 const pointsB = b[1].points || 0;
