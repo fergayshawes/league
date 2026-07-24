@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ckb" dir="rtl">
 <head>
@@ -233,6 +234,21 @@
             background: var(--text-main); color: var(--bg-body);
         }
 
+        nav ul { list-style: none; display: flex; width: 100%; gap: 8px; }
+        nav ul li { flex: 1; }
+        nav ul li a {
+            color: var(--text-muted); text-decoration: none; padding: 12px 4px; display: flex;
+            align-items: center; justify-content: center; background: var(--bg-sub);
+            border-radius: 8px; border: 1px solid var(--border-color);
+            transition: all 0.15s ease; outline: none; box-shadow: var(--shadow-sm);
+        }
+        nav ul li a i { font-size: 18px; }
+        nav ul li a:hover { color: var(--text-main); background: var(--bg-card); }
+        nav ul li a.active {
+            background: var(--text-main); color: var(--bg-body);
+            font-weight: 800; border-color: var(--text-main);
+        }
+
         .container { padding: 16px; margin-top: 5px; }
 
         .hero-section { 
@@ -349,31 +365,6 @@
         .fantasy-nav-item i { font-size: 22px; }
         .fantasy-nav-item.active { color: var(--text-main); text-shadow: 0 0 10px var(--card-glow); }
 
-        .ads-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 15px; }
-        .ad-slot-box {
-            background: var(--bg-sub); border: 1px dashed var(--border-color);
-            border-radius: 14px; padding: 20px 10px; text-align: center;
-            cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
-            box-shadow: var(--shadow-sm); transition: all 0.2s ease;
-        }
-        .ad-slot-box:hover { border-color: #eab308; background: rgba(234, 179, 8, 0.03); transform: translateY(-2px); }
-        .ad-slot-box.disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            background: var(--bg-body);
-            border-color: var(--border-color);
-        }
-        .ad-slot-box.disabled:hover {
-            transform: none;
-            background: var(--bg-body);
-            border-color: var(--border-color);
-        }
-        .ad-slot-box i { font-size: 24px; color: #eab308; }
-        .ad-slot-box.disabled i { color: var(--text-muted); }
-        .ad-slot-box span { font-size: 12px; font-weight: bold; color: var(--text-main); }
-        .ad-slot-box small { font-size: 10px; color: #10b981; font-weight: 800; }
-        .ad-slot-box.disabled small { color: #ef4444; }
-
         .news-timeline { display: flex; flex-direction: column; gap: 10px; margin-top: 15px; }
         .news-feed-item {
             background: var(--bg-card); border: 1px solid var(--border-color);
@@ -399,7 +390,7 @@
         }
         .news-points-badge.minus { color: #ef4444; }
 
-        .fantasy-auth-box { text-align: center; padding: 25px; border: 1px solid var(--border-color); border-radius: 16px; background: var(--bg-card); box-shadow: var(--shadow-sm); }
+        .fantasy-auth-box { text-align: center; padding: 25px; border: 1px solid var(--border-color); border-radius: 16px; background: var(--bg-card); margin-top: 20px; box-shadow: var(--shadow-sm); }
         .fantasy-user-profile { display: flex; align-items: center; justify-content: space-between; background: var(--bg-card); padding: 15px; border-radius: 14px; border: 1px solid var(--border-color); margin-bottom: 20px; }
         .fantasy-user-avatar { width: 55px; height: 55px; border-radius: 50%; border: 2px solid var(--text-main); object-fit: cover; }
         .fantasy-stats-dashboard { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
@@ -696,6 +687,49 @@
             color: var(--bg-body);
             box-shadow: var(--shadow-sm);
         }
+
+        /* تنسيق جدول الترتيب العام لفانتازي المستخدمين */
+        .fantasy-leaderboard-container {
+            margin-top: 20px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 16px;
+            box-shadow: var(--shadow-md);
+        }
+        .leaderboard-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: right;
+            margin-top: 10px;
+        }
+        .leaderboard-table th, .leaderboard-table td {
+            padding: 10px 12px;
+            font-size: 12px;
+        }
+        .leaderboard-table th {
+            background: var(--bg-sub);
+            color: var(--text-muted);
+            font-weight: 700;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .leaderboard-table td {
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-main);
+            vertical-align: middle;
+        }
+        .leaderboard-user-cell {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .leaderboard-user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 1px solid var(--border-color);
+        }
     </style>
 </head>
 <body>
@@ -708,6 +742,16 @@
     <div class="top-laser-line"></div>
 
     <div id="toastContainer"></div>
+
+    <!-- نافذة الحظر -->
+    <div class="modal-overlay" id="bannedModal" style="z-index: 999999;">
+        <div class="beIn-squad-card" style="height: auto; max-width: 380px; padding: 25px; text-align: center;">
+            <div style="font-size: 50px; color: #ef4444; margin-bottom: 15px;"><i class="fa-solid fa-ban"></i></div>
+            <h2 style="color: #ef4444; margin-bottom: 10px;" id="bannedModalTitle">حسابك محظور</h2>
+            <p style="font-size: 13px; color: var(--text-muted); line-height: 1.6; margin-bottom: 20px;" id="bannedModalDesc">عذراً، تم حظر حسابك من قبل إدارة الموقع. لا يمكنك الدخول إلى قسم الفانتازي.</p>
+            <button class="btn-action-submit-squad" id="bannedLogoutBtn" style="background: #ef4444; margin-top: 0;" onclick="logoutDueToBan()">تسجيل الخروج بحساب آخر</button>
+        </div>
+    </div>
 
     <div class="notification-info-modal" id="notificationInfoModal">
         <div class="notification-info-card">
@@ -825,12 +869,18 @@
                     <a href="index.html" class="btn-header-icon" id="lblBackHome" title="گەڕانەوە بۆ سەرەکی"><i class="fa-solid fa-house"></i></a>
                 </div>
             </div>
+            <ul>
+                <li style="flex:1;"><a href="index.html" class="nav-link"><i class="fa-solid fa-trophy"></i></a></li>
+                <li style="flex:1;"><a href="index.html" class="nav-link"><i class="fa-solid fa-calendar-days"></i></a></li>
+                <li style="flex:1;"><a href="index.html" class="nav-link"><i class="fa-solid fa-users"></i></a></li>
+                <li style="flex:1;"><a href="fantasy.html" class="nav-link active"><i class="fa-solid fa-gamepad"></i></a></li>
+            </ul>
         </div>
     </nav>
 
     <div class="container">
-        <div id="fantasyAuthWall" style="display: none; text-align: center; padding: 20px; min-height: calc(100vh - 120px); display: flex; align-items: center; justify-content: center;">
-            <div class="fantasy-auth-box" style="width: 100%; max-width: 400px; margin: auto;">
+        <div id="fantasyAuthWall" style="display: none; text-align: center; padding: 40px 20px;">
+            <div class="fantasy-auth-box">
                 <i class="fa-solid fa-lock" style="font-size: 40px; color: #eab308; margin-bottom: 15px;"></i>
                 <h3 id="lblFantasyLoginReq" style="margin-bottom: 15px; font-size: 15px;">بۆ بەکارهێنانی بەشی فانتازی، دەبێت سەرەتا لەڕێگەی گۆگڵەوە بچیتە ژوورەوە</h3>
                 <button class="btn-google-login" onclick="loginWithGoogle()">
@@ -848,7 +898,7 @@
         <div id="fantasy" class="page active" style="display: none;">
             <div class="hero-section">
                 <h1 id="lblFantasyTitle">فانتازی شەشی خولی فەرمی</h1>
-                <p id="lblFantasyDesc">پێکهاتەی تیمەکەت دروستبکە، ریکلامەکان ببینە بۆ زیادکردنی بودجەکەت و کێبڕکێ بکە!</p>
+                <p id="lblFantasyDesc">پێکهاتەی تیمەکەت دروستبکە و کێبڕکێ بکە!</p>
             </div>
 
             <div id="fantasy-sub-profile" class="fantasy-subpage active">
@@ -874,27 +924,22 @@
                     </div>
                 </div>
 
-                <h3 style="font-size: 13px; margin: 15px 0 5px 0; font-weight: 800;" id="lblWatchAdsTitle">ریکلامەکان ببینە بۆ بەدەستهێنانی بودجە (2,000 IQD بۆ هەر ریکلامێک):</h3>
-                <div class="ads-grid">
-                    <div class="ad-slot-box" id="adBox-1" onclick="watchAdReward(1)">
-                        <i class="fa-solid fa-circle-play" id="adIcon-1"></i>
-                        <span id="lblAd1Text">ریکلامی یەکەم</span>
-                        <small id="adSmall-1">+2,000 IQD</small>
-                    </div>
-                    <div class="ad-slot-box" id="adBox-2" onclick="watchAdReward(2)">
-                        <i class="fa-solid fa-circle-play" id="adIcon-2"></i>
-                        <span id="lblAd2Text">ریکلامی دووەم</span>
-                        <small id="adSmall-2">+2,000 IQD</small>
-                    </div>
-                    <div class="ad-slot-box" id="adBox-3" onclick="watchAdReward(3)">
-                        <i class="fa-solid fa-circle-play" id="adIcon-3"></i>
-                        <span id="lblAd3Text">ریکلامی سێیەم</span>
-                        <small id="adSmall-3">+2,000 IQD</small>
-                    </div>
-                    <div class="ad-slot-box" id="adBox-4" onclick="watchAdReward(4)">
-                        <i class="fa-solid fa-circle-play" id="adIcon-4"></i>
-                        <span id="lblAd4Text">ریکلامی چوارەم</span>
-                        <small id="adSmall-4">+2,000 IQD</small>
+                <!-- جدول الترتيب العام لفانتازي المستخدمين -->
+                <div class="fantasy-leaderboard-container">
+                    <h3 style="font-size: 13px; font-weight: 800; margin-bottom: 8px;" id="lblLeaderboardTitle"><i class="fa-solid fa-ranking-star" style="color: #eab308; margin-left: 5px;"></i> <span id="lblLeaderboardText">ڕیزبەندی گشتی بەکارهێنەرانی فانتازی</span></h3>
+                    <div style="overflow-x: auto;">
+                        <table class="leaderboard-table">
+                            <thead>
+                                <tr>
+                                    <th style="text-align: center; width: 45px;"><i class="fa-solid fa-hashtag"></i></th>
+                                    <th id="lblLeaderColUser">المستخدم</th>
+                                    <th style="text-align: center; color: #10b981;" id="lblLeaderColPoints">النقاط (PTS)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="fantasyLeaderboardTbody">
+                                <!-- سيتم تعبئتها ديناميكياً -->
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
@@ -953,7 +998,7 @@
 
             <div id="fantasy-sub-news" class="fantasy-subpage">
                 <div style="background: rgba(234, 179, 8, 0.08); border: 1px solid rgba(234, 179, 8, 0.3); border-radius: 12px; padding: 12px; margin-bottom: 12px; font-size: 11px; color: var(--text-main); text-align: center;" id="lblNewsNotice">
-                    💡 <strong>تێبینی:</strong> کلیک لەسەر هەر ئاگادارییەک بکە بۆ بینینی ڕونکردنەوەی خاڵەکان.
+                    <i class="fa-solid fa-lightbulb" style="color: #eab308; margin-left: 5px;"></i> <strong>تێبینی:</strong> کلیک لەسەر هەر ئاگادارییەک بکە بۆ بینینی ڕونکردنەوەی خاڵەکان.
                 </div>
 
                 <div class="notifications-filter-tabs">
@@ -988,8 +1033,8 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-        import { getDatabase, ref, onValue, set, get } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
-        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+        import { getDatabase, ref, onValue, set, get, remove } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBhYee5yLdNN-ttq6dux8G0w8_vl-ald-g",
@@ -1015,25 +1060,24 @@
                 fantasyLoginReq: "بۆ بەکارهێنانی بەشی فانتازی، دەبێت سەرەتا لەڕێگەی گۆگڵەوە بچیتە ژوورەوە",
                 googleLoginText: "چوونەژوورەوە لەڕێگەی گۆگڵ",
                 fantasyTitle: "فانتازی شەشی خولی فەرمی",
-                fantasyDesc: "پێکهاتەی تیمەکەت دروستبکە، ریکلامەکان ببینە بۆ زیادکردنی بودجەکەت و کێبڕکێ بکە!",
+                fantasyDesc: "پێکهاتەی تیمەکەت دروستبکە و کێبڕکێ بکە!",
                 fantasyWelcome: "بەخێر هاتیت بۆ خولی فانتازی",
                 editProfileBtn: "دەستکاری هەژمار",
                 fantasyBudget: "بودجەی بەردەست",
                 fantasyPoints: "کۆی گشتی خاڵەکان",
-                watchAdsTitle: "ریکلامەکان ببینە بۆ بەدەستهێنانی بودجە (2,000 IQD بۆ هەر ریکلامێک):",
-                ad1Text: "ریکلامی یەکەم",
-                ad2Text: "ریکلامی دووەم",
-                ad3Text: "ریکلامی سێیەم",
-                ad4Text: "ریکلامی چوارەم",
-                viewModeText: "وضع العرض",
-                editModeText: "تعديل التشكيلة",
+                leaderboardTitle: "ڕیزبەندی گشتی بەکارهێنەرانی فانتازی",
+                userYourTeamTag: "(تیمەکەت)",
+                leaderColUser: "بەکارهێنەر",
+                leaderColPoints: "خاڵەکان (PTS)",
+                viewModeText: "دۆخی نیشاندان",
+                editModeText: "دۆخی دەستکاری",
                 setCaptainBtn: "دیاریکردنی کابتن",
                 submitSquadBtn: "پشتڕاستکردنەوە و بەشداریکردن",
                 extraPlayersTitle: "یاریزانە یەدەگ و زیادەکان (کۆگا):",
                 noExtraPlayers: "هیچ یاریزانێکی زیادە لە کۆگاکەتدا نییە",
                 marketTitle: "بازاڕی گواستنەوەی یاریزانە بەردەستەکان:",
                 sellTitle: "فرۆشتنی یاریزانەکان (یەدەگ):",
-                newsNotice: "💡 <strong>تێبینی:</strong> کلیک لەسەر هەر ئاگادارییەک بکە بۆ بینینی ڕونکردنەوەی خاڵەکان.",
+                newsNotice: "تێبینی: کلیک لەسەر هەر ئاگادارییەک بکە بۆ بینینی ڕونکردنەوەی خاڵەکان.",
                 newsEventsTitle: "دوایین ڕووداو و ئاگادارییەکانی فانتازی:",
                 profileModalTitle: "تۆمارکردن و دەستکاریکردنی زانیاریەکانی هەژمار",
                 usernameField: "ناوی بەکارهێنەر:",
@@ -1053,7 +1097,12 @@
                 posDef: "بەرگریکار",
                 posGk: "گۆڵپارێز",
                 notifTabAll: "هەموو ئاگادارییەکان",
-                notifTabMy: "ئاگادارییەکانی فریقی من"
+                notifTabMy: "ئاگادارییەکانی فریقی من",
+                matchLockedErrorTitle: "ناتوانرێت دەستکاری بکرێت",
+                matchLockedErrorDesc: " ناتوانرێت دەستکاری بکرێت چونکە بەم زووانە یارییەک دێتە پێشەوە.",
+                bannedTitle: "هەژمارەکەت قەدەغەکراوە",
+                bannedDesc: "ببورە، هەژمارەکەت لەلایەن بەڕێوەبەرەوە قەدەغەکراوە و ناتوانیت دەست بە فانتازی بکەیت.",
+                bannedLogoutBtn: "چوونە دەرەوە بە هەژمارێکی تر"
             },
             ar: {
                 loaderText: "تحميل الدوري الرسمي...",
@@ -1062,16 +1111,15 @@
                 fantasyLoginReq: "استخدام قسم الفانتازي يتطلب تسجيل الدخول عبر جوجل أولاً",
                 googleLoginText: "تسجيل الدخول عبر جوجل",
                 fantasyTitle: "فانتازي الدوري الرسمي",
-                fantasyDesc: "أنشئ تشكيلة فريقك، شاهد الإعلانات لزيادة ميزانيتك ونافس بقوة!",
+                fantasyDesc: "أنشئ تشكيلة فريقك ونافس بقوة!",
                 fantasyWelcome: "مرحباً بك في دوري الفانتازي",
                 editProfileBtn: "تعديل الحساب",
                 fantasyBudget: "الميزانية المتاحة",
                 fantasyPoints: "إجمالي النقاط",
-                watchAdsTitle: "شاهد الإعلانات لكسب الميزانية (2,000 IQD لكل إعلان):",
-                ad1Text: "الإعلان الأول",
-                ad2Text: "الإعلان الثاني",
-                ad3Text: "الإعلان الثالث",
-                ad4Text: "الإعلان الرابع",
+                leaderboardTitle: "الترتيب العام لمستخدمي الفانتازي",
+                userYourTeamTag: "(فريقك)",
+                leaderColUser: "المستخدم",
+                leaderColPoints: "النقاط (PTS)",
                 viewModeText: "وضع العرض",
                 editModeText: "تعديل التشكيلة",
                 setCaptainBtn: "تحديد الكابتن",
@@ -1080,7 +1128,7 @@
                 noExtraPlayers: "لا يوجد أي لاعبين إضافيين في المخزن",
                 marketTitle: "سوق الانتقالات للاعبين المتاحين:",
                 sellTitle: "بيع اللاعبين (الاحتياط):",
-                newsNotice: "💡 <strong>ملاحظة:</strong> اضغط على أي إشعار لعرض تفاصيل وشرح النقاط.",
+                newsNotice: "ملاحظة: اضغط على أي إشعار لعرض تفاصيل وشرح النقاط.",
                 newsEventsTitle: "آخر الأحداث وإشعارات الفانتازي:",
                 profileModalTitle: "تسجيل وتعديل بيانات الحساب",
                 usernameField: "اسم المستخدم:",
@@ -1100,7 +1148,12 @@
                 posDef: "مدافع",
                 posGk: "حارس",
                 notifTabAll: "جميع الإشعارات",
-                notifTabMy: "إشعارات فريقي"
+                notifTabMy: "إشعارات فريقي",
+                matchLockedErrorTitle: "تنبيه التعديل",
+                matchLockedErrorDesc: "لا يمكن التعديل لوجود مباراة قريبة",
+                bannedTitle: "حسابك محظور",
+                bannedDesc: "عذراً، تم حظر حسابك من قبل إدارة الموقع. لا يمكنك الدخول إلى قسم الفانتازي.",
+                bannedLogoutBtn: "تسجيل الخروج بحساب آخر"
             }
         };
 
@@ -1121,11 +1174,9 @@
             document.getElementById('lblEditProfileBtn').innerText = getLangText('editProfileBtn');
             document.getElementById('lblFantasyBudget').innerText = getLangText('fantasyBudget');
             document.getElementById('lblFantasyPoints').innerText = getLangText('fantasyPoints');
-            document.getElementById('lblWatchAdsTitle').innerText = getLangText('watchAdsTitle');
-            document.getElementById('lblAd1Text').innerText = getLangText('ad1Text');
-            document.getElementById('lblAd2Text').innerText = getLangText('ad2Text');
-            document.getElementById('lblAd3Text').innerText = getLangText('ad3Text');
-            document.getElementById('lblAd4Text').innerText = getLangText('ad4Text');
+            document.getElementById('lblLeaderboardText').innerText = getLangText('leaderboardTitle');
+            document.getElementById('lblLeaderColUser').innerText = getLangText('leaderColUser');
+            document.getElementById('lblLeaderColPoints').innerText = getLangText('leaderColPoints');
             
             const editBtn = document.getElementById('lblEditModeBtn');
             if(editBtn) {
@@ -1145,7 +1196,6 @@
 
             document.getElementById('lblMarketTitle').innerText = getLangText('marketTitle');
             document.getElementById('lblSellTitle').innerText = getLangText('sellTitle');
-            document.getElementById('lblNewsNotice').innerHTML = getLangText('newsNotice');
             document.getElementById('lblNewsEventsTitle').innerText = getLangText('newsEventsTitle');
             document.getElementById('lblProfileModalTitle').innerText = getLangText('profileModalTitle');
             document.getElementById('lblUsernameField').innerText = getLangText('usernameField');
@@ -1162,10 +1212,14 @@
             document.getElementById('lblNotifCloseBtn').innerText = getLangText('notifCloseBtn');
             document.getElementById('lblNotifTabAll').innerText = getLangText('notifTabAll');
             document.getElementById('lblNotifTabMy').innerText = getLangText('notifTabMy');
+            document.getElementById('bannedModalTitle').innerText = getLangText('bannedTitle');
+            document.getElementById('bannedModalDesc').innerText = getLangText('bannedDesc');
+            document.getElementById('bannedLogoutBtn').innerText = getLangText('bannedLogoutBtn');
         };
 
         let playersDatabase = [];
         let notificationsDatabase = [];
+        let globalFantasyUsers = {};
         
         let currentUser = null;
         let userFantasySquad = { attack: [null], midfield: [null, null], defense: [null, null], goalkeeper: [null] };
@@ -1174,7 +1228,6 @@
         let userCaptain = null;
         let userBudget = 60000; 
         let userPoints = 0;
-        let userAdsData = {};
         let userClaimedNotifications = {}; 
         window.isEditMode = false; 
         window.currentFormation = "2-2-1";
@@ -1182,12 +1235,88 @@
         let isDataLoadedFromFirebase = false;
         let currentNotificationFilter = 'all';
 
+        let serverFantasyEditAllowed = true;
+
         const defaultPlayerImage = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2394a3b8'><path d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'/></svg>";
 
         window.addEventListener('load', () => {
             const loader = document.getElementById("page-loader");
             if(loader) loader.classList.add("fade-out");
             applyGlobalTranslations();
+            
+            // استعادة القسم الأخير عند التحميل أو الريفريش
+            restoreLastActiveState();
+        });
+
+        // الاستماع لقائمة جميع مستخدمي الفانتازي لعرضهم في جدول الترتيب العام
+        const allUsersRef = ref(db, 'fantasyUsers');
+        onValue(allUsersRef, (snapshot) => {
+            const data = snapshot.val();
+            globalFantasyUsers = data || {};
+            renderFantasyLeaderboard();
+        });
+
+        function renderFantasyLeaderboard() {
+            const tbody = document.getElementById("fantasyLeaderboardTbody");
+            if(!tbody) return;
+            tbody.innerHTML = "";
+
+            // ترتيب المستخدمين تنازلياً حسب النقاط
+            const sortedUsers = Object.entries(globalFantasyUsers).sort((a, b) => {
+                const ptsA = a[1].points || 0;
+                const ptsB = b[1].points || 0;
+                return ptsB - ptsA;
+            });
+
+            if(sortedUsers.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="3" style="text-align: center; color: var(--text-muted); padding: 15px;">هیچ بەکارهێنەرێک نییە</td></tr>`;
+                return;
+            }
+
+            sortedUsers.forEach(([uid, u], index) => {
+                const name = u.customDisplayName || u.displayName || "مستخدم";
+                const photo = u.customPhotoURL || u.photoURL || 'https://via.placeholder.com/32';
+                const pts = u.points || 0;
+                const isCurrent = currentUser && currentUser.uid === uid;
+
+                const tr = document.createElement('tr');
+                if (isCurrent) {
+                    tr.style.background = "rgba(16, 185, 129, 0.08)";
+                }
+
+                let rankDisplay = `${index + 1}`;
+                if(index === 0) {
+                    rankDisplay = `<i class="fa-solid fa-trophy" style="color: #eab308; font-size: 14px;" title="المركز الأول"></i> 1`;
+                } else if(index === 1) {
+                    rankDisplay = `<i class="fa-solid fa-medal" style="color: #94a3b8; font-size: 14px;" title="المركز الثاني"></i> 2`;
+                } else if(index === 2) {
+                    rankDisplay = `<i class="fa-solid fa-award" style="color: #d97706; font-size: 14px;" title="المركز الثالث"></i> 3`;
+                }
+
+                tr.innerHTML = `
+                    <td style="text-align: center; font-weight: bold; color: var(--text-muted);">${rankDisplay}</td>
+                    <td>
+                        <div class="leaderboard-user-cell">
+                            <img src="${photo}" class="leaderboard-user-avatar" onerror="this.src='https://via.placeholder.com/32'">
+                            <span style="font-weight: 700; color: var(--text-main);">${name} ${isCurrent ? `<span style="font-size:10px; color:#10b981;">${getLangText('userYourTeamTag')}</span>` : ''}</span>
+                        </div>
+                    </td>
+                    <td style="text-align: center; font-weight: 800; color: #10b981; font-size: 13px;">${pts}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        const systemSettingsRef = ref(db, 'systemSettings/fantasyEditMode');
+        onValue(systemSettingsRef, (snapshot) => {
+            const val = snapshot.val();
+            if (val !== null && val !== undefined) {
+                serverFantasyEditAllowed = Boolean(val);
+                if (!serverFantasyEditAllowed && window.isEditMode) {
+                    window.isEditMode = false;
+                    updateEditModeUIState();
+                }
+            }
         });
 
         function updateEditModeUIState() {
@@ -1234,71 +1363,6 @@
             }
         }
 
-        function isSquadFull() {
-            let totalPlayersCount = 0;
-            if (userFantasySquad) {
-                Object.keys(userFantasySquad).forEach(zone => {
-                    userFantasySquad[zone].forEach(p => {
-                        if (p && p.name) totalPlayersCount++;
-                    });
-                });
-            }
-            return totalPlayersCount === 6;
-        }
-
-        function processNewNotificationsForUser() {
-            if (!currentUser || !isDataLoadedFromFirebase) return;
-            let updated = false;
-
-            notificationsDatabase.forEach(n => {
-                if (!n || !n.id || !n.playerName) return;
-
-                if (userClaimedNotifications[n.id] === undefined) {
-                    let playerNameTrimmed = n.playerName.trim();
-                    let entryTime = squadEntryTimestamps[playerNameTrimmed];
-                    let notifTime = n.timestamp || 0;
-
-                    let activePlayerNames = [];
-                    Object.keys(userFantasySquad).forEach(z => {
-                        userFantasySquad[z].forEach(p => {
-                            if (p && p.name) activePlayerNames.push(p.name.trim());
-                        });
-                    });
-
-                    let isPlayerInSquadNow = activePlayerNames.includes(playerNameTrimmed);
-
-                    if (isSquadFull() && isPlayerInSquadNow && entryTime !== undefined && entryTime <= notifTime) {
-                        userClaimedNotifications[n.id] = { claimed: true, wasCaptain: (userCaptain && userCaptain === playerNameTrimmed) };
-                        updated = true;
-                    } else {
-                        userClaimedNotifications[n.id] = { claimed: false, wasCaptain: false };
-                        updated = true;
-                    }
-                }
-            });
-
-            let calculatedTotalPoints = 0;
-            Object.keys(userClaimedNotifications).forEach(notifId => {
-                let claimInfo = userClaimedNotifications[notifId];
-                if (claimInfo && claimInfo.claimed) {
-                    let matchingNotif = notificationsDatabase.find(item => item.id === notifId);
-                    if (matchingNotif) {
-                        let pts = getNotificationPointValue(matchingNotif.type);
-                        if (claimInfo.wasCaptain) {
-                            pts *= 2;
-                        }
-                        calculatedTotalPoints += pts;
-                    }
-                }
-            });
-
-            if (userPoints !== calculatedTotalPoints || updated) {
-                userPoints = calculatedTotalPoints;
-                saveUserDataRealtime();
-                updateFantasyPitchUI();
-            }
-        }
-
         const notifRef = ref(db, 'notificationsDatabase');
         onValue(notifRef, (snapshot) => {
             const data = snapshot.val();
@@ -1310,7 +1374,6 @@
                 notificationsDatabase.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
             }
             renderNotifications();
-            processNewNotificationsForUser();
         });
 
         const playersRef = ref(db, 'playersDatabase');
@@ -1332,7 +1395,7 @@
             const toast = document.createElement("div");
             toast.className = `toast-message ${type}`;
             
-            const icon = type === "success" ? "⭐" : "⚠️";
+            const icon = type === "success" ? '<i class="fa-solid fa-star"></i>' : '<i class="fa-solid fa-triangle-exclamation"></i>';
             
             toast.innerHTML = `
                 <div class="toast-icon">${icon}</div>
@@ -1383,10 +1446,10 @@
         };
 
         let pendingAction = null;
-        window.openConfirmationModal = function(title, desc, icon, actionCallback) {
+        window.openConfirmationModal = function(title, desc, iconClass, actionCallback) {
             document.getElementById("confirmModalTitle").innerText = title;
             document.getElementById("confirmModalDesc").innerText = desc;
-            document.getElementById("confirmModalIcon").innerText = icon || "⚠️";
+            document.getElementById("confirmModalIcon").innerHTML = `<i class="${iconClass || 'fa-solid fa-triangle-exclamation'}"></i>`;
             document.getElementById("confirmModalYesBtn").innerText = getLangText('confirmModalYes');
             document.getElementById("confirmModalNoBtn").innerText = getLangText('confirmModalNo');
             pendingAction = actionCallback;
@@ -1409,6 +1472,13 @@
             signInWithPopup(auth, provider).then((result) => {
             }).catch((error) => {
                 console.error("Authentication Error", error);
+            });
+        };
+
+        window.logoutDueToBan = function() {
+            signOut(auth).then(() => {
+                document.getElementById("bannedModal").classList.remove("active");
+                window.location.reload();
             });
         };
 
@@ -1439,6 +1509,7 @@
                     let existing = snapshot.val() || {};
                     existing.customDisplayName = newName;
                     existing.customPhotoURL = newPhoto || currentUser.photoURL;
+                    existing.email = currentUser.email || "";
                     set(userRef, existing).then(() => {
                         document.getElementById("profileSetupModal").classList.remove("active");
                         document.getElementById("fantasyUserName").innerText = newName;
@@ -1449,52 +1520,31 @@
             }
         };
 
-        function updateAdsUI() {
-            const now = Date.now();
-            const oneDay = 24 * 60 * 60 * 1000;
-            const lang = document.documentElement.getAttribute("lang");
-
-            for(let i = 1; i <= 4; i++) {
-                const box = document.getElementById(`adBox-${i}`);
-                const icon = document.getElementById(`adIcon-${i}`);
-                const small = document.getElementById(`adSmall-${i}`);
-                if(!box) continue;
-
-                const lastWatched = userAdsData[i] || 0;
-                if(now - lastWatched < oneDay) {
-                    box.classList.add("disabled");
-                    if(icon) icon.className = "fa-solid fa-lock";
-                    if(small) small.innerText = lang === 'ar' ? "مشاهد اليوم مكتملة" : "بینراوە (سبەی دەکرێتەوە)";
-                } else {
-                    box.classList.remove("disabled");
-                    if(icon) icon.className = "fa-solid fa-circle-play";
-                    if(small) small.innerText = "+2,000 IQD";
-                }
-            }
-        }
-
         function saveUserDataRealtime() {
             if(!currentUser || !isDataLoadedFromFirebase) return;
             const dataToSave = {
                 budget: userBudget,
                 points: userPoints,
                 captain: userCaptain,
-                adsData: userAdsData,
                 reservePlayers: userReservePlayers,
                 squad: userFantasySquad,
                 squadEntryTimestamps: squadEntryTimestamps,
                 formation: window.currentFormation,
-                claimedNotifications: userClaimedNotifications
+                claimedNotifications: userClaimedNotifications,
+                email: currentUser.email || ""
             };
 
             const userRef = ref(db, 'fantasyUsers/' + currentUser.uid);
             get(userRef).then((snapshot) => {
                 let currentData = snapshot.val() || {};
-                set(userRef, {
-                    ...currentData,
-                    displayName: currentData.customDisplayName || currentUser.displayName,
-                    ...dataToSave
-                });
+                if (currentData) {
+                    set(userRef, {
+                        ...currentData,
+                        displayName: currentData.customDisplayName || currentUser.displayName,
+                        email: currentUser.email || "",
+                        ...dataToSave
+                    });
+                }
             });
         }
 
@@ -1511,123 +1561,81 @@
             if (user) {
                 currentUser = user;
                 authWall.style.display = "none";
-                fantasyPageContent.style.display = "block";
-
+                
                 const userRef = ref(db, 'fantasyUsers/' + user.uid);
-                get(userRef).then((snapshot) => {
+                onValue(userRef, (snapshot) => {
                     const fData = snapshot.val();
-                    if(fData) {
-                        userBudget = fData.budget !== undefined ? fData.budget : 60000;
-                        userPoints = fData.points || 0;
-                        userCaptain = fData.captain || null;
-                        userAdsData = fData.adsData || {};
-                        userReservePlayers = fData.reservePlayers || [];
-                        squadEntryTimestamps = fData.squadEntryTimestamps || {};
-                        userClaimedNotifications = fData.claimedNotifications || {};
-                        if(fData.formation) {
-                            window.currentFormation = fData.formation;
-                            document.getElementById("formationSelector").value = window.currentFormation;
-                        }
-                        if(fData.squad) {
-                            userFantasySquad = {
-                                attack: fData.squad.attack || [null],
-                                midfield: fData.squad.midfield || [null, null],
-                                defense: fData.squad.defense || [null, null],
-                                goalkeeper: fData.squad.goalkeeper || [null]
-                            };
-                        }
-
-                        const finalName = fData.customDisplayName || user.displayName;
-                        const finalPhoto = fData.customPhotoURL || user.photoURL;
-                        document.getElementById("fantasyUserName").innerText = finalName;
-                        document.getElementById("fantasyUserImg").src = finalPhoto;
-
-                        if(!fData.customDisplayName) {
-                            document.getElementById("setupUsernameInput").value = user.displayName || "";
-                            document.getElementById("setupPhotoUrlInput").value = user.photoURL || "";
-                            document.getElementById("profileSetupModal").classList.add("active");
-                        }
-                    } else {
-                        userBudget = 60000;
-                        userAdsData = {};
-                        userReservePlayers = [];
-                        squadEntryTimestamps = {};
-                        userClaimedNotifications = {};
-                        set(userRef, { 
-                            displayName: user.displayName, 
-                            customDisplayName: user.displayName,
-                            customPhotoURL: user.photoURL,
-                            budget: 60000, 
-                            points: 0, 
-                            captain: null, 
-                            adsData: {}, 
-                            reservePlayers: [], 
-                            squadEntryTimestamps: {},
-                            squad: userFantasySquad, 
-                            formation: "2-2-1",
-                            claimedNotifications: {}
-                        });
-                        document.getElementById("setupUsernameInput").value = user.displayName || "";
-                        document.getElementById("setupPhotoUrlInput").value = user.photoURL || "";
-                        document.getElementById("profileSetupModal").classList.add("active");
-                    }
                     
+                    if (!fData) {
+                        isDataLoadedFromFirebase = false;
+                        fantasyPageContent.style.display = "none";
+                        authWall.style.display = "block";
+                        window.showToast("تم الحذف", "تم حذف حسابك من قبل الإدارة أو إعادة تعيينه.", "error");
+                        return;
+                    }
+
+                    if (fData.isBanned === true) {
+                        document.getElementById("bannedModal").classList.add("active");
+                        fantasyPageContent.style.display = "none";
+                        return;
+                    } else {
+                        document.getElementById("bannedModal").classList.remove("active");
+                        fantasyPageContent.style.display = "block";
+                    }
+
+                    userBudget = fData.budget !== undefined ? fData.budget : 60000;
+                    userPoints = fData.points !== undefined ? fData.points : 0;
+                    
+                    userCaptain = fData.captain || null;
+                    userReservePlayers = fData.reservePlayers || [];
+                    squadEntryTimestamps = fData.squadEntryTimestamps || {};
+                    userClaimedNotifications = fData.claimedNotifications || {};
+                    if(fData.formation) {
+                        window.currentFormation = fData.formation;
+                        document.getElementById("formationSelector").value = window.currentFormation;
+                    }
+                    if(fData.squad) {
+                        userFantasySquad = {
+                            attack: fData.squad.attack || [null],
+                            midfield: fData.squad.midfield || [null, null],
+                            defense: fData.squad.defense || [null, null],
+                            goalkeeper: fData.squad.goalkeeper || [null]
+                        };
+                    }
+
+                    const finalName = fData.customDisplayName || user.displayName;
+                    const finalPhoto = fData.customPhotoURL || user.photoURL;
+                    document.getElementById("fantasyUserName").innerText = finalName;
+                    document.getElementById("fantasyUserImg").src = finalPhoto;
+
                     isDataLoadedFromFirebase = true;
                     updateFormationStructure();
                     updateFantasyPitchUI();
                     renderMarketGlobal();
                     renderSellPlayersList();
-                    updateAdsUI();
-                    processNewNotificationsForUser();
+                    renderFantasyLeaderboard();
+                }, {
+                    onlyOnce: false
                 });
+
             } else {
                 currentUser = null;
                 isDataLoadedFromFirebase = false;
-                authWall.style.display = "flex";
+                authWall.style.display = "block";
                 fantasyPageContent.style.display = "none";
+                renderFantasyLeaderboard();
             }
         });
 
-        window.watchAdReward = function(slotNumber) {
-            const now = Date.now();
-            const oneDay = 24 * 60 * 60 * 1000;
-            const lastWatched = userAdsData[slotNumber] || 0;
-            const lang = document.documentElement.getAttribute("lang");
-
-            if(now - lastWatched < oneDay) {
-                window.showToast(
-                    lang === 'ar' ? "الإعلان مغلق" : "ریکلامەکە داخراوە",
-                    lang === 'ar' ? "لقد شاهدت هذا الإعلان بالفعل اليوم! يمكنك مشاهدته مرة أخرى في اليوم الثاني." : "تۆ ئەم ریکلامەت ئەمڕۆ بینیوە! دەتوانیت سبەی دووبارە سەیری بکەیت.",
-                    "error"
-                );
+        window.toggleEditMode = function() {
+            if (!serverFantasyEditAllowed && !window.isEditMode) {
+                window.showToast(getLangText('matchLockedErrorTitle'), getLangText('matchLockedErrorDesc'), "error");
                 return;
             }
 
-            window.showToast(
-                lang === 'ar' ? "مشاهدة الإعلان" : "بینینی ریکلام",
-                lang === 'ar' ? `جاري تشغيل الإعلان رقم ${slotNumber}... يرجى الانتظار 3 ثوانٍ للكسب.` : `ریکلامی ژمارە ${slotNumber} کارا دەبێت... تکایە ٣ چرکە چاوەڕوان بە.`,
-                "success"
-            );
-
-            setTimeout(() => {
-                userBudget += 2000; 
-                userAdsData[slotNumber] = Date.now();
-
-                saveUserDataRealtime();
-                updateAdsUI();
-                updateFantasyPitchUI();
-
-                window.showToast(
-                    lang === 'ar' ? "مبروك الرصيد الجديد!" : "پیرۆزە بودجەی نوێ!",
-                    lang === 'ar' ? "رائع! لقد أضفنا +2,000 IQD بنجاح إلى ميزانية فريقك." : "بە سەرکەوتوویی بڕی +2,000 دینار زیادکرا.",
-                    "success"
-                );
-            }, 3000);
-        };
-
-        window.toggleEditMode = function() {
             window.isEditMode = !window.isEditMode;
             updateEditModeUIState();
+            
             const lang = document.documentElement.getAttribute("lang") || 'ckb';
             if (window.isEditMode) {
                 window.showToast(lang === 'ar' ? "وضع التعديل" : "دۆخی دەستکاری", lang === 'ar' ? "تم تفعيل وضع التعديل، يمكنك الآن تعديل تشكيلتك." : "دۆخی دەستکاری کارا بوو، دەتوانیت پێکهاتەکەت بگۆڕیت.", "success");
@@ -1638,8 +1646,13 @@
 
         window.changeFormation = function(formStr) {
             const lang = document.documentElement.getAttribute("lang") || 'ckb';
+            if (!serverFantasyEditAllowed) {
+                window.showToast(getLangText('matchLockedErrorTitle'), getLangText('matchLockedErrorDesc'), "error");
+                document.getElementById("formationSelector").value = window.currentFormation;
+                return;
+            }
             if (!window.isEditMode) {
-                window.showToast(lang === 'ar' ? "وضع العرض فعال" : "دۆخی نیشاندان کارایە", lang === 'ar' ? "يرجى الضغط على زر وضع العرض لتفعيله وتعديل التشكيلة." : "تکایە سەرەتا دوگمەی وضع العرض بکە بۆ کاراکردنی دەستکاری.", "error");
+                window.showToast(lang === 'ar' ? "وضع العرض فعال" : "دۆخی نیشاندان کارایە", lang === 'ar' ? "يرجى الضغط على وضع التعديل أولاً." : "تکایە سەرەتا دۆخی دەستکاری کارا بکە.", "error");
                 document.getElementById("formationSelector").value = window.currentFormation;
                 return;
             }
@@ -1764,7 +1777,7 @@
             }
             const btnSubmit = document.getElementById("btnFantasySubmitSquad");
             if(btnSubmit) {
-                if(totalPlayersCount === expectedTotal && window.isEditMode) {
+                if(totalPlayersCount === expectedTotal && window.isEditMode && serverFantasyEditAllowed) {
                     btnSubmit.disabled = false;
                 } else {
                     btnSubmit.disabled = true;
@@ -1774,6 +1787,10 @@
 
         window.submitUserSquadFinal = function() {
             const lang = document.documentElement.getAttribute("lang") || 'ckb';
+            if (!serverFantasyEditAllowed) {
+                window.showToast(getLangText('matchLockedErrorTitle'), getLangText('matchLockedErrorDesc'), "error");
+                return;
+            }
             if (!window.isEditMode) {
                 window.showToast(lang === 'ar' ? "وضع العرض فعال" : "دۆخی نیشاندان کارایە", lang === 'ar' ? "يرجى تفعيل وضع التعديل أولاً." : "تکایە دۆخی دەستکاری کارا بکە.", "error");
                 return;
@@ -1806,8 +1823,12 @@
         window.removePlayerFromPitch = function(event, zone, index) {
             event.stopPropagation();
             const lang = document.documentElement.getAttribute("lang") || 'ckb';
+            if (!serverFantasyEditAllowed) {
+                window.showToast(getLangText('matchLockedErrorTitle'), getLangText('matchLockedErrorDesc'), "error");
+                return;
+            }
             if (!window.isEditMode) {
-                window.showToast(lang === 'ar' ? "وضع العرض فعال" : "دۆخی نیشاندان کارایە", lang === 'ar' ? "يرجى الضغط على زر وضع العرض لتفعيله وإزالة اللاعبين." : "تکایە دۆخی دەستکاری کارا بکە بۆ لابردنی یاریزان.", "error");
+                window.showToast(lang === 'ar' ? "وضع العرض فعال" : "دۆخی نیشاندان کارایە", lang === 'ar' ? "يرجى تفعيل وضع التعديل لإزالة اللاعبين." : "تکایە دۆخی دەستکاری کارا بکە بۆ لابردنی یاریزان.", "error");
                 return;
             }
 
@@ -1838,6 +1859,11 @@
             const player = userFantasySquad[zone][index];
 
             if(window.isEditMode) {
+                if (!serverFantasyEditAllowed) {
+                    window.showToast(getLangText('matchLockedErrorTitle'), getLangText('matchLockedErrorDesc'), "error");
+                    return;
+                }
+
                 activeSelectedNode = { zone, index };
                 
                 if(userReservePlayers.length === 0) {
@@ -1876,7 +1902,7 @@
                 if(player && player.name) {
                     openPlayerDetailCardModal(player.name, player.team || '', player.goals || 0, player.photo || '', player.number || 0, player.price || 40000, player.positionZone || '');
                 } else {
-                    window.showToast(lang === 'ar' ? "وضع العرض فعال" : "دۆخی نیشاندان کارایە", lang === 'ar' ? "وضع العرض مفعل. اضغط على زر وضع العرض للتعديل وإضافة اللاعبين." : "دۆخی نیشاندان کارایە. تکایە دوگمەی وضع العرض بکە بۆ دەستکاری.", "error");
+                    window.showToast(lang === 'ar' ? "وضع العرض فعال" : "دۆخی نیشاندان کارایە", lang === 'ar' ? "وضع العرض مفعل. اضغط على وضع التعديل لإضافة اللاعبين." : "دۆخی نیشاندان کارایە. تکایە دۆخی دەستکاری کارا بکە.", "error");
                 }
             }
         };
@@ -1887,6 +1913,11 @@
 
         window.assignReservePlayerToPitch = function(reserveIndex) {
             const lang = document.documentElement.getAttribute("lang") || 'ckb';
+            if (!serverFantasyEditAllowed) {
+                window.showToast(getLangText('matchLockedErrorTitle'), getLangText('matchLockedErrorDesc'), "error");
+                closeFantasySelector();
+                return;
+            }
             if (!window.isEditMode) {
                 window.showToast(lang === 'ar' ? "وضع العرض فعال" : "دۆخی نیشاندان کارایە", lang === 'ar' ? "يرجى تفعيل وضع التعديل أولاً." : "تکایە دۆخی دەستکاری کارا بکە.", "error");
                 closeFantasySelector();
@@ -1923,13 +1954,16 @@
             renderSellPlayersList();
             renderNotifications();
             closeFantasySelector();
-            processNewNotificationsForUser();
 
             window.showToast(lang === 'ar' ? "تم التحديث" : "نوێکرایەوە", lang === 'ar' ? "تم وضع اللاعب في التشكيلة بنجاح!" : "یاریزانەکە دابنرا لە پێکهاتەدا!", "success");
         };
 
         window.openCaptainSelectorModal = function() {
             const lang = document.documentElement.getAttribute("lang") || 'ckb';
+            if (!serverFantasyEditAllowed) {
+                window.showToast(getLangText('matchLockedErrorTitle'), getLangText('matchLockedErrorDesc'), "error");
+                return;
+            }
             if (!window.isEditMode) {
                 window.showToast(lang === 'ar' ? "وضع العرض فعال" : "دۆخی نیشاندان کارایە", lang === 'ar' ? "يرجى تفعيل وضع التعديل لتحديد الكابتن." : "تکایە دۆخی دەستکاری کارا بکە بۆ دیاریکردنی کابتن.", "error");
                 return;
@@ -1976,6 +2010,11 @@
 
         window.setTeamCaptain = function(playerName) {
             const lang = document.documentElement.getAttribute("lang") || 'ckb';
+            if (!serverFantasyEditAllowed) {
+                window.showToast(getLangText('matchLockedErrorTitle'), getLangText('matchLockedErrorDesc'), "error");
+                closeCaptainSelector();
+                return;
+            }
             if (!window.isEditMode) {
                 window.showToast(lang === 'ar' ? "وضع العرض فعال" : "دۆخی نیشاندان کارایە", lang === 'ar' ? "يرجى تفعيل وضع التعديل." : "تکایە دۆخی دەستکاری کارا بکە.", "error");
                 closeCaptainSelector();
@@ -1997,7 +2036,6 @@
         window.updateFantasyPitchUI = function() {
             const budgetElement = document.getElementById("fantasyBudgetVal");
             const pointsElement = document.getElementById("fantasyPointsVal");
-            const lang = document.documentElement.getAttribute("lang");
             
             if (budgetElement) budgetElement.innerText = `${userBudget.toLocaleString()} IQD`;
             if (pointsElement) pointsElement.innerText = userPoints;
@@ -2129,6 +2167,10 @@
 
         window.confirmBuyPlayer = function(name, price, photo, posZone) {
             const lang = document.documentElement.getAttribute("lang") || 'ckb';
+            if (!serverFantasyEditAllowed) {
+                window.showToast(getLangText('matchLockedErrorTitle'), getLangText('matchLockedErrorDesc'), "error");
+                return;
+            }
             if (!window.isEditMode) {
                 window.showToast(lang === 'ar' ? "وضع العرض فعال" : "دۆخی نیشاندان کارایە", lang === 'ar' ? "يرجى تفعيل وضع التعديل لشراء اللاعبين." : "تکایە دۆخی دەستکاری کارا بکە بۆ کڕینی یاریزان.", "error");
                 return;
@@ -2137,7 +2179,7 @@
             openConfirmationModal(
                 lang === 'ar' ? "تأكيد شراء اللاعب" : "پشتڕاستکردنەوەی کڕینی یاریزان",
                 lang === 'ar' ? `هل أنت متأكد من شراء اللاعب ${name} مقابل ${price.toLocaleString()} IQD؟` : `ئایا دڵنیایت لە کڕینی یاریزان ${name} بە بڕی ${price.toLocaleString()} دینار؟`,
-                "🛒",
+                "fa-solid fa-cart-shopping",
                 () => {
                     if(userBudget < price) {
                         window.showToast(lang === 'ar' ? "الميزانية غير كافية" : "بودجە بەشێ ناکات", lang === 'ar' ? "عذراً! ميزانية فريقك لا تكفي." : "بودجەکەت بەشێ ناکات.", "error");
@@ -2189,6 +2231,10 @@
 
         window.confirmSellPlayer = function(name, price, index) {
             const lang = document.documentElement.getAttribute("lang") || 'ckb';
+            if (!serverFantasyEditAllowed) {
+                window.showToast(getLangText('matchLockedErrorTitle'), getLangText('matchLockedErrorDesc'), "error");
+                return;
+            }
             if (!window.isEditMode) {
                 window.showToast(lang === 'ar' ? "وضع العرض فعال" : "دۆخی نیشاندان کارایە", lang === 'ar' ? "يرجى تفعيل وضع التعديل لبيع اللاعبين." : "تکایە دۆخی دەستکاری کارا بکە بۆ فرۆشتنی یاریزان.", "error");
                 return;
@@ -2197,7 +2243,7 @@
             openConfirmationModal(
                 lang === 'ar' ? "تأكيد بيع اللاعب" : "پشتڕاستکردنەوەی فرۆشتنی یاریزان",
                 lang === 'ar' ? `هل أنت متأكد من بيع اللاعب ${name} واسترداد مبلغ ${price.toLocaleString()} IQD؟` : `ئایا دڵنیایت لە فرۆشتنی یاریزان ${name}؟`,
-                "💰",
+                "fa-solid fa-coins",
                 () => {
                     userReservePlayers.splice(index, 1);
                     userBudget += price;
@@ -2275,6 +2321,15 @@
 
             document.getElementById(subPageId).classList.add('active');
             btnElement.classList.add('active');
+            
+            // حفظ القسم النشط الحالي في localStorage
+            localStorage.setItem("activeFantasySubPage", subPageId);
+            
+            // ربط الزر المرادف له في شريط التنقل السفلي
+            if(subPageId === 'fantasy-sub-profile') localStorage.setItem("activeFantasyNavBtn", 'btnSubTabProfile');
+            else if(subPageId === 'fantasy-sub-squad') localStorage.setItem("activeFantasyNavBtn", 'btnSubTabSquad');
+            else if(subPageId === 'fantasy-sub-market') localStorage.setItem("activeFantasyNavBtn", 'btnSubTabMarket');
+            else if(subPageId === 'fantasy-sub-news') localStorage.setItem("activeFantasyNavBtn", 'btnSubTabNews');
         };
 
         window.switchNotificationFilter = function(filterType) {
@@ -2289,8 +2344,38 @@
                 btnMy.classList.add("active");
                 btnAll.classList.remove("active");
             }
+            localStorage.setItem("activeNotifFilter", filterType);
             renderNotifications();
         };
+
+        function restoreLastActiveState() {
+            // استعادة القسم الرئيسي الفرعي لفانتازي
+            const savedSubPage = localStorage.getItem("activeFantasySubPage");
+            const savedNavBtnId = localStorage.getItem("activeFantasyNavBtn");
+            if (savedSubPage && document.getElementById(savedSubPage)) {
+                const pages = document.querySelectorAll('.fantasy-subpage');
+                pages.forEach(p => p.classList.remove('active'));
+                document.getElementById(savedSubPage).classList.add('active');
+
+                const navBtns = document.querySelectorAll('.fantasy-nav-item');
+                navBtns.forEach(b => b.classList.remove('active'));
+                if (savedNavBtnId && document.getElementById(savedNavBtnId)) {
+                    document.getElementById(savedNavBtnId).classList.add('active');
+                }
+            }
+
+            // استعادة تبويب سوق الانتقالات (بيع أو شراء)
+            const savedMarketTab = localStorage.getItem("activeMarketTab");
+            if (savedMarketTab !== null) {
+                switchMarketTab(Number(savedMarketTab));
+            }
+
+            // استعادة فلتر الإشعارات (الكل أو الخاصة بي)
+            const savedNotifFilter = localStorage.getItem("activeNotifFilter");
+            if (savedNotifFilter) {
+                switchNotificationFilter(savedNotifFilter);
+            }
+        }
 
         function formatTimeAgo(timestamp) {
             const lang = document.documentElement.getAttribute("lang");
@@ -2469,7 +2554,7 @@
             renderNotifications();
             renderMarketGlobal();
             renderSellPlayersList();
-            updateAdsUI();
+            renderFantasyLeaderboard();
         };
 
         const savedTheme = localStorage.getItem('theme') || 'dark';
