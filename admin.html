@@ -1,0 +1,1883 @@
+<!DOCTYPE html>
+<html lang="ckb" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⚙️ پانێڵی بەڕێوەبردن</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@400;600;800&display=swap');
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+        }
+
+        body {
+            font-family: 'Noto Naskh Arabic', 'Noto Kufi Arabic', sans-serif;
+            background-color: #0f1115; 
+            color: #e2e8f0;
+            padding-bottom: 60px;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        #loginGate {
+            position: fixed;
+            top: 0; left: 0; 
+            width: 100%; height: 100%;
+            background: #0f1115;
+            display: flex; justify-content: center; align-items: center;
+            z-index: 9999;
+            padding: 16px;
+        }
+
+        .login-card {
+            background: #161920;
+            border: 1px solid #222733;
+            border-radius: 12px;
+            padding: 28px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            text-align: center;
+        }
+
+        .login-card h2 {
+            font-size: 16px;
+            font-weight: 800;
+            margin-bottom: 20px;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .admin-header {
+            background-color: #161920; 
+            border-bottom: 1px solid #222733;
+            padding: 20px 16px;
+            text-align: center;
+            position: relative;
+        }
+
+        .admin-header h1 {
+            font-size: 18px;
+            font-weight: 800;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .admin-header p {
+            font-size: 11px;
+            color: #707e94;
+            margin-top: 6px;
+        }
+
+        .btn-back-home {
+            position: absolute;
+            left: 20px;
+            top: 20px;
+            background: #ffffff;
+            color: #0f1115;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            font-size: 14px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+        .btn-back-home:hover {
+            background: #e2e8f0;
+            transform: scale(1.05);
+        }
+
+        @media (max-width: 768px) {
+            .admin-header {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 12px;
+            }
+            .btn-back-home {
+                position: static;
+                border-radius: 8px;
+                width: 100%;
+                height: 40px;
+            }
+        }
+
+        .main-container {
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        @media (min-width: 992px) {
+            .main-container {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                padding: 16px;
+                gap: 24px;
+            }
+            .full-width-panel {
+                grid-column: span 2;
+            }
+        }
+
+        .box-panel {
+            background: #161920;
+            border: 1px solid #222733;
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            height: fit-content;
+            overflow: hidden;
+        }
+
+        .box-title {
+            font-size: 14px;
+            font-weight: 800;
+            color: #ffffff;
+            border-right: 3px solid #ffffff;
+            padding-right: 10px;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            width: 100%;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            width: 100%;
+        }
+
+        label {
+            font-size: 11px;
+            font-weight: 600;
+            color: #94a3b8;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        input, select, textarea {
+            background: #1f242f;
+            border: 1px solid #2d3446;
+            border-radius: 8px;
+            padding: 12px;
+            color: #ffffff;
+            font-family: 'Noto Kufi Arabic', sans-serif;
+            font-size: 12px;
+            outline: none;
+            width: 100%;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            border-color: #ffffff;
+        }
+
+        .input-error {
+            border-color: #ef4444 !important;
+            animation: shake 0.4s ease;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-6px); }
+            75% { transform: translateX(6px); }
+        }
+
+        .flatpickr-calendar {
+            background: #161920 !important;
+            border: 1px solid #2d3446 !important;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.6) !important;
+            font-family: 'Noto Kufi Arabic', sans-serif !important;
+            border-radius: 12px !important;
+            width: 315px !important;
+        }
+
+        .flatpickr-months .flatpickr-month { background: #161920 !important; color: #ffffff !important; fill: #ffffff !important; }
+        span.flatpickr-weekday { background: #1f242f !important; color: #94a3b8 !important; font-weight: 600 !important; }
+        .flatpickr-day { color: #e2e8f0 !important; border-radius: 6px !important; }
+        .flatpickr-day.selected { background: #ffffff !important; border-color: #ffffff !important; color: #0f1115 !important; font-weight: 800 !important; }
+        .flatpickr-time { border-top: 1px solid #2d3446 !important; background: #1f242f !important; }
+        .flatpickr-time input { background: transparent !important; color: #ffffff !important; font-weight: bold !important; }
+
+        button {
+            background: #ffffff;
+            color: #0f1115;
+            border: none;
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 12px;
+            font-weight: 800;
+            cursor: pointer;
+            font-family: 'Noto Kufi Arabic', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        button:hover { background: #e2e8f0; transform: translateY(-1px); }
+        button:active { transform: translateY(0); }
+
+        button.btn-danger {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+        button.btn-danger:hover { background: #ef4444; color: #ffffff; }
+
+        button.btn-secondary {
+            background: #1f242f;
+            color: #94a3b8;
+            border: 1px solid #2d3446;
+        }
+        button.btn-secondary:hover { background: #2d3446; color: #ffffff; }
+
+        .match-type-selector {
+            display: flex;
+            background: #1f242f;
+            border: 1px solid #2d3446;
+            border-radius: 8px;
+            padding: 4px;
+            gap: 4px;
+        }
+
+        .match-type-btn {
+            flex: 1;
+            background: transparent;
+            color: #94a3b8;
+            padding: 8px;
+            font-size: 11px;
+            border-radius: 6px;
+        }
+
+        .match-type-btn.active { background: #ffffff; color: #0f1115; }
+
+        .data-table-container {
+            overflow-x: auto;
+            width: 100%;
+            border: 1px solid #222733;
+            border-radius: 8px;
+            background: #161920;
+            margin-top: 10px;
+        }
+
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            text-align: right; 
+            min-width: 500px;
+        }
+
+        th, td { 
+            padding: 12px 10px; 
+            font-size: 12px; 
+            vertical-align: middle;
+        }
+
+        th { 
+            background: #1f242f; 
+            color: #94a3b8; 
+            font-weight: 600; 
+            white-space: nowrap;
+        }
+
+        td { 
+            border-bottom: 1px solid #222733; 
+            color: #e2e8f0; 
+        }
+
+        .player-info-cell {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-align: right;
+        }
+
+        .player-info-cell img {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            object-fit: cover;
+            background: #2d3446;
+            flex-shrink: 0;
+            border: 1px solid #3b4f6e;
+        }
+
+        .actions-cell { 
+            display: flex; 
+            gap: 6px; 
+            justify-content: flex-start; 
+            align-items: center;
+        }
+        
+        .actions-cell button { 
+            width: 32px;
+            height: 32px;
+            padding: 0;
+            font-size: 12px; 
+            border-radius: 6px; 
+            justify-content: center;
+        }
+
+        .inline-edit-input { 
+            padding: 8px; 
+            font-size: 11px; 
+            background: #0f1115; 
+            border: 1px solid #2d3446; 
+            border-radius: 4px;
+            width: 100%;
+        }
+
+        #toastContainer {
+            position: fixed;
+            top: 24px;
+            right: 24px; 
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .toast-card {
+            background: #1c202b;
+            border-right: 4px solid #ffffff; 
+            color: #ffffff;
+            padding: 16px 24px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 320px;
+            transform: translateX(150%);
+            animation: slideInToast 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        @keyframes slideInToast {
+            to { transform: translateX(0); }
+        }
+
+        .toast-card.success { border-right-color: #10b981; background: linear-gradient(90deg, #161e1b, #1c202b); } 
+        .toast-card.error { border-right-color: #ef4444; background: linear-gradient(90deg, #24181a, #1c202b); }   
+        .toast-card.info { border-right-color: #3b82f6; background: linear-gradient(90deg, #171d29, #1c202b); }    
+
+        #customConfirmModal {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 17, 21, 0.85);
+            backdrop-filter: blur(8px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 10005;
+        }
+
+        .confirm-card {
+            background: #161920;
+            border: 1px solid #2d3446;
+            border-radius: 16px;
+            padding: 28px;
+            width: 90%;
+            max-width: 420px;
+            box-shadow: 0 30px 70px rgba(0,0,0,0.8);
+            text-align: center;
+            transform: scale(0.8);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        #customConfirmModal.active { display: flex; }
+        #customConfirmModal.active .confirm-card { transform: scale(1); }
+
+        .confirm-card h3 { font-size: 16px; font-weight: 800; color: #ffffff; margin-bottom: 12px; display: flex; align-items: center; justify-content: center; gap: 8px;}
+        .confirm-card p { font-size: 13px; color: #94a3b8; margin-bottom: 24px; line-height: 1.6; }
+        .confirm-actions { display: flex; gap: 12px; justify-content: center; }
+        .confirm-actions button { flex: 1; padding: 12px; }
+
+        .admin-pitch-workspace { display: flex; flex-direction: column; gap: 24px; background: #0b0d13; border-radius: 20px; padding: 24px; border: 1px solid #222733; margin-top: 8px; width: 100%; }
+        
+        .admin-pitch-container {
+            width: 100%; max-width: 420px; margin: 0 auto; 
+            background-image: url('https://i.postimg.cc/WpGVVxBb/c17da56905c5df082ea221524ccf88cb.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            border: 3px solid rgba(255,255,255,0.7); border-radius: 12px; position: relative;
+            display: flex; flex-direction: column; justify-content: space-around; padding: 25px 15px; aspect-ratio: 3 / 4; 
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+        }
+
+        .admin-pitch-row { display: flex; justify-content: center; gap: 18px; align-items: center; width: 100%; z-index: 10; min-height: 65px; position: relative; }
+        
+        .btn-assign-here { background: rgba(15, 17, 21, 0.85); color: #fff; border: 2px dashed rgba(255,255,255,0.5); font-size: 11px; padding: 8px 14px; border-radius: 8px; cursor: pointer; font-weight: 600; backdrop-filter: blur(4px); white-space: nowrap; display: flex; align-items: center; gap: 4px; box-shadow: 0 4px 10px rgba(0,0,0,0.25);}
+        .btn-assign-here:hover { background: #ffffff; color: #0f1115; border-style: solid; border-color: #fff; transform: translateY(-2px); }
+
+        .admin-pitch-node { display: flex; flex-direction: column; align-items: center; width: 90px; background: rgba(15, 17, 21, 0.9); padding: 8px; border-radius: 10px; border: 2px solid #ffffff; box-shadow: 0 8px 16px rgba(0,0,0,0.5); gap: 6px; transform: scale(1.02); backdrop-filter: blur(4px); }
+        .admin-node-name { font-size: 11px; color: #fff; text-overflow: ellipsis; white-space: nowrap; overflow: hidden; max-width: 80px; font-weight: 700; text-align: center; }
+        .admin-pitch-node button { padding: 4px; width: 100%; height: auto; font-size: 10px; border-radius: 4px; font-weight: 600; }
+
+        .admin-subs-sidebar { width: 100%; background: #161920; border-radius: 14px; padding: 20px; border: 1px solid #222733; }
+        .subs-grid-layout { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; margin-top: 16px; }
+        
+        .badge-icon { background: #1f242f; padding: 4px 8px; border-radius: 6px; font-size: 11px; color: #94a3b8; border: 1px solid #2d3446; }
+        .section-subtitle { font-size: 12px; font-weight: 600; color: #94a3b8; margin-top: 10px; margin-bottom: 5px; }
+    </style>
+</head>
+<body>
+
+    <div id="toastContainer"></div>
+
+    <div id="customConfirmModal">
+        <div class="confirm-card">
+            <h3><i class="fa-solid fa-triangle-exclamation text-danger" style="color:#ef4444"></i> دڵنیایی لە سڕینەوە؟</h3>
+            <p id="confirmMessage">ئەم کارە ناگەڕێتەوە دواوە و داتاکان بە یەکجاری دەسڕێنەوە.</p>
+            <div class="confirm-actions">
+                <button class="btn-danger" id="confirmYesBtn"><i class="fa-solid fa-trash"></i> بەڵێ</button>
+                <button class="btn-secondary" onclick="closeConfirmModal()"><i class="fa-solid fa-xmark"></i> پاشگەزبوونەوە</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="loginGate">
+        <div class="login-card">
+            <h2><i class="fa-solid fa-lock" style="color: #3b82f6;"></i> چوونەژوورەوەی بەڕێوەبەر</h2>
+            <div class="form-group" style="margin-bottom: 14px; text-align: right;">
+                <label><i class="fa-solid fa-user"></i> ناوی بەکارهێنەر</label>
+                <input type="text" id="usernameInput" autocomplete="off" value="">
+            </div>
+            <div class="form-group" style="margin-bottom: 20px; text-align: right;">
+                <label><i class="fa-solid fa-key"></i> تێپەڕەوشە (Password)</label>
+                <input type="password" id="passwordInput" value="">
+            </div>
+            <button onclick="verifySystemAccess()" style="width: 100%;"><i class="fa-solid fa-right-to-bracket"></i> چوونەژوورەوە</button>
+        </div>
+    </div>
+
+    <div class="admin-header">
+        <a href="index.html" class="btn-back-home"><i class="fa-solid fa-house"></i></a>
+        <h1><i class="fa-solid fa-sliders" style="color: #10b981;"></i> سیستەمی بەڕێوەبردنی داتاکان</h1>
+        <p>کۆنترۆڵی ناوەندی بۆ یاریزانان و نوێکردنەوەی ئەنجام و ڕیزبەندی گشتی</p>
+    </div>
+
+    <div class="main-container">
+
+        <!-- صندوق الأول -->
+        <div class="box-panel">
+            <div class="box-title"><i class="fa-solid fa-users"></i> سندوقی یەکەم: یاریزانان</div>
+            
+            <form id="playerForm" onsubmit="createNewPlayer(event)" novalidate>
+                <div class="form-group" style="margin-bottom: 12px;">
+                    <label><i class="fa-solid fa-signature"></i> ناوی تەواوی یاریزان</label>
+                    <input type="text" id="pName">
+                </div>
+                <div class="form-row" style="margin-bottom: 14px;">
+                    <div class="form-group">
+                        <label><i class="fa-solid fa-shield-halved"></i> یانە / فەریق</label>
+                        <select id="pTeam">
+                            <option value="ئـ">ئـ</option>
+                            <option value="ب">ب</option>
+                            <option value="ت">ت</option>
+                            <option value="م">م</option>
+                            <option value="ک">ک</option>
+                            <option value="ل">ل</option>
+                            <option value="د">د</option>
+                            <option value="ر">ر</option>
+                            <option value="س">س</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fa-solid fa-arrow-1-9"></i> ژمارەی درێس</label>
+                        <input type="number" id="pNumber">
+                    </div>
+                </div>
+                <div class="form-group" style="margin-bottom: 14px;">
+                    <label><i class="fa-solid fa-image"></i> لینکی وێنەی یاریزان</label>
+                    <input type="url" id="pPhotoUrl" placeholder="https://example.com/image.jpg">
+                </div>
+                <button type="submit" style="width: 100%; background: #10b981; color:#fff;"><i class="fa-solid fa-user-plus"></i> تۆمارکردن</button>
+            </form>
+
+            <div class="data-table-container">
+                <table id="adminPlayersTable">
+                    <thead>
+                        <tr>
+                            <th><i class="fa-solid fa-user"></i> ناو و وێنە</th>
+                            <th><i class="fa-solid fa-shield-halved"></i> فەریق</th>
+                            <th><i class="fa-solid fa-hashtag"></i></th>
+                            <th><i class="fa-solid fa-soccer-ball"></i></th>
+                            <th style="text-align: left;"><i class="fa-solid fa-gear"></i></th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- صندوق الثاني -->
+        <div class="box-panel">
+            <div class="box-title"><i class="fa-solid fa-calendar-days"></i> سندوقی دووەم: یارییەکان</div>
+            
+            <div class="form-group">
+                <div class="match-type-selector">
+                    <button type="button" class="match-type-btn active" id="typeUpcoming" onclick="toggleMatchForm('upcoming')"><i class="fa-solid fa-clock"></i> داهاتوو (ناڕوون)</button>
+                    <button type="button" class="match-type-btn" id="typeFinished" onclick="toggleMatchForm('finished')"><i class="fa-solid fa-square-poll-horizontal"></i> کۆتاییهاتوو</button>
+                </div>
+            </div>
+
+            <form id="matchForm" onsubmit="createNewMatch(event)" novalidate>
+                <div class="form-row" style="margin-bottom: 12px;">
+                    <div class="form-group">
+                        <label><i class="fa-solid fa-house-chimney"></i> فەریقی یەکەم</label>
+                        <select id="mHomeTeam">
+                            <option value="ئـ">ئـ</option>
+                            <option value="ب">ب</option>
+                            <option value="ت">ت</option>
+                            <option value="م">م</option>
+                            <option value="ک">ک</option>
+                            <option value="ل">ل</option>
+                            <option value="د">د</option>
+                            <option value="ر">ر</option>
+                            <option value="س">س</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fa-solid fa-plane"></i> فەریقی دووەم</label>
+                        <select id="mAwayTeam">
+                            <option value="ئـ">ئـ</option>
+                            <option value="ب">ب</option>
+                            <option value="ت">ت</option>
+                            <option value="م">م</option>
+                            <option value="ک">ک</option>
+                            <option value="ل">ل</option>
+                            <option value="د">د</option>
+                            <option value="ر">ر</option>
+                            <option value="س">س</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div id="wrapperUpcoming">
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label><i class="fa-solid fa-calendar-day"></i> کات و ڕێکەوت</label>
+                        <input type="text" id="mDateTime" placeholder="کلیک بکە بۆ دیاریکردن">
+                    </div>
+                </div>
+
+                <div id="wrapperFinished" style="display: none;">
+                    <div class="form-row" style="margin-bottom: 12px;">
+                        <div class="form-group">
+                            <label><i class="fa-solid fa-list-ol"></i> گۆڵ (Home)</label>
+                            <input type="number" id="mHomeScore" value="0">
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fa-solid fa-list-ol"></i> گۆڵ (Away)</label>
+                            <input type="number" id="mAwayScore" value="0">
+                        </div>
+                    </div>
+                    <div class="form-row" style="margin-bottom: 12px;">
+                        <div class="form-group">
+                            <label><i class="fa-solid fa-calendar-check"></i> ڕێکەوت</label>
+                            <input type="text" id="mDateOnly" placeholder="مێژووی یاری">
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fa-solid fa-star"></i> باشترین یاریزان (MOTM)</label>
+                            <input type="text" id="mMotm" placeholder="ناوی یاریزان">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row" style="margin-bottom: 14px;">
+                        <div class="form-group">
+                            <label><i class="fa-solid fa-notes-medical"></i> ڕووداوەکان (فەریقی ١)</label>
+                            <textarea id="mHomeEventsRaw" rows="3" placeholder="ناو - گۆڵ&#10;ناو - کارتی زەرد"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fa-solid fa-notes-medical"></i> ڕووداوەکان (فەریقی ٢)</label>
+                            <textarea id="mAwayEventsRaw" rows="3" placeholder="ناو - گۆڵ&#10;ناو - کارتی زەرد"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" style="width: 100%; background: #3b82f6; color:#fff;"><i class="fa-solid fa-circle-plus"></i> تۆمارکردنی یاری</button>
+            </form>
+
+            <div class="section-subtitle"><i class="fa-solid fa-clock"></i> یارییە داهاتووەکان (تەواونەکراو)</div>
+            <div class="data-table-container">
+                <table id="adminUpcomingMatchesTable">
+                    <thead>
+                        <tr>
+                            <th>فەریقی یەکەم</th>
+                            <th>فەریقی دووەم</th>
+                            <th>کاتی یاری</th>
+                            <th>ڕێکەوت</th>
+                            <th style="text-align: left;"><i class="fa-solid fa-gear"></i></th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+
+            <div class="section-subtitle" style="margin-top: 20px;"><i class="fa-solid fa-square-poll-horizontal"></i> یارییە کۆتاییهاتووەکان</div>
+            <div class="data-table-container">
+                <table id="adminFinishedMatchesTable">
+                    <thead>
+                        <tr>
+                            <th>فەریقی یەکەم</th>
+                            <th>فەریقی دووەم</th>
+                            <th style="text-align: center;">ئەنجام</th>
+                            <th>ڕێکەوت</th>
+                            <th>MOTM</th>
+                            <th style="text-align: left;"><i class="fa-solid fa-gear"></i></th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- صندوق الثالث: داڕشتنی پێکهاتەی تیپەکان -->
+        <div class="box-panel full-width-panel">
+            <div class="box-title"><i class="fa-solid fa-dribbble"></i> سندوقی سێیەم: داڕشتنی پێکهاتەی تیپەکان (٥ یاریزان - بێ حارس)</div>
+            
+            <div style="background:#1f242f; padding:18px; border-radius:12px; display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:16px; width:100%;">
+                <div class="form-group">
+                    <label><i class="fa-solid fa-shield-halved"></i> تیپ</label>
+                    <select id="squadTeamSelect" onchange="loadTeamSquadManagement()">
+                        <option value="ئـ">ئـ</option>
+                        <option value="ب">ب</option>
+                        <option value="ت">ت</option>
+                        <option value="م">م</option>
+                        <option value="ک">ک</option>
+                        <option value="ل">ل</option>
+                        <option value="د">د</option>
+                        <option value="ر">ر</option>
+                        <option value="س">س</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label><i class="fa-solid fa-sitemap"></i> پلان</label>
+                    <select id="squadFormationSelect" onchange="updateTeamFormation()">
+                        <option value="2-2-1">2-2-1</option>
+                        <option value="3-1-1">3-1-1</option>
+                        <option value="2-1-2">2-1-2</option>
+                        <option value="1-3-1">1-3-1</option>
+                        <option value="1-2-2">1-2-2</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label style="color:#ffffff; font-weight:800;"><i class="fa-solid fa-user-check"></i> یاریزان بۆ یاریگا:</label>
+                    <select id="squadPlayerSelect" style="border: 2px solid #ffffff;"></select>
+                </div>
+            </div>
+
+            <div class="admin-pitch-workspace">
+                <div class="admin-pitch-container">
+                    <div class="admin-pitch-row" id="admRowAttack"></div>
+                    <div class="admin-pitch-row" id="admRowMidfield"></div>
+                    <div class="admin-pitch-row" id="admRowDefense"></div>
+                </div>
+
+                <div class="admin-subs-sidebar">
+                    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #222733; padding-bottom:10px;">
+                        <h4 style="color:#ffffff; font-size:14px; font-weight:800;"><i class="fa-solid fa-chair"></i> یاریزانانی یەدەگ</h4>
+                        <button type="button" onclick="addPlayerToZone('subs')" style="font-size:12px; padding:6px 14px; background:#ffffff; color:#0f1115;"><i class="fa-solid fa-plus"></i> یەدەگ</button>
+                    </div>
+                    <div id="admSubsList" class="subs-grid-layout"></div>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 14px; border-top: 1px solid #222733; padding-top: 16px;">
+                <button type="button" class="btn-danger" style="padding: 10px 20px;" onclick="clearEntireSquad()"><i class="fa-solid fa-eraser"></i> سڕینەوەی گشتی</button>
+                <button type="button" style="padding: 10px 24px; background-color: #10b981; color: #ffffff;" onclick="saveEntireSquadWithNotification()"><i class="fa-solid fa-floppy-disk"></i> پاشەکەوتکردن</button>
+            </div>
+        </div>
+
+        <!-- صندوق الرابع: بازاڕی فانتازي -->
+        <div class="box-panel full-width-panel">
+            <div class="box-title"><i class="fa-solid fa-store"></i> سندوقی چوارەم: بەڕێوەبردنی لاعبی فانتازی (بازاڕی کڕین و فرۆشتن)</div>
+            
+            <form id="fantasyMarketForm" onsubmit="createFantasyMarketPlayer(event)" novalidate>
+                <div class="form-row" style="margin-bottom: 14px;">
+                    <div class="form-group">
+                        <label><i class="fa-solid fa-shield-halved"></i> هەڵبژاردنی تیپ</label>
+                        <select id="marketTeamSelect" onchange="updateFilteredPlayersList()">
+                            <option value="ئـ">ئـ</option>
+                            <option value="ب">ب</option>
+                            <option value="ت">ت</option>
+                            <option value="م">م</option>
+                            <option value="ک">ک</option>
+                            <option value="ل">ل</option>
+                            <option value="د">د</option>
+                            <option value="ر">ر</option>
+                            <option value="س">س</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fa-solid fa-user"></i> دیاریکردنی یاریزان</label>
+                        <select id="marketPlayerSelect"></select>
+                    </div>
+                </div>
+
+                <div class="form-row" style="margin-bottom: 14px;">
+                    <div class="form-group">
+                        <label><i class="fa-solid fa-arrows-to-dot"></i> جۆری مرکز (Position)</label>
+                        <select id="marketPositionSelect">
+                            <option value="gk">گۆڵپارێز (GK)</option>
+                            <option value="cb">بەرگریکار (CB)</option>
+                            <option value="cm">ناوەڕاست (CM)</option>
+                            <option value="st">هێرشبەر (ST)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fa-solid fa-coins"></i> نرخ و بڕی پارە (IQD)</label>
+                        <input type="number" id="marketPriceInput" placeholder="نموونە: 45000" value="40000">
+                    </div>
+                </div>
+
+                <button type="submit" style="width: 100%; background: #10b981; color: #ffffff;"><i class="fa-solid fa-circle-plus"></i> زیادکردنی یاریزان بۆ بازار و فانتازی</button>
+            </form>
+
+            <div class="data-table-container" style="margin-top: 10px;">
+                <table id="adminFantasyMarketTable">
+                    <thead>
+                        <tr>
+                            <th><i class="fa-solid fa-user"></i> ناو</th>
+                            <th><i class="fa-solid fa-shield-halved"></i> تیپ</th>
+                            <th><i class="fa-solid fa-arrows-to-dot"></i> مرکز</th>
+                            <th><i class="fa-solid fa-coins"></i> نرخ (IQD)</th>
+                            <th style="text-align: left;"><i class="fa-solid fa-gear"></i></th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- صندوق پنجم: بەڕێوەبردنی ئەخبار و ئاگادارییەکانی فانتازی -->
+        <div class="box-panel full-width-panel">
+            <div class="box-title"><i class="fa-solid fa-bell"></i> سندوقی پێنجەم: بەڕێوەبردنی ئەخبار و ئاگادارییەکانی فانتازی</div>
+            
+            <form id="fantasyNotificationForm" onsubmit="saveFantasyNotification(event)" novalidate>
+                <div class="form-row" style="margin-bottom: 14px;">
+                    <div class="form-group">
+                        <label><i class="fa-solid fa-shield-halved"></i> 1. هەڵبژاردنی فەریق</label>
+                        <select id="notifTeamSelect" onchange="updateNotifPlayersList()">
+                            <option value="ئـ">ئـ</option>
+                            <option value="ب">ب</option>
+                            <option value="ت">ت</option>
+                            <option value="م">م</option>
+                            <option value="ک">ک</option>
+                            <option value="ل">ل</option>
+                            <option value="د">د</option>
+                            <option value="ر">ر</option>
+                            <option value="س">س</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fa-solid fa-user"></i> 2. هەڵبژاردنی یاریزان</label>
+                        <select id="notifPlayerSelect"></select>
+                    </div>
+                </div>
+
+                <div class="form-row" style="margin-bottom: 14px;">
+                    <div class="form-group">
+                        <label><i class="fa-solid fa-bolt"></i> 3. جۆری ئاگاداری / ڕووداو</label>
+                        <select id="notifTypeSelect" onchange="calculateAutoPoints()">
+                            <option value="goal_def">⚽ گۆڵی بەرگریکار (+6)</option>
+                            <option value="goal_mid">⚽ گۆڵی ناوەڕاست (+5)</option>
+                            <option value="goal_att">⚽ گۆڵی هێرشبەر (+4)</option>
+                            <option value="assist">🤝 دروستکردنی گۆڵ / ئەیست (+3)</option>
+                            <option value="clean_def">🛡️ تۆڕی خاوێن / بەرگریکار یان گۆڵپارێز (+4)</option>
+                            <option value="clean_mid">🛡️ تۆڕی خاوێن / ناوەڕاست (+1)</option>
+                            <option value="save_pk">🧤 گێڕانەوەی لێدانی سزا (+5)</option>
+                            <option value="saves_3">🧤 هەر ٣ گرتنەوەی تۆپ (+1)</option>
+                            <option value="bonus">⭐ خاڵی ئیضافی / بۆنەس (دەستکاری کراو)</option>
+                            <option value="concede_2">⚠️ گۆڵ لێکردن / استقبال هدفين (-1)</option>
+                            <option value="yellow">🟨 کارت زەرد (-1)</option>
+                            <option value="red">🟥 کارت سوور (-3)</option>
+                            <option value="miss_pk">❌ لەدەستدانی لێدانی سزا (-2)</option>
+                            <option value="own_goal">🔄 گۆڵ لە خۆی / هدفي عكسي (-2)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fa-solid fa-star-half-stroke"></i> 4. ژمارەی خاڵەکان</label>
+                        <input type="number" id="notifPointsInput" value="6" readonly style="background:#12151c; font-weight:800; font-size:14px; text-align:center;">
+                    </div>
+                </div>
+
+                <button type="submit" style="width: 100%; background: #3b82f6; color: #ffffff;"><i class="fa-solid fa-circle-plus"></i> بڵاوکردنەوەی ئاگاداری</button>
+            </form>
+
+            <div class="data-table-container" style="margin-top: 10px;">
+                <table id="adminNotificationsTable">
+                    <thead>
+                        <tr>
+                            <th><i class="fa-solid fa-user"></i> یاریزان</th>
+                            <th><i class="fa-solid fa-bolt"></i> جۆری ڕووداو</th>
+                            <th><i class="fa-solid fa-star"></i> خاڵەکان</th>
+                            <th><i class="fa-solid fa-calendar"></i> کات</th>
+                            <th style="text-align: left;"><i class="fa-solid fa-gear"></i></th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- صندوق ششەم: کۆنتڕۆڵی قفڵکردنی دەستکاری پێکهاتە (دەستی) -->
+        <div class="box-panel full-width-panel">
+            <div class="box-title"><i class="fa-solid fa-lock"></i> سندوقی شەشەم: کۆنتڕۆڵی دەستکاری پێکهاتەی فانتازی (دەستی)</div>
+            <p style="font-size: 11px; color: #94a3b8; line-height: 1.6;">
+                لێرەدا دەتوانیت بە شێوەی دەستی دوگمەی دەستکاری لە فانتاسیدا کارا یان ناچالاک بکەیت.
+            </p>
+            <div style="background:#1f242f; padding:18px; border-radius:12px; display:grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap:16px; align-items: center; width:100%;">
+                <div class="form-group">
+                    <label><i class="fa-solid fa-toggle-on"></i> دۆخی دوگمەی دەستکاری (تۆمارکردنی دەستی)</label>
+                    <select id="fantasyEditStateSelect" onchange="updateFantasyEditStateManual(this.value)">
+                        <option value="true">🔓 کارا (کراوە بۆ بەکارهێنەران)</option>
+                        <option value="false">🔒 قفڵکراو (ڕێگری لە گۆڕانکاری)</option>
+                    </select>
+                </div>
+                <div style="display:flex; flex-direction:column; gap:4px;">
+                    <span style="font-size: 11px; color: #94a3b8; font-weight: 600;">باری ئێستا لە سێرڤەردا:</span>
+                    <span id="fantasyRealStatusBadge" style="font-size: 12px; font-weight: 800; padding: 6px 12px; border-radius: 6px; width: fit-content; background: rgba(16,185,129,0.15); color: #10b981;">باری نەناسراو</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="box-panel full-width-panel">
+            <div class="box-title"><i class="fa-solid fa-ranking-star"></i> ڕیزبەندی گشتی خول</div>
+            <div class="data-table-container">
+                <table id="leagueTable">
+                    <thead>
+                        <tr>
+                            <th style="text-align: center; width: 50px;">#</th>
+                            <th><i class="fa-solid fa-shield-halved"></i> فەریق</th>
+                            <th style="text-align: center;"><i class="fa-solid fa-gamepad"></i></th>
+                            <th style="text-align: center; color:#10b981;"><i class="fa-solid fa-square-check"></i></th>
+                            <th style="text-align: center; color:#94a3b8;"><i class="fa-solid fa-square-minus"></i></th>
+                            <th style="text-align: center; color:#ef4444;"><i class="fa-solid fa-square-xmark"></i></th>
+                            <th style="text-align: center;"><i class="fa-solid fa-right-left"></i></th>
+                            <th style="text-align: center; font-weight: 800; color: #ffffff; background: rgba(255,255,255,0.05)"><i class="fa-solid fa-award"></i> PTS</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+        import { getDatabase, ref, set, push, onValue, remove, update } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBhYee5yLdNN-ttq6dux8G0w8_vl-ald-g",
+            authDomain: "league-aec67.firebaseapp.com",
+            databaseURL: "https://league-aec67-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "league-aec67",
+            storageBucket: "league-aec67.firebasestorage.app",
+            messagingSenderId: "825335921135",
+            appId: "1:825335921135:web:2ad16d50a25adc3363de1a",
+            measurementId: "G-ZLKJ3FJVW2"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        let currentMatchTypeMode = 'upcoming';
+        let localPlayersArray = {};
+        let localComputedGoals = {};
+        let localSquadsData = {};
+        let localNotificationsData = {};
+        let localMatchesData = {};
+        let onConfirmCallback = null;
+
+        const defaultTeams = ["ئـ", "ب", "ت", "م", "ک", "ل", "د", "ر", "س"];
+
+        window.showNotification = function(message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast-card ${type}`;
+            
+            let icon = '<i class="fa-solid fa-circle-check"></i>';
+            if(type === 'error') icon = '<i class="fa-solid fa-circle-xmark"></i>';
+            if(type === 'info') icon = '<i class="fa-solid fa-circle-info"></i>';
+            
+            toast.innerHTML = `${icon} <span>${message}</span>`;
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.transform = 'translateX(150%)';
+                toast.style.transition = 'transform 0.3s cubic-bezier(0.6, -0.28, 0.735, 0.045)';
+                setTimeout(() => { toast.remove(); }, 300);
+            }, 3500);
+        }
+
+        window.openConfirmModal = function(title, msg, onConfirm) {
+            document.getElementById('confirmMessage').innerText = msg;
+            const modal = document.getElementById('customConfirmModal');
+            modal.style.display = 'flex';
+            setTimeout(() => modal.classList.add('active'), 10);
+            onConfirmCallback = onConfirm;
+        }
+
+        window.closeConfirmModal = function() {
+            const modal = document.getElementById('customConfirmModal');
+            modal.classList.remove('active');
+            setTimeout(() => modal.style.display = 'none', 300);
+            onConfirmCallback = null;
+        }
+
+        document.getElementById('confirmYesBtn').addEventListener('click', () => {
+            if(onConfirmCallback) onConfirmCallback();
+            closeConfirmModal();
+        });
+
+        function validateFields(fieldIds) {
+            let isValid = true;
+            fieldIds.forEach(id => {
+                const input = document.getElementById(id);
+                if (!input.value.trim()) {
+                    input.classList.add('input-error');
+                    isValid = false;
+                    input.addEventListener('input', function removeErr() {
+                        input.classList.remove('input-error');
+                        input.removeEventListener('input', removeErr);
+                    });
+                }
+            });
+            if(!isValid) {
+                showNotification("تکایە سەرجەم خانە داواکراوەکان پڕبکەرەوە!", "error");
+            }
+            return isValid;
+        }
+
+        flatpickr("#mDateTime", { enableTime: true, dateFormat: "Y-m-d H:i", disableMobile: "true" });
+        flatpickr("#mDateOnly", { dateFormat: "Y-m-d", disableMobile: "true" });
+
+        window.verifySystemAccess = function() {
+            const user = document.getElementById('usernameInput').value.trim();
+            const pass = document.getElementById('passwordInput').value.trim();
+            if(user === "00" && pass === "11") {
+                document.getElementById('loginGate').style.display = 'none';
+                showNotification("بەخێربێیت بەڕێوەبەر! سیستم بە سەرکەوتوویی کرایەوە.", "success");
+            } else {
+                showNotification("زانیارییەکان هەڵەن، دووبارە هەوڵبدەرەوە!", "error");
+            }
+        }
+
+        window.toggleMatchForm = function(mode) {
+            currentMatchTypeMode = mode;
+            document.getElementById('typeUpcoming').classList.toggle('active', mode === 'upcoming');
+            document.getElementById('typeFinished').classList.toggle('active', mode === 'finished');
+            document.getElementById('wrapperUpcoming').style.display = mode === 'upcoming' ? 'block' : 'none';
+            document.getElementById('wrapperFinished').style.display = mode === 'finished' ? 'block' : 'none';
+        }
+
+        /* --- الصندوق السادس: التفعيل والتعطيل اليدوي فقط --- */
+        window.updateFantasyEditStateManual = function(val) {
+            const configVal = (val === 'true');
+            set(ref(db, 'systemSettings/fantasyEditMode'), configVal).then(() => {
+                showNotification("باری دوگمەی دەستکاری لە سێرڤەر پاشەکەوت کرا!", "success");
+            });
+        };
+
+        /* --- 1. Inline Editing: Players Table --- */
+        window.createNewPlayer = function(e) {
+            e.preventDefault();
+            if(!validateFields(['pName', 'pTeam', 'pNumber'])) return;
+
+            const playerName = document.getElementById('pName').value.trim();
+            const playerTeam = document.getElementById('pTeam').value;
+            const playerNumber = document.getElementById('pNumber').value;
+            const photoUrl = document.getElementById('pPhotoUrl').value.trim();
+
+            const playerRef = ref(db, 'playersDatabase');
+            const newPlayerPush = push(playerRef);
+
+            set(newPlayerPush, {
+                id: newPlayerPush.key,
+                name: playerName,
+                team: playerTeam,
+                number: playerNumber,
+                photo: photoUrl
+            }).then(() => {
+                document.getElementById('pName').value = "";
+                document.getElementById('pNumber').value = "";
+                document.getElementById('pPhotoUrl').value = "";
+                showNotification(`یاریزان (${playerName}) بە سەرکەوتوویی زیادکرا!`, "success");
+            }).catch((err) => {
+                showNotification("خەتایەک لە پاشەکەوتکردندا ڕوویدا!", "error");
+            });
+        }
+
+        window.deletePlayer = function(playerId) {
+            const pName = localPlayersArray[playerId]?.name || "یاریزانەکە";
+            openConfirmModal(
+                "سڕینەوەی یاریزان", 
+                `ئایا بەڕاستي دڵنیایت لە سڕینەوەی یاریزان [ ${pName} ] لە سیستمەکە؟`, 
+                () => {
+                    remove(ref(db, `playersDatabase/${playerId}`)).then(() => {
+                        showNotification(`یاریزان (${pName}) بە سەرکەوتوویی سڕایەوە!`, "error");
+                    }).catch((error) => {
+                        showNotification("خەتایەک لە سڕینەوەدا ڕوویدا", "error");
+                    });
+                }
+            );
+        }
+
+        window.activateInlineEdit = function(playerId) {
+            const tr = document.getElementById(`player-row-${playerId}`);
+            const p = localPlayersArray[playerId];
+            if(!p) return;
+            const currentComputedGoals = localComputedGoals[p.name] || 0;
+            
+            let optionsHtml = defaultTeams.map(t => `<option value="${t}" ${t === p.team ? 'selected' : ''}>${t}</option>`).join('');
+
+            tr.innerHTML = `
+                <td>
+                    <div style="display: flex; flex-direction: column; gap: 4px; width: 100%; min-width: 130px;">
+                        <input type="text" id="edit-name-${playerId}" class="inline-edit-input" style="font-weight: 600;" value="${p.name}" placeholder="ناوی یاریزان">
+                        <input type="url" id="edit-photo-${playerId}" class="inline-edit-input" style="font-size: 10px;" value="${p.photo || ''}" placeholder="لینکی وێنە">
+                    </div>
+                </td>
+                <td><select id="edit-team-${playerId}" class="inline-edit-input" style="min-width: 60px;">${optionsHtml}</select></td>
+                <td><input type="number" id="edit-number-${playerId}" class="inline-edit-input" style="width: 50px;" value="${p.number}"></td>
+                <td style="font-weight: bold; color: #94a3b8;">${currentComputedGoals}</td>
+                <td class="actions-cell">
+                    <button onclick="saveInlineEdit('${playerId}')" style="background:#10b981; color:#fff;"><i class="fa-solid fa-floppy-disk"></i></button>
+                    <button class="btn-secondary" onclick="cancelInlineEdit('${playerId}')"><i class="fa-solid fa-xmark"></i></button>
+                </td>
+            `;
+            showNotification("دۆخی دەستکاری چالاککرا، گۆڕانکاری بکە.", "info");
+        }
+
+        window.cancelInlineEdit = function(playerId) {
+            renderPlayersTableOnly();
+        }
+
+        window.saveInlineEdit = function(playerId) {
+            const updatedName = document.getElementById(`edit-name-${playerId}`).value.trim();
+            const updatedPhoto = document.getElementById(`edit-photo-${playerId}`).value.trim();
+            
+            update(ref(db, `playersDatabase/${playerId}`), {
+                name: updatedName,
+                photo: updatedPhoto, 
+                team: document.getElementById(`edit-team-${playerId}`).value,
+                number: document.getElementById(`edit-number-${playerId}`).value
+            }).then(() => {
+                showNotification(`زانیارییەکانی یاریزان (${updatedName}) نوێکرانەوە!`, "success");
+            });
+        }
+
+        /* --- 2. Inline Editing: Matches Tables (Upcoming & Finished) --- */
+        window.activateUpcomingInlineEdit = function(matchId) {
+            const tr = document.getElementById(`upcoming-row-${matchId}`);
+            const m = localMatchesData[matchId];
+            if(!m) return;
+
+            let hOptions = defaultTeams.map(t => `<option value="${t}" ${t === m.homeTeam ? 'selected' : ''}>${t}</option>`).join('');
+            let aOptions = defaultTeams.map(t => `<option value="${t}" ${t === m.awayTeam ? 'selected' : ''}>${t}</option>`).join('');
+
+            tr.innerHTML = `
+                <td><select id="edit-u-hTeam-${matchId}" class="inline-edit-input">${hOptions}</select></td>
+                <td><select id="edit-u-aTeam-${matchId}" class="inline-edit-input">${aOptions}</select></td>
+                <td><input type="text" id="edit-u-time-${matchId}" class="inline-edit-input" value="${m.time || ''}" placeholder="18:00"></td>
+                <td><input type="text" id="edit-u-date-${matchId}" class="inline-edit-input" value="${m.date || ''}" placeholder="2026-07-22"></td>
+                <td class="actions-cell">
+                    <button onclick="saveUpcomingInlineEdit('${matchId}')" style="background:#10b981; color:#fff;"><i class="fa-solid fa-floppy-disk"></i></button>
+                    <button class="btn-secondary" onclick="cancelMatchInlineEdit()"><i class="fa-solid fa-xmark"></i></button>
+                </td>
+            `;
+            showNotification("دۆخی دەستکاری یاری داهاتوو چالاککرا.", "info");
+        }
+
+        window.saveUpcomingInlineEdit = function(matchId) {
+            const hTeam = document.getElementById(`edit-u-hTeam-${matchId}`).value;
+            const aTeam = document.getElementById(`edit-u-aTeam-${matchId}`).value;
+            const time = document.getElementById(`edit-u-time-${matchId}`).value.trim();
+            const date = document.getElementById(`edit-u-date-${matchId}`).value.trim();
+
+            if(hTeam === aTeam) {
+                showNotification("تکایە دوو فەریقی جیاواز هەڵبژێرە!", "error");
+                return;
+            }
+
+            update(ref(db, `matchesDatabase/${matchId}`), {
+                homeTeam: hTeam,
+                awayTeam: aTeam,
+                time: time,
+                date: date
+            }).then(() => {
+                showNotification("زانیارییەکانی یاری داهاتوو نوێکرایەوە!", "success");
+            });
+        }
+
+        window.activateFinishedInlineEdit = function(matchId) {
+            const tr = document.getElementById(`finished-row-${matchId}`);
+            const m = localMatchesData[matchId];
+            if(!m) return;
+
+            let hOptions = defaultTeams.map(t => `<option value="${t}" ${t === m.homeTeam ? 'selected' : ''}>${t}</option>`).join('');
+            let aOptions = defaultTeams.map(t => `<option value="${t}" ${t === m.awayTeam ? 'selected' : ''}>${t}</option>`).join('');
+
+            tr.innerHTML = `
+                <td><select id="edit-f-hTeam-${matchId}" class="inline-edit-input">${hOptions}</select></td>
+                <td><select id="edit-f-aTeam-${matchId}" class="inline-edit-input">${aOptions}</select></td>
+                <td>
+                    <div style="display:flex; gap:2px; align-items:center;">
+                        <input type="number" id="edit-f-hScore-${matchId}" class="inline-edit-input" style="width:38px; text-align:center;" value="${m.homeScore}">
+                        <span>-</span>
+                        <input type="number" id="edit-f-aScore-${matchId}" class="inline-edit-input" style="width:38px; text-align:center;" value="${m.awayScore}">
+                    </div>
+                </td>
+                <td><input type="text" id="edit-f-date-${matchId}" class="inline-edit-input" value="${m.date || ''}"></td>
+                <td><input type="text" id="edit-f-motm-${matchId}" class="inline-edit-input" value="${m.motm || ''}"></td>
+                <td class="actions-cell">
+                    <button onclick="saveFinishedInlineEdit('${matchId}')" style="background:#10b981; color:#fff;"><i class="fa-solid fa-floppy-disk"></i></button>
+                    <button class="btn-secondary" onclick="cancelMatchInlineEdit()"><i class="fa-solid fa-xmark"></i></button>
+                </td>
+            `;
+            showNotification("دۆخی دەستکاری یاری کۆتاییهاتوو چالاککرا.", "info");
+        }
+
+        window.saveFinishedInlineEdit = function(matchId) {
+            const hTeam = document.getElementById(`edit-f-hTeam-${matchId}`).value;
+            const aTeam = document.getElementById(`edit-f-aTeam-${matchId}`).value;
+            const hScore = Number(document.getElementById(`edit-f-hScore-${matchId}`).value) || 0;
+            const aScore = Number(document.getElementById(`edit-f-aScore-${matchId}`).value) || 0;
+            const date = document.getElementById(`edit-f-date-${matchId}`).value.trim();
+            const motm = document.getElementById(`edit-f-motm-${matchId}`).value.trim();
+
+            if(hTeam === aTeam) {
+                showNotification("تکایە دوو فەریقی جیاواز هەڵبژێرە!", "error");
+                return;
+            }
+
+            update(ref(db, `matchesDatabase/${matchId}`), {
+                homeTeam: hTeam,
+                awayTeam: aTeam,
+                homeScore: hScore,
+                awayScore: aScore,
+                date: date,
+                motm: motm
+            }).then(() => {
+                showNotification("ئەنجام و زانیارییەکانی یارییەکە نوێکرایەوە!", "success");
+            });
+        }
+
+        window.cancelMatchInlineEdit = function() {
+            renderMatchesTables();
+        }
+
+        /* --- 3. Inline Editing: Fantasy Market Table --- */
+        window.activateFantasyInlineEdit = function(playerId) {
+            const tr = document.getElementById(`market-row-${playerId}`);
+            const p = localPlayersArray[playerId];
+            if(!p) return;
+
+            let optionsHtml = defaultTeams.map(t => `<option value="${t}" ${t === p.team ? 'selected' : ''}>${t}</option>`).join('');
+            let posHtml = ['gk', 'cb', 'cm', 'st'].map(pos => `<option value="${pos}" ${pos === (p.positionZone || 'cm') ? 'selected' : ''}>${pos.toUpperCase()}</option>`).join('');
+
+            tr.innerHTML = `
+                <td><input type="text" id="market-edit-name-${playerId}" class="inline-edit-input" value="${p.name}"></td>
+                <td><select id="market-edit-team-${playerId}" class="inline-edit-input">${optionsHtml}</select></td>
+                <td><select id="market-edit-pos-${playerId}" class="inline-edit-input">${posHtml}</select></td>
+                <td><input type="number" id="market-edit-price-${playerId}" class="inline-edit-input" value="${p.price || 40000}"></td>
+                <td class="actions-cell">
+                    <button onclick="saveFantasyInlineEdit('${playerId}')" style="background:#10b981; color:#fff;"><i class="fa-solid fa-floppy-disk"></i></button>
+                    <button class="btn-secondary" onclick="cancelFantasyInlineEdit('${playerId}')"><i class="fa-solid fa-xmark"></i></button>
+                </td>
+            `;
+            showNotification("دۆخی دەستکاری بازاڕی فانتازی چالاککرا.", "info");
+        };
+
+        window.cancelFantasyInlineEdit = function(playerId) {
+            renderFantasyMarketTable();
+        };
+
+        window.saveFantasyInlineEdit = function(playerId) {
+            const newName = document.getElementById(`market-edit-name-${playerId}`).value.trim();
+            const newTeam = document.getElementById(`market-edit-team-${playerId}`).value;
+            const newPos = document.getElementById(`market-edit-pos-${playerId}`).value;
+            const newPrice = Number(document.getElementById(`market-edit-price-${playerId}`).value) || 40000;
+
+            update(ref(db, `playersDatabase/${playerId}`), {
+                name: newName,
+                team: newTeam,
+                positionZone: newPos,
+                price: newPrice
+            }).then(() => {
+                showNotification(`زانیارییەکانی یاریزانی فانتازی (${newName}) نوێکرانەوە!`, "success");
+            });
+        };
+
+        /* --- 4. Inline Editing: Notifications Table --- */
+        window.activateNotifInlineEdit = function(notifId) {
+            const tr = document.getElementById(`notif-row-${notifId}`);
+            const n = localNotificationsData[notifId];
+            if(!n) return;
+
+            let typeOptions = `
+                <option value="goal_def" ${n.type==='goal_def'?'selected':''}>⚽ گۆڵی بەرگریکار (+6)</option>
+                <option value="goal_mid" ${n.type==='goal_mid'?'selected':''}>⚽ گۆڵی ناوەڕاست (+5)</option>
+                <option value="goal_att" ${n.type==='goal_att'?'selected':''}>⚽ گۆڵی هێرشبەر (+4)</option>
+                <option value="assist" ${n.type==='assist'?'selected':''}>🤝 ئەیست (+3)</option>
+                <option value="clean_def" ${n.type==='clean_def'?'selected':''}>🛡️ تۆڕی خاوێن (+4)</option>
+                <option value="bonus" ${n.type==='bonus'?'selected':''}>⭐ بۆنەس</option>
+                <option value="yellow" ${n.type==='yellow'?'selected':''}>🟨 زەرد (-1)</option>
+                <option value="red" ${n.type==='red'?'selected':''}>🟥 سوور (-3)</option>
+            `;
+
+            tr.innerHTML = `
+                <td><input type="text" id="edit-n-player-${notifId}" class="inline-edit-input" value="${n.playerName}"></td>
+                <td><select id="edit-n-type-${notifId}" class="inline-edit-input">${typeOptions}</select></td>
+                <td><input type="number" id="edit-n-pts-${notifId}" class="inline-edit-input" style="width:60px;" value="${n.points}"></td>
+                <td style="font-size:10px; color:#94a3b8;">${new Date(n.timestamp || Date.now()).toLocaleTimeString()}</td>
+                <td class="actions-cell">
+                    <button onclick="saveNotifInlineEdit('${notifId}')" style="background:#10b981; color:#fff;"><i class="fa-solid fa-floppy-disk"></i></button>
+                    <button class="btn-secondary" onclick="cancelNotifInlineEdit()"><i class="fa-solid fa-xmark"></i></button>
+                </td>
+            `;
+            showNotification("دۆخی دەستکاری ئاگاداری چالاککرا.", "info");
+        }
+
+        window.saveNotifInlineEdit = function(notifId) {
+            const pName = document.getElementById(`edit-n-player-${notifId}`).value.trim();
+            const nType = document.getElementById(`edit-n-type-${notifId}`).value;
+            const pts = Number(document.getElementById(`edit-n-pts-${notifId}`).value) || 0;
+
+            update(ref(db, `notificationsDatabase/${notifId}`), {
+                playerName: pName,
+                type: nType,
+                points: pts
+            }).then(() => {
+                showNotification("ئاگادارییەکە لەناو جدول نوێکرایەوە!", "success");
+            });
+        }
+
+        window.cancelNotifInlineEdit = function() {
+            renderNotificationsTable();
+        }
+
+        /* --- Helper & Utility Functions --- */
+        window.updateFilteredPlayersList = function() {
+            const selectedTeam = document.getElementById('marketTeamSelect').value;
+            const marketPlayerSelect = document.getElementById('marketPlayerSelect');
+            if(!marketPlayerSelect) return;
+
+            marketPlayerSelect.innerHTML = "";
+            const filteredPlayers = Object.values(localPlayersArray).filter(p => p.team === selectedTeam);
+
+            if(filteredPlayers.length === 0) {
+                marketPlayerSelect.innerHTML = `<option value="">هیچ یاریزانێک لەم فەریقەدا نییە</option>`;
+            } else {
+                filteredPlayers.forEach(p => {
+                    marketPlayerSelect.innerHTML += `<option value="${p.name}">${p.name} (#${p.number})</option>`;
+                });
+            }
+        };
+
+        window.updateNotifPlayersList = function() {
+            const selectedTeam = document.getElementById('notifTeamSelect').value;
+            const notifPlayerSelect = document.getElementById('notifPlayerSelect');
+            if(!notifPlayerSelect) return;
+
+            notifPlayerSelect.innerHTML = "";
+            const filteredPlayers = Object.values(localPlayersArray).filter(p => p.team === selectedTeam);
+
+            if(filteredPlayers.length === 0) {
+                notifPlayerSelect.innerHTML = `<option value="">هیچ یاریزانێک لەم فەریقەدا نییە</option>`;
+            } else {
+                filteredPlayers.forEach(p => {
+                    notifPlayerSelect.innerHTML += `<option value="${p.name}">${p.name} (#${p.number})</option>`;
+                });
+            }
+            calculateAutoPoints();
+        };
+
+        window.calculateAutoPoints = function() {
+            const type = document.getElementById('notifTypeSelect').value;
+            const ptsInput = document.getElementById('notifPointsInput');
+            if(!ptsInput) return;
+
+            let pts = 6;
+            if(type === 'goal_def') pts = 6;
+            else if(type === 'goal_mid') pts = 5;
+            else if(type === 'goal_att') pts = 4;
+            else if(type === 'assist') pts = 3;
+            else if(type === 'clean_def') pts = 4;
+            else if(type === 'clean_mid') pts = 1;
+            else if(type === 'save_pk') pts = 5;
+            else if(type === 'saves_3') pts = 1;
+            else if(type === 'bonus') pts = Number(ptsInput.value) || 3;
+            else if(type === 'concede_2') pts = -1;
+            else if(type === 'yellow') pts = -1;
+            else if(type === 'red') pts = -3;
+            else if(type === 'miss_pk') pts = -2;
+            else if(type === 'own_goal') pts = -2;
+
+            if(type !== 'bonus') {
+                ptsInput.value = pts;
+                ptsInput.setAttribute('readonly', 'true');
+            } else {
+                ptsInput.removeAttribute('readonly');
+            }
+
+            ptsInput.style.color = (pts < 0) ? '#ef4444' : '#10b981';
+        };
+
+        window.saveFantasyNotification = function(e) {
+            e.preventDefault();
+            const playerName = document.getElementById('notifPlayerSelect').value;
+            const type = document.getElementById('notifTypeSelect').value;
+            const points = Number(document.getElementById('notifPointsInput').value) || 0;
+
+            if(!playerName) {
+                showNotification("تکایە یاریزانێک هەڵبژێرە!", "error");
+                return;
+            }
+
+            const notifRef = ref(db, 'notificationsDatabase');
+            const newPush = push(notifRef);
+            set(newPush, {
+                id: newPush.key,
+                playerName: playerName,
+                type: type,
+                points: points,
+                timestamp: Date.now()
+            }).then(() => {
+                showNotification("ئاگادارییەکە بە سەرکەوتوویی زیادکرا!", "success");
+                document.getElementById('fantasyNotificationForm').reset();
+                updateNotifPlayersList();
+            });
+        };
+
+        window.deleteFantasyNotification = function(key) {
+            openConfirmModal("سڕینەوەی ئاگاداری", "دڵنیای لە سڕینەوەی ئەم ئاگادارییە؟", () => {
+                remove(ref(db, `notificationsDatabase/${key}`)).then(() => {
+                    showNotification("ئاگادارییەکە سڕایەوە", "error");
+                });
+            });
+        };
+
+        window.createFantasyMarketPlayer = function(e) {
+            e.preventDefault();
+            const team = document.getElementById('marketTeamSelect').value;
+            const playerName = document.getElementById('marketPlayerSelect').value;
+            const position = document.getElementById('marketPositionSelect').value;
+            const price = Number(document.getElementById('marketPriceInput').value) || 40000;
+
+            if(!playerName) {
+                showNotification("تکایە یاریزانێک هەڵبژێرە!", "error");
+                return;
+            }
+
+            let matchedPlayerObj = Object.values(localPlayersArray).find(p => p.name === playerName && p.team === team);
+
+            const marketRef = ref(db, 'playersDatabase');
+            if(matchedPlayerObj) {
+                update(ref(db, `playersDatabase/${matchedPlayerObj.id}`), {
+                    positionZone: position,
+                    price: price
+                }).then(() => {
+                    showNotification(`یاریزان (${playerName}) بە سەرکەوتوویی بۆ بازاڕی فانتازی نوێکرایەوە!`, "success");
+                });
+            } else {
+                const newPush = push(marketRef);
+                set(newPush, {
+                    id: newPush.key,
+                    name: playerName,
+                    team: team,
+                    number: "0",
+                    photo: "",
+                    positionZone: position,
+                    price: price
+                }).then(() => {
+                    showNotification(`یاریزان (${playerName}) زیادکرا بۆ بازاڕی فانتازی!`, "success");
+                });
+            }
+        };
+
+        window.deleteFantasyMarketPlayer = function(playerId) {
+            openConfirmModal("لادانی یاریزان لە بازار", "دڵنیای لە سڕینەوەی ئەم یاریزانە لە بازاڕی فانتازی؟", () => {
+                update(ref(db, `playersDatabase/${playerId}`), {
+                    positionZone: null,
+                    price: null
+                }).then(() => {
+                    showNotification("یاریزان لە بازار لادرا", "info");
+                });
+            });
+        };
+
+        function parseEvents(rawText) {
+            if(!rawText || !rawText.trim()) return [];
+            const lines = rawText.split('\n');
+            const events = [];
+            lines.forEach(line => {
+                if(line.includes('-')) {
+                    const parts = line.split('-');
+                    const pName = parts[0].trim();
+                    const typeRaw = parts[1].trim();
+                    let type = 'goal';
+                    if(typeRaw.includes('زەرد')) type = 'yellow';
+                    if(typeRaw.includes('سوور') || typeRaw.includes('سور')) type = 'red';
+                    events.push({ type: type, playerName: pName });
+                }
+            });
+            return events;
+        }
+
+        window.createNewMatch = function(e) {
+            e.preventDefault();
+            
+            const reqFields = ['mHomeTeam', 'mAwayTeam'];
+            if(currentMatchTypeMode === 'upcoming') reqFields.push('mDateTime');
+            else reqFields.push('mDateOnly');
+            
+            if(!validateFields(reqFields)) return;
+
+            const homeT = document.getElementById('mHomeTeam').value;
+            const awayT = document.getElementById('mAwayTeam').value;
+
+            if(homeT === awayT) {
+                showNotification("خەتا! ناتوانرێت یاری لە نێوان هەمان فەریقدا دروستبکرێت.", "error");
+                return;
+            }
+
+            const matchesRef = ref(db, 'matchesDatabase');
+            const newMatchPush = push(matchesRef);
+
+            let matchPayload = {
+                id: newMatchPush.key,
+                homeTeam: homeT,
+                awayTeam: awayT,
+                status: currentMatchTypeMode
+            };
+
+            if (currentMatchTypeMode === 'upcoming') {
+                const rawDateTime = document.getElementById('mDateTime').value; 
+                if(rawDateTime) {
+                    const parts = rawDateTime.split(' ');
+                    matchPayload.date = parts[0];
+                    matchPayload.time = parts[1] || "00:00";
+                }
+                matchPayload.motm = "";
+            } else {
+                matchPayload.date = document.getElementById('mDateOnly').value;
+                matchPayload.time = ""; 
+                matchPayload.motm = document.getElementById('mMotm').value.trim() || "دیاری نەکراوە";
+                matchPayload.homeScore = Number(document.getElementById('mHomeScore').value) || 0;
+                matchPayload.awayScore = Number(document.getElementById('mAwayScore').value) || 0;
+                matchPayload.homeEvents = parseEvents(document.getElementById('mHomeEventsRaw').value);
+                matchPayload.awayEvents = parseEvents(document.getElementById('mAwayEventsRaw').value);
+            }
+
+            set(newMatchPush, matchPayload).then(() => {
+                document.getElementById('matchForm').reset();
+                toggleMatchForm('upcoming');
+                showNotification(`یاری نێوان [ ${homeT} × ${awayT} ] بە سەرکەوتوویی خستە ناو خشتەکەوە!`, "success");
+            });
+        }
+
+        window.deleteMatch = function(matchId) {
+            openConfirmModal(
+                "سڕینەوەی یاری", 
+                "ئایا دڵنیایت لە سڕینەوەی ئەم یارییە بە یەکجاری لە سیستەمەکە؟", 
+                () => {
+                    remove(ref(db, `matchesDatabase/${matchId}`)).then(() => {
+                        showNotification("یارییەکە بە سەرکەوتوویی لە خشتەی خولەکە سڕایەوە!", "error");
+                    });
+                }
+            );
+        }
+
+        window.updateTeamFormation = function() {
+            const selectedTeam = document.getElementById('squadTeamSelect').value;
+            const selectedFormation = document.getElementById('squadFormationSelect').value;
+            update(ref(db, `squadsDatabase/${selectedTeam}`), { formation: selectedFormation }).then(() => { 
+                showNotification(`پلان بە سەرکەوتوویی گۆڕدرا بۆ ${selectedFormation}`, "success");
+                loadTeamSquadManagement();
+            });
+        };
+
+        window.addPlayerToZone = function(zone) {
+            const team = document.getElementById('squadTeamSelect').value;
+            const pId = document.getElementById('squadPlayerSelect').value;
+            if(!pId) { 
+                showNotification("تکایە یاریزانێک دیاری بکە!", "error"); 
+                return; 
+            }
+            const p = localPlayersArray[pId];
+
+            if(zone === 'subs') {
+                set(ref(db, `squadsDatabase/${team}/subs/${p.id}`), { id: p.id, name: p.name, number: p.number, positionZone: 'subs' })
+                .then(() => { showNotification(`یاریزان (${p.name}) زیادکرا بۆ یەدەگ`, "success"); });
+            } else {
+                set(ref(db, `squadsDatabase/${team}/main/${p.id}`), { id: p.id, name: p.name, number: p.number, positionZone: zone })
+                .then(() => { showNotification(`یاریزان (${p.name}) خرایە پێکهاتەی سەرەکی یاریگا`, "success"); });
+            }
+        };
+
+        window.removePlayerFromSquad = function(type, id) {
+            const team = document.getElementById('squadTeamSelect').value;
+            remove(ref(db, `squadsDatabase/${team}/${type}/${id}`)).then(() => { 
+                showNotification("یاریزان لە پێکهاتە لادرا", "info");
+                loadTeamSquadManagement(); 
+            });
+        };
+
+        window.clearEntireSquad = function() {
+            const team = document.getElementById('squadTeamSelect').value;
+            openConfirmModal("سڕینەوەی پێکهاتە", `دڵنیای لە سڕینەوەی تەواوی پێکهاتەی (${team})؟`, () => {
+                remove(ref(db, `squadsDatabase/${team}`)).then(() => {
+                    showNotification("پێکهاتەی تیپەکە بە تەواوی سڕدرایەوە", "error");
+                    loadTeamSquadManagement();
+                });
+            });
+        };
+
+        window.saveEntireSquadWithNotification = function() {
+            const team = document.getElementById('squadTeamSelect').value;
+            showNotification(`پێکهاتە و پلانی تیپی (${team}) بە سەرکەوتوویی لە سێرڤەر پاشەکەوت کرا!`, "success");
+        };
+
+        window.loadTeamSquadManagement = function() {
+            const team = document.getElementById('squadTeamSelect').value;
+            const pSelect = document.getElementById('squadPlayerSelect'); 
+            if(pSelect) pSelect.innerHTML = "";
+            
+            Object.values(localPlayersArray).forEach(p => { 
+                if(p.team === team && pSelect) pSelect.innerHTML += `<option value="${p.id}">${p.name} (#${p.number})</option>`; 
+            });
+
+            const teamSquad = localSquadsData[team] || { formation: "2-2-1", main: {}, subs: {} };
+            const formation = teamSquad.formation || "2-2-1";
+            document.getElementById('squadFormationSelect').value = formation;
+
+            const rAtt = document.getElementById('admRowAttack');
+            const rMid = document.getElementById('admRowMidfield');
+            const rDef = document.getElementById('admRowDefense');
+            const sWrapper = document.getElementById('admSubsList');
+
+            if(rAtt) rAtt.innerHTML = ""; 
+            if(rMid) rMid.innerHTML = ""; 
+            if(rDef) rDef.innerHTML = ""; 
+            if(sWrapper) sWrapper.innerHTML = "";
+
+            const mainPlayers = teamSquad.main ? Object.values(teamSquad.main) : [];
+            const subPlayers = teamSquad.subs ? Object.values(teamSquad.subs) : [];
+
+            let defP = mainPlayers.filter(p => p.positionZone === 'defense');
+            let midP = mainPlayers.filter(p => p.positionZone === 'midfield');
+            let attP = mainPlayers.filter(p => p.positionZone === 'attack');
+
+            const parts = formation.split('-');
+            let defLimit = parseInt(parts[0]) || 2;
+            let midLimit = parseInt(parts[1]) || 2;
+            let attLimit = parseInt(parts[2]) || 1;
+
+            if(rDef) {
+                defP.forEach(p => rDef.innerHTML += createAdminNodeHtml('main', p));
+                if(defP.length < defLimit) rDef.innerHTML += `<button type="button" class="btn-assign-here" onclick="addPlayerToZone('defense')"><i class="fa-solid fa-square-plus"></i> DEF (${defP.length}/${defLimit})</button>`;
+            }
+
+            if(rMid) {
+                midP.forEach(p => rMid.innerHTML += createAdminNodeHtml('main', p));
+                if(midP.length < midLimit) rMid.innerHTML += `<button type="button" class="btn-assign-here" onclick="addPlayerToZone('midfield')"><i class="fa-solid fa-square-plus"></i> MID (${midP.length}/${midLimit})</button>`;
+            }
+
+            if(rAtt) {
+                attP.forEach(p => rAtt.innerHTML += createAdminNodeHtml('main', p));
+                if(attP.length < attLimit) rAtt.innerHTML += `<button type="button" class="btn-assign-here" onclick="addPlayerToZone('attack')"><i class="fa-solid fa-square-plus"></i> ATT (${attP.length}/${attLimit})</button>`;
+            }
+
+            if(sWrapper) {
+                subPlayers.forEach(p => {
+                    sWrapper.innerHTML += `
+                        <div style="display:flex; justify-content:space-between; align-items:center; background:#1f242f; padding:10px; border-radius:8px; border:1px solid #2d3446;">
+                            <span style="font-size:12px; color:#fff; font-weight:600;">${p.name} (#${p.number})</span>
+                            <button type="button" class="btn-danger" style="padding:4px 8px; width:auto; height:auto; font-size:10px;" onclick="removePlayerFromSquad('subs','${p.id}')"><i class="fa-solid fa-xmark"></i></button>
+                        </div>
+                    `;
+                });
+            }
+        };
+
+        function createAdminNodeHtml(type, player) {
+            return `
+                <div class="admin-pitch-node">
+                    <span class="admin-node-name">${player.name}</span>
+                    <button type="button" class="btn-danger" onclick="removePlayerFromSquad('${type}','${player.id}')"><i class="fa-solid fa-trash-can"></i></button>
+                </div>
+            `;
+        }
+
+        /* --- Real-Time Database Sync --- */
+        const dbRef = ref(db, '/');
+        onValue(dbRef, (snapshot) => {
+            const data = snapshot.val() || {};
+            localMatchesData = data.matchesDatabase || {};
+            const matchesList = Object.values(localMatchesData);
+            
+            localComputedGoals = {};
+            matchesList.forEach(m => {
+                if(m.status === 'finished') {
+                    if(m.homeEvents) {
+                        Object.values(m.homeEvents).forEach(ev => {
+                            if(ev.type === 'goal' && ev.playerName) {
+                                localComputedGoals[ev.playerName] = (localComputedGoals[ev.playerName] || 0) + 1;
+                            }
+                        });
+                    }
+                    if(m.awayEvents) {
+                        Object.values(m.awayEvents).forEach(ev => {
+                            if(ev.type === 'goal' && ev.playerName) {
+                                localComputedGoals[ev.playerName] = (localComputedGoals[ev.playerName] || 0) + 1;
+                            }
+                        });
+                    }
+                }
+            });
+
+            localPlayersArray = data.playersDatabase || {};
+            localSquadsData = data.squadsDatabase || {};
+            localNotificationsData = data.notificationsDatabase || {};
+            
+            renderPlayersTableOnly();
+            updateFilteredPlayersList();
+            updateNotifPlayersList();
+            renderFantasyMarketTable();
+            renderNotificationsTable();
+            renderMatchesTables();
+
+            loadTeamSquadManagement();
+            calculateLeagueStanding(matchesList);
+
+            // مزامنة حالة السندوق السادس
+            const settingVal = data.systemSettings && data.systemSettings.fantasyEditMode !== undefined ? data.systemSettings.fantasyEditMode : true;
+            const selectEl = document.getElementById('fantasyEditStateSelect');
+            const badgeEl = document.getElementById('fantasyRealStatusBadge');
+
+            if(selectEl) {
+                selectEl.value = settingVal ? "true" : "false";
+            }
+
+            if(badgeEl) {
+                if(settingVal) {
+                    badgeEl.innerText = "🔓 کارا (مفتوح للتعديل)";
+                    badgeEl.style.background = "rgba(16,185,129,0.15)";
+                    badgeEl.style.color = "#10b981";
+                } else {
+                    badgeEl.innerText = "🔒 قفڵکراو (مغلق للتعديل)";
+                    badgeEl.style.background = "rgba(239,68,68,0.15)";
+                    badgeEl.style.color = "#ef4444";
+                }
+            }
+        });
+
+        function renderPlayersTableOnly() {
+            const playersTbody = document.querySelector('#adminPlayersTable tbody');
+            if(!playersTbody) return;
+            playersTbody.innerHTML = "";
+            Object.keys(localPlayersArray).forEach(key => {
+                const p = localPlayersArray[key];
+                if(!p) return;
+                const totalGoals = localComputedGoals[p.name] || 0;
+                const tr = document.createElement('tr');
+                tr.id = `player-row-${p.id}`;
+                tr.innerHTML = `
+                    <td>
+                        <div class="player-info-cell">
+                            <img src="${p.photo || 'https://via.placeholder.com/32'}" onerror="this.src='https://via.placeholder.com/32'">
+                            <span>${p.name}</span>
+                        </div>
+                    </td>
+                    <td><span class="badge-icon">${p.team}</span></td>
+                    <td>#${p.number}</td>
+                    <td style="font-weight: bold; color: #10b981;">${totalGoals}</td>
+                    <td class="actions-cell">
+                        <button onclick="activateInlineEdit('${p.id}')" style="background:#3b82f6; color:#fff;"><i class="fa-solid fa-pen-to-square"></i></button>
+                        <button class="btn-danger" onclick="deletePlayer('${p.id}')"><i class="fa-solid fa-trash"></i></button>
+                    </td>
+                `;
+                playersTbody.appendChild(tr);
+            });
+        }
+
+        function renderMatchesTables() {
+            const upcomingTbody = document.querySelector('#adminUpcomingMatchesTable tbody');
+            const finishedTbody = document.querySelector('#adminFinishedMatchesTable tbody');
+            
+            if(upcomingTbody) upcomingTbody.innerHTML = "";
+            if(finishedTbody) finishedTbody.innerHTML = "";
+
+            Object.values(localMatchesData).forEach(m => {
+                const tr = document.createElement('tr');
+                const isFin = m.status === 'finished';
+                
+                if (!isFin) {
+                    tr.id = `upcoming-row-${m.id}`;
+                    tr.innerHTML = `
+                        <td><span class="badge-icon">${m.homeTeam}</span></td>
+                        <td><span class="badge-icon">${m.awayTeam}</span></td>
+                        <td style="font-weight: bold; color: #94a3b8;">${m.time || '00:00'}</td>
+                        <td style="font-size:11px;">${m.date || ''}</td>
+                        <td class="actions-cell">
+                            <button onclick="activateUpcomingInlineEdit('${m.id}')" style="background:#3b82f6; color:#fff;"><i class="fa-solid fa-pen-to-square"></i></button>
+                            <button class="btn-danger" onclick="deleteMatch('${m.id}')"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    `;
+                    if(upcomingTbody) upcomingTbody.appendChild(tr);
+                } else {
+                    tr.id = `finished-row-${m.id}`;
+                    const displayMotm = m.motm || "دیاری نەکراوە";
+                    tr.innerHTML = `
+                        <td><span class="badge-icon">${m.homeTeam}</span></td>
+                        <td><span class="badge-icon">${m.awayTeam}</span></td>
+                        <td style="text-align: center; font-weight: bold; color: #ef4444">${m.homeScore} - ${m.awayScore}</td>
+                        <td style="font-size:11px;">${m.date || ''}</td>
+                        <td style="color: #3b82f6; font-weight: 600; font-size:11px;">${displayMotm}</td>
+                        <td class="actions-cell">
+                            <button onclick="activateFinishedInlineEdit('${m.id}')" style="background:#3b82f6; color:#fff;"><i class="fa-solid fa-pen-to-square"></i></button>
+                            <button class="btn-danger" onclick="deleteMatch('${m.id}')"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    `;
+                    if(finishedTbody) finishedTbody.appendChild(tr);
+                }
+            });
+        }
+
+        function renderFantasyMarketTable() {
+            const marketTbody = document.querySelector('#adminFantasyMarketTable tbody');
+            if(!marketTbody) return;
+            marketTbody.innerHTML = "";
+
+            Object.values(localPlayersArray).forEach(p => {
+                if(p.price !== undefined && p.price !== null) {
+                    const tr = document.createElement('tr');
+                    tr.id = `market-row-${p.id}`;
+                    tr.innerHTML = `
+                        <td style="font-weight:600; color:#fff;">${p.name}</td>
+                        <td><span class="badge-icon">${p.team}</span></td>
+                        <td style="text-transform: uppercase; color:#3b82f6; font-weight:bold;">${(p.positionZone || 'cm').toUpperCase()}</td>
+                        <td style="color:#eab308; font-weight:bold;">${Number(p.price).toLocaleString()} IQD</td>
+                        <td class="actions-cell">
+                            <button onclick="activateFantasyInlineEdit('${p.id}')" style="background:#3b82f6; color:#fff;"><i class="fa-solid fa-pen-to-square"></i></button>
+                            <button class="btn-danger" onclick="deleteFantasyMarketPlayer('${p.id}')"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    `;
+                    marketTbody.appendChild(tr);
+                }
+            });
+        }
+
+        function renderNotificationsTable() {
+            const notifTbody = document.querySelector('#adminNotificationsTable tbody');
+            if(!notifTbody) return;
+            notifTbody.innerHTML = "";
+
+            Object.keys(localNotificationsData).forEach(key => {
+                const n = localNotificationsData[key];
+                if(!n) return;
+                const tr = document.createElement('tr');
+                tr.id = `notif-row-${key}`;
+                let ptsColor = Number(n.points) >= 0 ? '#10b981' : '#ef4444';
+                tr.innerHTML = `
+                    <td style="font-weight:600; color:#fff;">${n.playerName}</td>
+                    <td><span class="badge-icon">${n.type}</span></td>
+                    <td style="color:${ptsColor}; font-weight:bold;">${n.points > 0 ? '+' + n.points : n.points}</td>
+                    <td style="font-size:10px; color:#94a3b8;">${new Date(n.timestamp || Date.now()).toLocaleTimeString()}</td>
+                    <td class="actions-cell">
+                        <button type="button" onclick="activateNotifInlineEdit('${key}')" style="background:#3b82f6; color:#fff;"><i class="fa-solid fa-pen-to-square"></i></button>
+                        <button type="button" class="btn-danger" onclick="deleteFantasyNotification('${key}')"><i class="fa-solid fa-trash"></i></button>
+                    </td>
+                `;
+                notifTbody.appendChild(tr);
+            });
+        }
+
+        function calculateLeagueStanding(matches) {
+            const standings = {};
+            defaultTeams.forEach(tName => {
+                standings[tName] = { name: tName, p:0, w:0, d:0, l:0, gf:0, ga:0, pts:0 };
+            });
+
+            matches.forEach(m => {
+                if(m.status !== 'finished') return;
+
+                if(!standings[m.homeTeam]) standings[m.homeTeam] = { name: m.homeTeam, p:0, w:0, d:0, l:0, gf:0, ga:0, pts:0 };
+                if(!standings[m.awayTeam]) standings[m.awayTeam] = { name: m.awayTeam, p:0, w:0, d:0, l:0, gf:0, ga:0, pts:0 };
+
+                standings[m.homeTeam].p += 1; standings[m.awayTeam].p += 1;
+                standings[m.homeTeam].gf += m.homeScore; standings[m.homeTeam].ga += m.awayScore;
+                standings[m.awayTeam].gf += m.awayScore; standings[m.awayTeam].ga += m.homeScore;
+
+                if(m.homeScore > m.awayScore) {
+                    standings[m.homeTeam].w += 1; standings[m.homeTeam].pts += 3; standings[m.awayTeam].l += 1;
+                } else if(m.homeScore < m.awayScore) {
+                    standings[m.awayTeam].w += 1; standings[m.awayTeam].pts += 3; standings[m.homeTeam].l += 1;
+                } else {
+                    standings[m.homeTeam].d += 1; standings[m.awayTeam].d += 1;
+                    standings[m.homeTeam].pts += 1; standings[m.awayTeam].pts += 1;
+                }
+            });
+
+            const sortedTeams = Object.values(standings).sort((a,b) => {
+                if(b.pts !== a.pts) return b.pts - a.pts;
+                return (b.gf - b.ga) - (a.gf - a.ga);
+            });
+
+            const tbody = document.querySelector('#leagueTable tbody');
+            if(!tbody) return;
+            tbody.innerHTML = "";
+            sortedTeams.forEach((team, idx) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td style="text-align: center; font-weight: bold; color: #94a3b8;">${idx + 1}</td>
+                    <td style="font-weight: 600; color: #ffffff;">${team.name}</td>
+                    <td style="text-align: center;">${team.p}</td>
+                    <td style="text-align: center; color: #10b981;">${team.w}</td>
+                    <td style="text-align: center; color: #94a3b8;">${team.d}</td>
+                    <td style="text-align: center; color: #ef4444;">${team.l}</td>
+                    <td style="text-align: center;">${team.gf}:${team.ga}</td>
+                    <td style="text-align: center; font-weight: 800; color: #ffffff; background: rgba(255,255,255,0.03)">${team.pts}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+    </script>
+</body>
+</html>
