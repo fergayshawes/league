@@ -588,7 +588,6 @@
         }
         .fantasy-pitch-node:hover { transform: scale(1.05); }
         
-        /* تعديل حجم دوائر اللاعبين داخل الملعب لتصبح أصغر ومناسبة */
         .fantasy-node-avatar {
             width: 48px; height: 48px; border-radius: 50%; background: rgba(0,0,0,0.6);
             border: 2px dashed rgba(255,255,255,0.4); display: flex; align-items: center; justify-content: center;
@@ -596,7 +595,6 @@
         }
         .fantasy-node-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
         
-        /* تعديل حجم شريط الاسم تحت الأفاتار ليتناسب مع الحجم الجديد */
         .fantasy-node-name {
             background: rgba(0, 0, 0, 0.75); color: #fff; font-size: 10px; font-weight: 800;
             padding: 2px 8px; border-radius: 5px; margin-top: 3px; white-space: nowrap; max-width: 100px;
@@ -734,18 +732,18 @@
             border: 1px solid var(--border-color);
         }
 
-        /* تعديل نسبة أبعاد الملعب مع استخدام Flexbox وتوزيع المسافات للتحكم بمواقع الصفوف بدقة */
+        /* تعديل الملعب ليصبح مستطيلاً بشكل طولي (عمودي) حتى على الشاشات الكبيرة واللابتوب */
         .fantasy-pitch-container {
             background: var(--pitch-bg);
             border-radius: 20px;
             border: 3px solid rgba(255,255,255,0.2);
-            padding: 12px 10px;
+            padding: 16px 10px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            max-width: 600px;
+            max-width: 420px;
             margin: 0 auto;
-            aspect-ratio: 4/3;
+            aspect-ratio: 3/4;
             position: relative;
             margin-bottom: 20px;
             box-shadow: var(--shadow-lg);
@@ -753,8 +751,8 @@
 
         @media (min-width: 768px) {
             .fantasy-pitch-container {
-                aspect-ratio: 16 / 10;
-                max-width: 750px;
+                aspect-ratio: 3 / 4;
+                max-width: 450px;
             }
         }
     </style>
@@ -992,7 +990,7 @@
                     </button>
                 </div>
 
-                <!-- حاوية الملعب المستطيل -->
+                <!-- حاوية الملعب المستطيل الطولي -->
                 <div class="fantasy-pitch-container" id="pitchContainerNodes">
                 </div>
 
@@ -1782,7 +1780,7 @@
 
             let html = '';
             
-            // الهجوم: على نص دائرة صندوق المرمى (أعلى الملعب)
+            // الهجوم
             html += `<div class="pitch-row" style="margin-top: 2px;">`;
             for(let i=0; i<attCount; i++) {
                 html += `
@@ -1797,7 +1795,7 @@
             }
             html += `</div>`;
 
-            // الوسط: فوق خط وسط الملعب
+            // الوسط
             html += `<div class="pitch-row" style="margin-top: -12px;">`;
             for(let i=0; i<midCount; i++) {
                 html += `
@@ -1812,7 +1810,7 @@
             }
             html += `</div>`;
 
-            // الدفاع: نازل شوي إلى الأسفل
+            // الدفاع
             html += `<div class="pitch-row" style="margin-top: 15px;">`;
             for(let i=0; i<defCount; i++) {
                 html += `
@@ -1827,7 +1825,7 @@
             }
             html += `</div>`;
 
-            // حارس المرمى: نازل أكثر باتجاه خط المرمى السفلي
+            // حارس المرمى
             html += `
                 <div class="pitch-row" style="margin-top: 5px;">
                     <div class="fantasy-pitch-node" id="node-goalkeeper-0" onclick="handlePitchCardClick('goalkeeper', 0)">
