@@ -33,7 +33,7 @@
             --border-color: #162030;
             --grid-opacity: 0.018;
             --dot-color: #ffffff;
-            --pitch-bg: url('https://i.postimg.cc/WpGVVxBb/c17da56905c5df082ea221524ccf88cb.jpg') center/cover no-repeat;
+            --pitch-bg: url('https://i.postimg.cc/V6FjPcfY/ab20788ad7f0bb063413446484d6c706.jpg') center/cover no-repeat;
             --card-glow: rgba(255, 255, 255, 0.15);
             --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.5);
             --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.7);
@@ -52,7 +52,7 @@
             --border-color: #cbd5e1;
             --grid-opacity: 0.05;
             --dot-color: #000000;
-            --pitch-bg: url('https://i.postimg.cc/WpGVVxBb/c17da56905c5df082ea221524ccf88cb.jpg') center/cover no-repeat;
+            --pitch-bg: url('https://i.postimg.cc/V6FjPcfY/ab20788ad7f0bb063413446484d6c706.jpg') center/cover no-repeat;
             --card-glow: rgba(15, 23, 42, 0.1);
             --shadow-sm: 0 2px 8px rgba(15, 23, 42, 0.08);
             --shadow-md: 0 8px 24px rgba(15, 23, 42, 0.12);
@@ -310,6 +310,7 @@
         .team-events.away .event-item { display: flex; align-items: center; gap: 6px; flex-direction: row; justify-content: flex-start; }
 
         .event-icons-group { display: inline-flex; align-items: center; gap: 4px; }
+        .event-icons-group i.fa-futbol { color: var(--text-main) !important; }
 
         .card-icon-rect {
             display: inline-block;
@@ -451,7 +452,7 @@
 
     <div id="page-loader">
         <div class="cyber-spinner"></div>
-        <div class="loader-text">CYBER LEAGUE LOADING...</div>
+        <div class="loader-text">Loading...</div>
     </div>
 
     <div class="top-laser-line"></div>
@@ -780,7 +781,7 @@
                         let htmlResult = '';
 
                         Object.entries(playerGoalsMap).forEach(([playerName, types]) => {
-                            let iconsHtml = types.map(() => '<i class="fa-solid fa-futbol" style="color: #ffffff;" title="هدف"></i>').join(' ');
+                            let iconsHtml = types.map(() => '<i class="fa-solid fa-futbol" title="هدف"></i>').join(' ');
                             htmlResult += `<div class="event-item">${playerName} <span class="event-icons-group">${iconsHtml}</span></div>`;
                         });
 
@@ -911,7 +912,7 @@
             });
             matchesDatabase = matchesList;
 
-            const defaultTeams = ["ئـ", "ب", "ت", "م", "ک", "ل", "د", "ر", "س"];
+            const defaultTeams = ["ژ", "ر", "ز", "د", "ن", "ج", "ۆ", "ت", "ب"];
             const standings = {};
             defaultTeams.forEach(teamName => { standings[teamName] = { team: teamName, played: 0, wins: 0, draws: 0, losses: 0, points: 0 }; });
 
@@ -1004,7 +1005,6 @@
             const targetNav = document.getElementById("nav-" + savedPage);
             switchPage(savedPage, null, targetNav);
 
-            // إظهار الإشعار فقط إذا كان المفتاح SHOW_UPDATE_NOTICE يساوي true وإذا لم يكن المستخدم قد شاهد هذا الإصدار من قبل
             if (SHOW_UPDATE_NOTICE) {
                 const seenVersion = localStorage.getItem("cyberLeagueUpdateVersion");
                 if (seenVersion !== CURRENT_UPDATE_VERSION) {
