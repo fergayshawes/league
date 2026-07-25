@@ -734,12 +734,12 @@
             border: 1px solid var(--border-color);
         }
 
-        /* ملعب مستطيل طولي متناسق تماماً مع إضافة بادينج علوي وسفلي متوازن للموبايل واللابتوب */
+        /* ملعب مستطيل طولي مع زيادة الـ padding العلوي أكثر لينزل الهجوم بالزبط داخل نص دائرة المرمى للموبايل واللابتوب */
         .fantasy-pitch-container {
             background: var(--pitch-bg);
             border-radius: 20px;
             border: 3px solid rgba(255,255,255,0.2);
-            padding: 24px 10px;
+            padding: 34px 10px 24px 10px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
@@ -755,7 +755,7 @@
             .fantasy-pitch-container {
                 aspect-ratio: 3 / 4;
                 max-width: 430px;
-                padding: 28px 14px;
+                padding: 40px 14px 28px 14px;
             }
         }
     </style>
@@ -1783,8 +1783,8 @@
 
             let html = '';
             
-            /* 1. الهجوم: تم إضافة مسافة وپادينج علوي متوازن ليكون جوات نص دائرة المرمى تماماً */
-            html += `<div class="pitch-row" style="margin-top: 4px;">`;
+            /* 1. الهجوم: نازل لتحت أكثر ومضبوط بالتمام داخل نص دائرة المرمى */
+            html += `<div class="pitch-row" style="margin-top: 6px;">`;
             for(let i=0; i<attCount; i++) {
                 html += `
                     <div class="fantasy-pitch-node" id="node-attack-${i}" onclick="handlePitchCardClick('attack', ${i})">
@@ -1830,7 +1830,7 @@
 
             /* 4. حارس المرمى: في أسفل الملعب داخل المرمى */
             html += `
-                <div class="pitch-row" style="margin-top: 4px;">
+                <div class="pitch-row" style="margin-top: 6px;">
                     <div class="fantasy-pitch-node" id="node-goalkeeper-0" onclick="handlePitchCardClick('goalkeeper', 0)">
                         <div class="fantasy-node-avatar" id="avatar-goalkeeper-0">
                             <i class="fa-solid fa-plus"></i>
