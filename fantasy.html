@@ -551,7 +551,7 @@
             to { opacity: 0; transform: translateY(-20px); }
         }
 
-        .pitch-row { display: flex; justify-content: center; gap: 35px; align-items: center; width: 100%; z-index: 5; min-height: auto; }
+        .pitch-row { display: flex; justify-content: center; gap: 20px; align-items: center; width: 100%; z-index: 5; min-height: auto; }
         .subs-horizontal-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; margin-top: 10px; }
         
         .sub-player-card {
@@ -588,20 +588,20 @@
         }
         .fantasy-pitch-node:hover { transform: scale(1.05); }
         
-        /* تكبير دائرة اللاعب حصرياً لتكون متناسقة مع الملعب الأكبر */
+        /* تم تصغير حجم دائرة اللاعب لتكون متناسقة وغير متداخلة */
         .fantasy-node-avatar {
-            width: 65px; height: 65px; border-radius: 50%; background: rgba(0,0,0,0.6);
+            width: 48px; height: 48px; border-radius: 50%; background: rgba(0,0,0,0.6);
             border: 2px dashed rgba(255,255,255,0.4); display: flex; align-items: center; justify-content: center;
-            font-size: 22px; color: #fff; position: relative; overflow: visible !important; box-shadow: 0 6px 14px rgba(0,0,0,0.6);
+            font-size: 16px; color: #fff; position: relative; overflow: visible !important; box-shadow: 0 4px 10px rgba(0,0,0,0.5);
         }
         .fantasy-node-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
         
-        /* تكبير اسم اللاعب وتحسين مظهره ليتناسب مع حجم الدائرة الجديد */
+        /* تصغير اسم اللاعب وتنسيقه بحجم مناسب */
         .fantasy-node-name {
-            background: rgba(0, 0, 0, 0.85); color: #fff; font-size: 12px; font-weight: 800;
-            padding: 3px 10px; border-radius: 6px; margin-top: 5px; white-space: nowrap; max-width: 130px;
-            overflow: hidden; text-overflow: ellipsis; border: 1px solid rgba(255,255,255,0.2);
-            text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.4);
+            background: rgba(0, 0, 0, 0.75); color: #fff; font-size: 10px; font-weight: 800;
+            padding: 2px 8px; border-radius: 5px; margin-top: 3px; white-space: nowrap; max-width: 100px;
+            overflow: hidden; text-overflow: ellipsis; border: 1px solid rgba(255,255,255,0.15);
+            text-align: center;
         }
         .fantasy-node-avatar i { display: none; }
         body.edit-mode-active .fantasy-pitch-node:not(.filled) .fantasy-node-avatar i { display: inline-block; }
@@ -620,10 +620,10 @@
             background: #ef4444;
             color: #ffffff;
             border: 2px solid var(--bg-body);
-            width: 24px;
-            height: 24px;
+            width: 22px;
+            height: 22px;
             border-radius: 50%;
-            font-size: 11px;
+            font-size: 10px;
             font-weight: 900;
             display: none;
             align-items: center;
@@ -734,19 +734,18 @@
             border: 1px solid var(--border-color);
         }
 
-        /* تكبير حجم الملعب وتوسعته ليكون أكبر ومناسب للشاشات واللابتوب، مع الاحتفاظ بالشكل الطولي المتناسق */
+        /* ملعب مستطيل طولي متناسق ومريح للعين */
         .fantasy-pitch-container {
             background: var(--pitch-bg);
             border-radius: 20px;
             border: 3px solid rgba(255,255,255,0.2);
-            padding: 22px 14px;
+            padding: 16px 10px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            width: 100%;
-            max-width: 520px;
+            max-width: 420px;
             margin: 0 auto;
-            aspect-ratio: 3 / 4.1;
+            aspect-ratio: 3/4;
             position: relative;
             margin-bottom: 20px;
             box-shadow: var(--shadow-lg);
@@ -754,9 +753,8 @@
 
         @media (min-width: 768px) {
             .fantasy-pitch-container {
-                max-width: 560px;
-                aspect-ratio: 3 / 4.1;
-                padding: 26px 18px;
+                aspect-ratio: 3 / 4;
+                max-width: 450px;
             }
         }
     </style>
@@ -994,7 +992,7 @@
                     </button>
                 </div>
 
-                <!-- حاوية الملعب المستطيل الطولي المكبر -->
+                <!-- حاوية الملعب المستطيل الطولي -->
                 <div class="fantasy-pitch-container" id="pitchContainerNodes">
                 </div>
 
@@ -1784,8 +1782,8 @@
 
             let html = '';
             
-            /* الهجوم: عند نص دائرة مستطيل المرمى الأمامي */
-            html += `<div class="pitch-row" style="margin-top: 10px;">`;
+            /* الهجوم: عند نص دائرة مستطيل مرمى الخصم (الأعلى) */
+            html += `<div class="pitch-row" style="margin-top: -5px;">`;
             for(let i=0; i<attCount; i++) {
                 html += `
                     <div class="fantasy-pitch-node" id="node-attack-${i}" onclick="handlePitchCardClick('attack', ${i})">
@@ -1800,7 +1798,7 @@
             html += `</div>`;
 
             /* الوسط: في منتصف الملعب تماماً */
-            html += `<div class="pitch-row" style="margin-top: 0px;">`;
+            html += `<div class="pitch-row" style="margin-top: 5px;">`;
             for(let i=0; i<midCount; i++) {
                 html += `
                     <div class="fantasy-pitch-node" id="node-midfield-${i}" onclick="handlePitchCardClick('midfield', ${i})">
@@ -1814,8 +1812,8 @@
             }
             html += `</div>`;
 
-            /* الدفاع: قرب نص دائرة مستطيل المرمى الخلفي */
-            html += `<div class="pitch-row" style="margin-top: 0px;">`;
+            /* الدفاع: عند نصف دائرة مستطيل المرمى (الأسفل) */
+            html += `<div class="pitch-row" style="margin-top: 5px;">`;
             for(let i=0; i<defCount; i++) {
                 html += `
                     <div class="fantasy-pitch-node" id="node-defense-${i}" onclick="handlePitchCardClick('defense', ${i})">
@@ -1829,9 +1827,9 @@
             }
             html += `</div>`;
 
-            /* حارس المرمى: مكانه الأصلي تماماً داخل المرمى */
+            /* حارس المرمى: مكانه الأصلي داخل المرمى */
             html += `
-                <div class="pitch-row" style="margin-top: 10px;">
+                <div class="pitch-row" style="margin-top: -2px;">
                     <div class="fantasy-pitch-node" id="node-goalkeeper-0" onclick="handlePitchCardClick('goalkeeper', 0)">
                         <div class="fantasy-node-avatar" id="avatar-goalkeeper-0">
                             <i class="fa-solid fa-plus"></i>
@@ -2139,7 +2137,7 @@
                         if (nodeEl && avatarEl && nameEl) {
                             if(player) {
                                 let isCap = userCaptain === player.name;
-                                avatarEl.innerHTML = `<img src="${player.photo || defaultPlayerImage}"> <span class="remove-player-btn" onclick="removePlayerFromPitch(event, '${zone}', ${index})">✕</span> ${isCap ? '<div style="position:absolute; top:-2px; right:-2px; background:#eab308; color:#000; font-size:10px; font-weight:bold; width:18px; height:18px; border-radius:50%; display:flex; align-items:center; justify-content:center; border:1px solid #fff;">C</div>' : ''}`;
+                                avatarEl.innerHTML = `<img src="${player.photo || defaultPlayerImage}"> <span class="remove-player-btn" onclick="removePlayerFromPitch(event, '${zone}', ${index})">✕</span> ${isCap ? '<div style="position:absolute; top:-2px; right:-2px; background:#eab308; color:#000; font-size:9px; font-weight:bold; width:16px; height:16px; border-radius:50%; display:flex; align-items:center; justify-content:center; border:1px solid #fff;">C</div>' : ''}`;
                                 nodeEl.classList.add('filled');
                                 nameEl.innerText = player.name;
                             } else {
