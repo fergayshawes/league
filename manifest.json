@@ -1,0 +1,15 @@
+{
+  "name": "فێرگەی وەرزشی شاوێس",
+  "short_name": "فێرگەی شاوێس",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#000000",
+  "icons": [
+    {
+      "src": "https://i.postimg.cc/yd079WZs/Logopit-1785006097680.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
