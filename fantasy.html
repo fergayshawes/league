@@ -588,18 +588,18 @@
         }
         .fantasy-pitch-node:hover { transform: scale(1.05); }
         
-        /* تم تصغير حجم دائرة اللاعب لتكون متناسقة وغير متداخلة */
+        /* حجم دائرة اللاعب صغير ومتناسق تماماً */
         .fantasy-node-avatar {
-            width: 48px; height: 48px; border-radius: 50%; background: rgba(0,0,0,0.6);
+            width: 44px; height: 44px; border-radius: 50%; background: rgba(0,0,0,0.6);
             border: 2px dashed rgba(255,255,255,0.4); display: flex; align-items: center; justify-content: center;
-            font-size: 16px; color: #fff; position: relative; overflow: visible !important; box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            font-size: 15px; color: #fff; position: relative; overflow: visible !important; box-shadow: 0 4px 10px rgba(0,0,0,0.5);
         }
         .fantasy-node-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
         
-        /* تصغير اسم اللاعب وتنسيقه بحجم مناسب */
+        /* اسم اللاعب بحجم صغير ومرتب */
         .fantasy-node-name {
             background: rgba(0, 0, 0, 0.75); color: #fff; font-size: 10px; font-weight: 800;
-            padding: 2px 8px; border-radius: 5px; margin-top: 3px; white-space: nowrap; max-width: 100px;
+            padding: 2px 8px; border-radius: 5px; margin-top: 3px; white-space: nowrap; max-width: 95px;
             overflow: hidden; text-overflow: ellipsis; border: 1px solid rgba(255,255,255,0.15);
             text-align: center;
         }
@@ -620,10 +620,10 @@
             background: #ef4444;
             color: #ffffff;
             border: 2px solid var(--bg-body);
-            width: 22px;
-            height: 22px;
+            width: 20px;
+            height: 20px;
             border-radius: 50%;
-            font-size: 10px;
+            font-size: 9px;
             font-weight: 900;
             display: none;
             align-items: center;
@@ -734,16 +734,16 @@
             border: 1px solid var(--border-color);
         }
 
-        /* ملعب مستطيل طولي متناسق ومريح للعين */
+        /* ملعب مستطيل طولي متناسق تماماً ومضبوط المساحات */
         .fantasy-pitch-container {
             background: var(--pitch-bg);
             border-radius: 20px;
             border: 3px solid rgba(255,255,255,0.2);
-            padding: 16px 10px;
+            padding: 14px 10px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            max-width: 420px;
+            max-width: 400px;
             margin: 0 auto;
             aspect-ratio: 3/4;
             position: relative;
@@ -754,7 +754,7 @@
         @media (min-width: 768px) {
             .fantasy-pitch-container {
                 aspect-ratio: 3 / 4;
-                max-width: 450px;
+                max-width: 430px;
             }
         }
     </style>
@@ -1782,8 +1782,8 @@
 
             let html = '';
             
-            /* الهجوم: عند نص دائرة مستطيل مرمى الخصم (الأعلى) */
-            html += `<div class="pitch-row" style="margin-top: -5px;">`;
+            /* 1. الهجوم: في الأعلى عند نص دائرة مستطيل مرمى الخصم */
+            html += `<div class="pitch-row" style="margin-top: 2px;">`;
             for(let i=0; i<attCount; i++) {
                 html += `
                     <div class="fantasy-pitch-node" id="node-attack-${i}" onclick="handlePitchCardClick('attack', ${i})">
@@ -1797,8 +1797,8 @@
             }
             html += `</div>`;
 
-            /* الوسط: في منتصف الملعب تماماً */
-            html += `<div class="pitch-row" style="margin-top: 5px;">`;
+            /* 2. الوسط: في منتصف الملعب تماماً على دائرة السنتر */
+            html += `<div class="pitch-row" style="margin-top: 0px;">`;
             for(let i=0; i<midCount; i++) {
                 html += `
                     <div class="fantasy-pitch-node" id="node-midfield-${i}" onclick="handlePitchCardClick('midfield', ${i})">
@@ -1812,8 +1812,8 @@
             }
             html += `</div>`;
 
-            /* الدفاع: عند نصف دائرة مستطيل المرمى (الأسفل) */
-            html += `<div class="pitch-row" style="margin-top: 5px;">`;
+            /* 3. الدفاع: في الأسفل عند نص دائرة مستطيل المرمى الخاص بفريقك */
+            html += `<div class="pitch-row" style="margin-top: 0px;">`;
             for(let i=0; i<defCount; i++) {
                 html += `
                     <div class="fantasy-pitch-node" id="node-defense-${i}" onclick="handlePitchCardClick('defense', ${i})">
@@ -1827,9 +1827,9 @@
             }
             html += `</div>`;
 
-            /* حارس المرمى: مكانه الأصلي داخل المرمى */
+            /* 4. حارس المرمى: في أسفل الملعب داخل المرمى */
             html += `
-                <div class="pitch-row" style="margin-top: -2px;">
+                <div class="pitch-row" style="margin-top: 2px;">
                     <div class="fantasy-pitch-node" id="node-goalkeeper-0" onclick="handlePitchCardClick('goalkeeper', 0)">
                         <div class="fantasy-node-avatar" id="avatar-goalkeeper-0">
                             <i class="fa-solid fa-plus"></i>
