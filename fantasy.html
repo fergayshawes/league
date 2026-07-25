@@ -733,6 +733,30 @@
             object-fit: cover;
             border: 1px solid var(--border-color);
         }
+
+        /* تعديل نسبة أبعاد الملعب لتكون مستطيلة على الشاشات الكبيرة ومتجاوبة على الموبايل */
+        .fantasy-pitch-container {
+            background: var(--pitch-bg);
+            border-radius: 20px;
+            border: 3px solid rgba(255,255,255,0.2);
+            padding: 25px 10px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            max-width: 600px;
+            margin: 0 auto;
+            aspect-ratio: 4/3;
+            position: relative;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow-lg);
+        }
+
+        @media (min-width: 768px) {
+            .fantasy-pitch-container {
+                aspect-ratio: 16 / 10;
+                max-width: 750px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -968,8 +992,8 @@
                     </button>
                 </div>
 
-                <!-- تم ضبط أبعاد الملعب هنا لتكون متناسقة ومتوازنة -->
-                <div class="fantasy-pitch-container" style="background: var(--pitch-bg); border-radius: 20px; border: 3px solid rgba(255,255,255,0.2); padding: 25px 10px; display: flex; flex-direction: column; justify-content: space-between; max-width: 600px; margin: 0 auto; aspect-ratio: 4/3; position: relative; margin-bottom: 20px; box-shadow: var(--shadow-lg);" id="pitchContainerNodes">
+                <!-- حاوية الملعب المستطيل -->
+                <div class="fantasy-pitch-container" id="pitchContainerNodes">
                 </div>
 
                 <button class="btn-action-submit-squad" id="btnFantasySubmitSquad" onclick="submitUserSquadFinal()" disabled>پشتڕاستکردنەوە و بەشداریکردن</button>
