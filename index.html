@@ -527,7 +527,6 @@
                 <div class="header-actions">
                     <button class="btn-header-icon" id="langToggleBtn" onclick="toggleLanguage()">کوردی</button>
                     <button class="btn-header-icon" id="themeToggleBtn" onclick="toggleTheme()"><i class="fa-solid fa-moon"></i></button>
-                    <a href="admin.html" class="btn-header-icon" id="lblAdminPanelLink" title="پانێڵی بەڕێوەبردن"><i class="fa-solid fa-gear"></i></a>
                 </div>
             </div>
             <ul>
@@ -946,10 +945,17 @@
     </script>
 
     <script>
+        // ----------------------------------------------------
+        // إعدادات إشعار التحديث:
+        // - اجعلها false حالياً ليبقى الإشعار مخفياً تماماً.
+        // - عندما تريد إظهاره مستقبلاً، قم بتغييرها إلى true وتغيير إصدار التحديث.
+        // ----------------------------------------------------
+        const SHOW_UPDATE_NOTICE = false; 
+        const CURRENT_UPDATE_VERSION = "v1.0"; 
+
         const langData = {
             ckb: {
                 brandName: "خولی فەرمی داتاکان",
-                adminTitle: "پانێڵی بەڕێوەبردن",
                 leaguesTitle: "ڕیزبەندی گشتی تیپەکان",
                 leaguesDesc: "داتای نوێکراوەی یارییەکان و خاڵەکان (کلیک لە ناوەکە بکە بۆ بینینی پێکهاتەی فەرمی)",
                 thRank: "ڕێز", thTeam: "تیپ", thPoints: "خاڵ",
@@ -968,7 +974,6 @@
             },
             ar: {
                 brandName: "دوري البيانات الرسمي",
-                adminTitle: "لوحة التحكم للإدارة",
                 leaguesTitle: "الترتيب العام للفرق",
                 leaguesDesc: "البيانات المحدثة للمباريات والنقاط (اضغط على اسم الفريق لرؤية التشكيلة الرسمية)",
                 thRank: "الترتيب", thTeam: "الفريق", thPoints: "النقاط",
@@ -999,9 +1004,12 @@
             const targetNav = document.getElementById("nav-" + savedPage);
             switchPage(savedPage, null, targetNav);
 
-            const hasSeenNotice = localStorage.getItem("cyberLeagueUpdateNotice");
-            if (!hasSeenNotice) {
-                document.getElementById("updateNoticeModal").classList.add("active");
+            // إظهار الإشعار فقط إذا كان المفتاح SHOW_UPDATE_NOTICE يساوي true وإذا لم يكن المستخدم قد شاهد هذا الإصدار من قبل
+            if (SHOW_UPDATE_NOTICE) {
+                const seenVersion = localStorage.getItem("cyberLeagueUpdateVersion");
+                if (seenVersion !== CURRENT_UPDATE_VERSION) {
+                    document.getElementById("updateNoticeModal").classList.add("active");
+                }
             }
         });
 
@@ -1018,7 +1026,6 @@
             
             const trans = langData[lang];
             document.getElementById("lblBrandName").innerText = trans.brandName;
-            document.getElementById("lblAdminPanelLink").setAttribute("title", trans.adminTitle);
             document.getElementById("lblLeagueTitle").innerText = trans.leaguesTitle;
             document.getElementById("lblLeagueDesc").innerText = trans.leaguesDesc;
             document.getElementById("thRank").innerText = trans.thRank;
@@ -1055,7 +1062,7 @@
 
         function closeUpdateModal() {
             document.getElementById("updateNoticeModal").classList.remove("active");
-            localStorage.setItem("cyberLeagueUpdateNotice", "true");
+            localStorage.setItem("cyberLeagueUpdateVersion", CURRENT_UPDATE_VERSION);
         }
 
         function filterPlayers() {
