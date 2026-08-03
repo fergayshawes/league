@@ -948,11 +948,6 @@
     </script>
 
     <script>
-        // ----------------------------------------------------
-        // إعدادات إشعار التحديث:
-        // - اجعلها false حالياً ليبقى الإشعار مخفياً تماماً.
-        // - عندما تريد إظهاره مستقبلاً، قم بتغييرها إلى true وتغيير إصدار التحديث.
-        // ----------------------------------------------------
         const SHOW_UPDATE_NOTICE = false; 
         const CURRENT_UPDATE_VERSION = "v1.0"; 
 
@@ -1089,9 +1084,13 @@
         }
     </script>
     <script>
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js');
-  }
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('sw.js')
+            .then((reg) => console.log('Service Worker registered: ', reg))
+            .catch((err) => console.log('Service Worker registration failed: ', err));
+        });
+      }
     </script>
 </body>
 </html>
