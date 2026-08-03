@@ -634,21 +634,25 @@
             display: flex;
         }
 
-        /* تعديل تصميم شريط التنقل في قسم البيع والشراء ليصبح أزرار بأيقونات فقط وبدون نصوص */
+        /* شريط التنقل في قسم البيع والشراء مثبت في الأعلى (Sticky) */
         .market-sub-nav {
             display: flex;
             justify-content: center;
             align-items: center;
             gap: 12px;
             margin-bottom: 15px;
-            padding: 6px;
+            padding: 8px 12px;
             background: var(--bg-sub);
             border-radius: 14px;
             border: 1px solid var(--border-color);
             width: fit-content;
             margin-left: auto;
             margin-right: auto;
-            box-shadow: var(--shadow-sm);
+            box-shadow: var(--shadow-md);
+            position: sticky;
+            top: 10px;
+            z-index: 100;
+            backdrop-filter: blur(8px);
         }
         .market-icon-tab {
             background: transparent;
@@ -1018,8 +1022,8 @@
                 </div>
             </div>
 
-            <!-- قسم المتجر بأيقونات فقط -->
-            <div id="fantasy-sub-market" class="fantasy-subpage" ontouchstart="handleTouchStart(event)" ontouchend="handleTouchEnd(event)" onmousedown="handleMouseDown(event)" onmouseup="handleMouseUp(event)">
+            <!-- قسم المتجر بدون سحب وبشريط ثابث في الأعلى -->
+            <div id="fantasy-sub-market" class="fantasy-subpage">
                 <div class="market-sub-nav">
                     <button class="market-icon-tab active" id="btnMarketTabBuy" onclick="switchMarketTab(0)" title="شراء اللاعبين">
                         <i class="fa-solid fa-cart-shopping"></i>
@@ -2341,38 +2345,6 @@
                 }
             );
         };
-
-        let touchStartX = 0;
-        let touchEndX = 0;
-        let mouseStartX = 0;
-        let mouseEndX = 0;
-
-        window.handleTouchStart = function(event) {
-            touchStartX = event.changedTouches[0].screenX;
-        };
-
-        window.handleTouchEnd = function(event) {
-            touchEndX = event.changedTouches[0].screenX;
-            handleSwipeGesture(touchStartX, touchEndX);
-        };
-
-        window.handleMouseDown = function(event) {
-            mouseStartX = event.clientX;
-        };
-
-        window.handleMouseUp = function(event) {
-            mouseEndX = event.clientX;
-            handleSwipeGesture(mouseStartX, mouseEndX);
-        };
-
-        function handleSwipeGesture(startX, endX) {
-            const threshold = 50;
-            if(endX > startX + threshold) {
-                switchMarketTab(1);
-            } else if(endX < startX - threshold) {
-                switchMarketTab(0);
-            }
-        }
 
         window.switchMarketTab = function(pageIndex) {
             currentMarketPageIndex = pageIndex;
