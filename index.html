@@ -592,6 +592,14 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
         import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
 
+        // تفعيل مراقبة الاتصال أوفلاين
+        window.addEventListener('offline', () => {
+            console.log('انقطع الإنترنت، يتم عرض البيانات المخزنة محلياً...');
+        });
+        window.addEventListener('online', () => {
+            console.log('عاد الاتصال بالإنترنت.');
+        });
+
         const firebaseConfig = {
             apiKey: "AIzaSyBhYee5yLdNN-ttq6dux8G0w8_vl-ald-g",
             authDomain: "league-aec67.firebaseapp.com",
