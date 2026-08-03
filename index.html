@@ -888,16 +888,8 @@
             domPlayersGrid.appendChild(listFragments);
         }
 
-        const dbRef = ref(db, '/');
-        onValue(dbRef, (snapshot) => {
-            const data = snapshot.val();
-            if (!data) {
-                // إذا لم توجد بيانات (أو انقطع الإنترنت)، أخفِ الـ Loader فوراً
-                const loader = document.getElementById("page-loader");
-                if(loader) loader.classList.add("fade-out");
-                return;
-            }
-
+        // دالة لتجهيز ومعالجة البيانات وعرضها
+        function processAndRenderData(data) {
             const matchesList = data.matchesDatabase ? Object.values(data.matchesDatabase) : [];
             const playersList = data.playersDatabase ? Object.values(data.playersDatabase) : [];
             squadsDatabase = data.squadsDatabase ? data.squadsDatabase : {};
@@ -938,29 +930,51 @@
             leaguesDatabase.forEach(t => { t.points = (t.wins * 3) + (t.draws * 1); });
             leaguesDatabase.sort((a, b) => b.points - a.points);
 
-            window.autoRefreshTranslations = function() {
-                autoRenderLeague(); 
-                autoRenderMatches(); 
-                autoRenderPlayersAndStats();
-            };
-            window.autoRefreshTranslations();
+            if(window.autoRefreshTranslations) window.autoRefreshTranslations();
 
-            setTimeout(() => {
+            const loader = document.getElementById("page-loader");
+            if(loader) loader.classList.add("fade-out");
+        }
+
+        const dbRef = ref(db, '/');
+        
+        // جلب البيانات الحية وحفظها محلياً للأوفلاين
+        onValue(dbRef, (snapshot) => {
+            const data = snapshot.val();
+            if (!data) {
                 const loader = document.getElementById("page-loader");
                 if(loader) loader.classList.add("fade-out");
-            }, 400);
+                return;
+            }
+
+            // حفظ النسخة الحالية في الذاكرة المحلية لاستخدامها عند انقطاع الإنترنت
+            localStorage.setItem('cyber_league_offline_data', JSON.stringify(data));
+
+            processAndRenderData(data);
         }, (error) => {
-            // في حال حدوث خطأ أو انقطاع في الاتصال، يتم إخفاء شاشة التحميل تلقائياً
-            console.log("خطأ في الاتصال، يتم تخطي التحميل...");
-            const loader = document.getElementById("page-loader");
-            if(loader) loader.classList.add("fade-out");
+            // في حالة انقطع الإنترنت، نقوم بقراءة البيانات المخزنة محلياً في localStorage وعرضها فوراً!
+            console.log("انقطع الإنترنت، جاري استرجاع البيانات المخزنة محلياً...");
+            const cachedData = localStorage.getItem('cyber_league_offline_data');
+            if (cachedData) {
+                processAndRenderData(JSON.parse(cachedData));
+            } else {
+                const loader = document.getElementById("page-loader");
+                if(loader) loader.classList.add("fade-out");
+            }
         });
 
-        // حماية إضافية: إخفاء شاشة التحميل كحد أقصى بعد ثانيتين لمنع تعليق الشاشة أوفلاين
+        // حماية إضافية أوفلاين: إذا لم يستجب جلب Firebase خلال ثانية ونصف، اعرض البيانات المخزنة محلياً فوراً
         setTimeout(() => {
-            const loader = document.getElementById("page-loader");
-            if(loader) loader.classList.add("fade-out");
-        }, 2000);
+            if (leaguesDatabase.length === 0) {
+                const cachedData = localStorage.getItem('cyber_league_offline_data');
+                if (cachedData) {
+                    processAndRenderData(JSON.parse(cachedData));
+                } else {
+                    const loader = document.getElementById("page-loader");
+                    if(loader) loader.classList.add("fade-out");
+                }
+            }
+        }, 1500);
     </script>
 
     <script>
@@ -1033,6 +1047,10 @@
             if (window.autoRefreshTranslations) window.autoRefreshTranslations();
         }
 
+        window.autoRefreshTranslations = function() {
+            // سيتم تحديث العرض تلقائياً
+        };
+
         function applyLanguage(lang) {
             document.documentElement.setAttribute("lang", lang);
             document.documentElement.setAttribute("dir", "rtl");
@@ -1102,9 +1120,7 @@
     <script>
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-          navigator.serviceWorker.register('sw.js')
-            .then((reg) => console.log('Service Worker registered: ', reg))
-            .catch((err) => console.log('Service Worker registration failed: ', err));
+          navigator.serviceWorker.register('sw.js');
         });
       }
     </script>
