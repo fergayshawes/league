@@ -929,45 +929,43 @@
             leaguesDatabase.forEach(t => { t.points = (t.wins * 3) + (t.draws * 1); });
             leaguesDatabase.sort((a, b) => b.points - a.points);
 
-            if(window.autoRefreshTranslations) window.autoRefreshTranslations();
+            autoRenderLeague(); 
+            autoRenderMatches(); 
+            autoRenderPlayersAndStats();
 
             const loader = document.getElementById("page-loader");
             if(loader) loader.classList.add("fade-out");
         }
 
-        // قراءة البيانات المخزنة محلياً وعرضها فوراً عند فتح الصفحة لمنع بقاء الشاشة فارغة
+        // 1. قراءة البيانات من الذاكرة المحلية أولاً فوراً لضمان عدم بقاء الشاشة فارغة أوفلاين
         const cachedData = localStorage.getItem('cyber_league_offline_data');
         if (cachedData) {
             try {
                 processAndRenderData(JSON.parse(cachedData));
-            } catch(e) {
-                console.log("Error loading cache");
-            }
+            } catch(e) {}
         }
 
+        // 2. جلب البيانات الحية وتحديثها من Firebase
         const dbRef = ref(db, '/');
         onValue(dbRef, (snapshot) => {
             const data = snapshot.val();
-            if (!data) {
+            if (data) {
+                localStorage.setItem('cyber_league_offline_data', JSON.stringify(data));
+                processAndRenderData(data);
+            } else {
                 const loader = document.getElementById("page-loader");
                 if(loader) loader.classList.add("fade-out");
-                return;
             }
-
-            // حفظ أحدث نسخة دائماً في الذاكرة المحلية
-            localStorage.setItem('cyber_league_offline_data', JSON.stringify(data));
-            processAndRenderData(data);
         }, (error) => {
-            console.log("العمل بوضع الأوفلاين عبر الذاكرة المحلية");
             const loader = document.getElementById("page-loader");
             if(loader) loader.classList.add("fade-out");
         });
 
-        // إخفاء الـ Loader حتماً بعد ثوانٍ قليلة لمنع أي تعليق
+        // حماية أخيرة لإخفاء شاشة التحميل إن حدث أي تأخير
         setTimeout(() => {
             const loader = document.getElementById("page-loader");
             if(loader) loader.classList.add("fade-out");
-        }, 1000);
+        }, 1500);
     </script>
 
     <script>
@@ -1024,6 +1022,13 @@
             const savedPage = localStorage.getItem("currentActivePage") || "leagues";
             const targetNav = document.getElementById("nav-" + savedPage);
             switchPage(savedPage, null, targetNav);
+
+            if (SHOW_UPDATE_NOTICE) {
+                const seenVersion = localStorage.getItem("cyberLeagueUpdateVersion");
+                if (seenVersion !== CURRENT_UPDATE_VERSION) {
+                    document.getElementById("updateNoticeModal").classList.add("active");
+                }
+            }
         });
 
         function toggleLanguage() {
@@ -1032,10 +1037,6 @@
             localStorage.setItem("appLang", currentLang);
             if (window.autoRefreshTranslations) window.autoRefreshTranslations();
         }
-
-        window.autoRefreshTranslations = function() {
-            // تحديث العرض تلقائياً
-        };
 
         function applyLanguage(lang) {
             document.documentElement.setAttribute("lang", lang);
@@ -1075,6 +1076,11 @@
         function updateThemeIcon(theme) {
             const btn = document.getElementById("themeToggleBtn");
             btn.innerHTML = theme === "dark" ? '<i class="fa-solid fa-moon"></i>' : '<i class="fa-solid fa-sun"></i>';
+        }
+
+        function closeUpdateModal() {
+            document.getElementById("updateNoticeModal").classList.remove("active");
+            localStorage.setItem("cyberLeagueUpdateVersion", CURRENT_UPDATE_VERSION);
         }
 
         function filterPlayers() {
