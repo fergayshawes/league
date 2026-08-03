@@ -281,7 +281,7 @@
 
         .table-container { overflow-x: auto; width: 100%; border-radius: 10px; }
         table { width: 100%; border-collapse: collapse; text-align: right; white-space: nowrap; }
-        th, td { padding: 15px 14px; font-size: 13px; }
+        th, td { padding: 15px 12px; font-size: 13px; }
         th { background-color: var(--bg-sub); color: var(--text-muted); font-weight: 600; border-bottom: 2px solid var(--border-color); }
         td { border-bottom: 1px solid var(--border-color); color: var(--text-main); }
         tr:hover td { background: rgba(255, 255, 255, 0.02); }
@@ -552,13 +552,15 @@
                     <table id="leagueTable">
                         <thead>
                             <tr>
-                                <th style="width: 60px; text-align: center;" id="thRank">ڕێز</th>
+                                <th style="width: 50px; text-align: center;" id="thRank">ڕێز</th>
                                 <th style="text-align: right;" id="thTeam">تیپ</th>
-                                <th style="text-align: center; width: 45px;">P</th>
-                                <th style="text-align: center; width: 45px;">W</th>
-                                <th style="text-align: center; width: 45px;">D</th>
-                                <th style="text-align: center; width: 45px;">L</th>
-                                <th style="text-align: left; width: 65px;" id="thPoints">خاڵ</th>
+                                <th style="text-align: center; width: 40px;">P</th>
+                                <th style="text-align: center; width: 40px;">W</th>
+                                <th style="text-align: center; width: 40px;">D</th>
+                                <th style="text-align: center; width: 40px;">L</th>
+                                <th style="text-align: center; width: 60px;">GF:GA</th>
+                                <th style="text-align: center; width: 50px;" id="thGD" title="فارق الأهداف">GD</th>
+                                <th style="text-align: left; width: 55px;" id="thPoints">خاڵ</th>
                             </tr>
                         </thead>
                         <tbody></tbody>
@@ -706,6 +708,10 @@
             if(!domLeagueTableBody) return; 
             let fragments = "";
             leaguesDatabase.forEach((t, i) => {
+                const gdVal = t.gf - t.ga;
+                const gdDisplay = gdVal > 0 ? `+${gdVal}` : gdVal;
+                const gdColor = gdVal > 0 ? '#10b981' : (gdVal < 0 ? '#ef4444' : 'var(--text-muted)');
+
                 fragments += `
                     <tr>
                         <td style="font-weight: bold; color: var(--text-muted); text-align: center;">${i + 1}</td>
@@ -718,6 +724,8 @@
                         <td style="text-align: center; color: #10b981; font-weight: 600;">${t.wins}</td>
                         <td style="text-align: center; color: var(--text-muted); font-weight: 600;">${t.draws}</td>
                         <td style="text-align: center; color: #ef4444; font-weight: 600;">${t.losses}</td>
+                        <td style="text-align: center; font-weight: 600; font-size: 11px;">${t.gf}:${t.ga}</td>
+                        <td style="text-align: center; font-weight: 800; color: ${gdColor};">${gdDisplay}</td>
                         <td style="text-align: left; font-weight: 800; font-size: 14px;">${t.points}</td>
                     </tr>
                 `;
@@ -912,14 +920,17 @@
 
             const defaultTeams = ["ژ", "ر", "ز", "د", "ن", "ج", "ۆ", "ت", "ب"];
             const standings = {};
-            defaultTeams.forEach(teamName => { standings[teamName] = { team: teamName, played: 0, wins: 0, draws: 0, losses: 0, points: 0 }; });
+            defaultTeams.forEach(teamName => { standings[teamName] = { team: teamName, played: 0, wins: 0, draws: 0, losses: 0, gf: 0, ga: 0, points: 0 }; });
 
             matchesList.forEach(m => {
                 if(m.status !== 'finished') return;
-                if(!standings[m.homeTeam]) standings[m.homeTeam] = { team: m.homeTeam, played: 0, wins: 0, draws: 0, losses: 0, points: 0 };
-                if(!standings[m.awayTeam]) standings[m.awayTeam] = { team: m.awayTeam, played: 0, wins: 0, draws: 0, losses: 0, points: 0 };
+                if(!standings[m.homeTeam]) standings[m.homeTeam] = { team: m.homeTeam, played: 0, wins: 0, draws: 0, losses: 0, gf: 0, ga: 0, points: 0 };
+                if(!standings[m.awayTeam]) standings[m.awayTeam] = { team: m.awayTeam, played: 0, wins: 0, draws: 0, losses: 0, gf: 0, ga: 0, points: 0 };
 
                 standings[m.homeTeam].played += 1; standings[m.awayTeam].played += 1;
+                standings[m.homeTeam].gf += Number(m.homeScore || 0); standings[m.homeTeam].ga += Number(m.awayScore || 0);
+                standings[m.awayTeam].gf += Number(m.awayScore || 0); standings[m.awayTeam].ga += Number(m.homeScore || 0);
+
                 if(Number(m.homeScore) > Number(m.awayScore)) { standings[m.homeTeam].wins += 1; standings[m.awayTeam].losses += 1; }
                 else if(Number(m.homeScore) < Number(m.awayScore)) { standings[m.awayTeam].wins += 1; standings[m.homeTeam].losses += 1; }
                 else { standings[m.homeTeam].draws += 1; standings[m.awayTeam].draws += 1; }
@@ -927,7 +938,15 @@
 
             leaguesDatabase = Object.values(standings);
             leaguesDatabase.forEach(t => { t.points = (t.wins * 3) + (t.draws * 1); });
-            leaguesDatabase.sort((a, b) => b.points - a.points);
+            
+            // ترتيب الجدول: أولاً النقاط، ثانياً فارق الأهداف (GF - GA)، ثالثاً الأهداف المسجلة (GF)
+            leaguesDatabase.sort((a, b) => {
+                if (b.points !== a.points) return b.points - a.points;
+                const diffA = a.gf - a.ga;
+                const diffB = b.gf - b.ga;
+                if (diffB !== diffA) return diffB - diffA;
+                return b.gf - a.gf;
+            });
 
             autoRenderLeague(); 
             autoRenderMatches(); 
